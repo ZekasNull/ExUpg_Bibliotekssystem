@@ -1,13 +1,16 @@
-CREATE TABLE IF NOT EXISTS "Film_Genre"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Film_Genre"
 (
     film_id  INTEGER NOT NULL
         CONSTRAINT "FK_Film_Genre.film_id"
-            REFERENCES "Film"
+            REFERENCES bibliotekssystem."Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
     genre_id INTEGER NOT NULL
         CONSTRAINT "FK_Film_Genre.genre_id"
-            REFERENCES "Genre"
+            REFERENCES bibliotekssystem."Genre"
             ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (film_id, genre_id)
 );
+
+ALTER TABLE bibliotekssystem."Film_Genre"
+    OWNER TO postgres;
 

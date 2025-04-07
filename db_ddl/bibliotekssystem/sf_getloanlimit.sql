@@ -1,9 +1,9 @@
-CREATE OR REPLACE FUNCTION sf_getloanlimit("användarid" INTEGER) RETURNS INTEGER
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_getloanlimit("användarid" integer) RETURNS integer
     LANGUAGE plpgsql
 AS
 $$
 DECLARE
-    loanlimit INT;
+    loanLimit INT;
 BEGIN
     SELECT ut.max_lån
     INTO loanlimit
@@ -14,4 +14,6 @@ BEGIN
     RETURN loanlimit;
 END;
 $$;
+
+ALTER FUNCTION bibliotekssystem.sf_getloanlimit(INTEGER) OWNER TO postgres;
 

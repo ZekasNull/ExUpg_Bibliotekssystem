@@ -1,6 +1,3 @@
--- Kan innehålla fel jämfört med individuella .sql filer men ska återskapa hela databasen på en gång
-create sequence "Användare_användar_id_seq";
-
 create table "Bok"
 (
     bok_id  integer generated always as identity
@@ -13,6 +10,9 @@ create table "Bok"
 
 comment on constraint bok_isbn_ak on "Bok" is 'ISBN är alltid unikt';
 
+alter table "Bok"
+    owner to postgres;
+
 create table "Ämnesord"
 (
     ord_id integer generated always as identity
@@ -23,6 +23,9 @@ create table "Ämnesord"
 );
 
 comment on constraint "Ämnesord_pk" on "Ämnesord" is 'Ämnesord måste vara unika';
+
+alter table "Ämnesord"
+    owner to postgres;
 
 create table "Bok_Ämnesord"
 (
@@ -37,6 +40,9 @@ create table "Bok_Ämnesord"
     primary key (ord_id, bok_id)
 );
 
+alter table "Bok_Ämnesord"
+    owner to postgres;
+
 create table "Författare"
 (
     författare_id integer generated always as identity
@@ -44,6 +50,9 @@ create table "Författare"
     förnamn       varchar(25) not null,
     efternamn     varchar(25) not null
 );
+
+alter table "Författare"
+    owner to postgres;
 
 create table "Bok_Författare"
 (
@@ -58,6 +67,9 @@ create table "Bok_Författare"
     primary key (bok_id, författare_id)
 );
 
+alter table "Bok_Författare"
+    owner to postgres;
+
 create table "Skådespelare"
 (
     skådespelare_id integer generated always as identity
@@ -65,6 +77,9 @@ create table "Skådespelare"
     förnamn         varchar(25) not null,
     efternamn       varchar(25) not null
 );
+
+alter table "Skådespelare"
+    owner to postgres;
 
 create table "Film"
 (
@@ -74,6 +89,9 @@ create table "Film"
     produktionsland varchar(30)       not null,
     åldersgräns     integer default 0 not null
 );
+
+alter table "Film"
+    owner to postgres;
 
 create table "Film_Skådespelare"
 (
@@ -88,6 +106,9 @@ create table "Film_Skådespelare"
     primary key (skådespelare_id, film_id)
 );
 
+alter table "Film_Skådespelare"
+    owner to postgres;
+
 create table "Regissör"
 (
     regissör_id integer generated always as identity
@@ -95,6 +116,9 @@ create table "Regissör"
     förnamn     varchar(25) not null,
     efternamn   varchar(25) not null
 );
+
+alter table "Regissör"
+    owner to postgres;
 
 create table "Film_Regissör"
 (
@@ -109,6 +133,9 @@ create table "Film_Regissör"
     primary key (film_id, regissör_id)
 );
 
+alter table "Film_Regissör"
+    owner to postgres;
+
 create table "Genre"
 (
     genre_id   integer generated always as identity
@@ -119,6 +146,9 @@ create table "Genre"
 );
 
 comment on constraint genre_pk on "Genre" is 'Genre måste vara unik';
+
+alter table "Genre"
+    owner to postgres;
 
 create table "Film_Genre"
 (
@@ -133,12 +163,18 @@ create table "Film_Genre"
     primary key (film_id, genre_id)
 );
 
+alter table "Film_Genre"
+    owner to postgres;
+
 create table "Användartyp"
 (
     användartyp varchar(10) not null
         primary key,
     max_lån     smallint    not null
 );
+
+alter table "Användartyp"
+    owner to postgres;
 
 create table "Användare"
 (
@@ -152,12 +188,14 @@ create table "Användare"
         constraint användare_pk
             unique,
     pin          varchar(4)  not null,
-    fullt_namn   varchar(50) not null
+    fullt_namn   varchar(50) not null,
+    efternamn    varchar(25) not null
 );
 
 comment on constraint användare_pk on "Användare" is 'Användarnamn måste vara unikt';
 
-alter sequence "Användare_användar_id_seq" owned by "Användare".användare_id;
+alter table "Användare"
+    owner to postgres;
 
 create table "Låneperiod"
 (
@@ -165,6 +203,9 @@ create table "Låneperiod"
         primary key,
     lånperiod interval    not null
 );
+
+alter table "Låneperiod"
+    owner to postgres;
 
 create table "Exemplar"
 (
@@ -186,6 +227,9 @@ create table "Exemplar"
         check (((film_id IS NULL) AND (bok_id IS NOT NULL)) OR ((bok_id IS NULL) AND (film_id IS NOT NULL)))
 );
 
+alter table "Exemplar"
+    owner to postgres;
+
 create table "Lån"
 (
     lån_id       integer generated always as identity
@@ -200,6 +244,38 @@ create table "Lån"
             on update cascade on delete cascade,
     lånedatum    timestamp default LOCALTIMESTAMP not null
 );
+
+alter table "Lån"
+    owner to postgres;
+
+create table "Tidsskrift"
+(
+    tidsskrift_id integer generated always as identity
+        primary key,
+    namn          varchar(25) not null
+        constraint tidsskrift_pk
+            unique
+);
+
+comment on constraint tidsskrift_pk on "Tidsskrift" is 'Tidsskriftens namn måste vara unikt';
+
+alter table "Tidsskrift"
+    owner to postgres;
+
+create table "Upplaga"
+(
+    upplaga_id    integer generated always as identity
+        primary key,
+    tidsskrift_id integer not null
+        constraint "FK_Upplaga.tidsskrift_id"
+            references "Tidsskrift"
+            on update cascade on delete restrict,
+    upplaga_nr    integer not null,
+    år            integer not null
+);
+
+alter table "Upplaga"
+    owner to postgres;
 
 create function sf_getloanlimit("användarid" integer) returns integer
     language plpgsql
@@ -218,6 +294,8 @@ BEGIN
 END;
 $$;
 
+alter function sf_getloanlimit(integer) owner to postgres;
+
 create function sf_getcurrentloanscount("användarid" integer) returns integer
     stable
     language plpgsql
@@ -235,6 +313,8 @@ BEGIN
 END;
 $$;
 
+alter function sf_getcurrentloanscount(integer) owner to postgres;
+
 create function check_loan_limit() returns trigger
     language plpgsql
 as
@@ -251,9 +331,34 @@ BEGIN
 END;
 $$;
 
+alter function check_loan_limit() owner to postgres;
+
 create trigger check_loan_limit_trigger
     before insert
     on "Lån"
     for each row
 execute procedure check_loan_limit();
+
+create function get_return_date(loan_id integer) returns date
+    language plpgsql
+as
+$$
+DECLARE
+    return_date DATE;
+BEGIN
+    SELECT
+        l.lånedatum + lp.lånperiod
+    INTO return_date
+    FROM
+        "Lån" l
+            JOIN "Exemplar" e ON l.streckkod = e.streckkod
+            JOIN "Låneperiod" lp ON e.låntyp = lp.låntyp
+    WHERE
+        l.streckkod = loan_id;
+
+    RETURN return_date;
+END;
+$$;
+
+alter function get_return_date(integer) owner to postgres;
 

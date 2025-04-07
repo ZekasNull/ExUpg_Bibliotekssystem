@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION check_loan_limit() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION bibliotekssystem.check_loan_limit() RETURNS trigger
     LANGUAGE plpgsql
 AS
 $$
@@ -13,3 +13,6 @@ BEGIN
     RETURN new;
 END;
 $$;
+
+ALTER FUNCTION bibliotekssystem.check_loan_limit() OWNER TO postgres;
+

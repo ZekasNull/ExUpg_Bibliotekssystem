@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "Film"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Film"
 (
     film_id         INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -6,4 +6,7 @@ CREATE TABLE IF NOT EXISTS "Film"
     produktionsland VARCHAR(30)       NOT NULL,
     åldersgräns     INTEGER DEFAULT 0 NOT NULL
 );
+
+ALTER TABLE bibliotekssystem."Film"
+    OWNER TO postgres;
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="097ce112-6847-45b7-b481-e07131df0f45" name="postgres@localhost Mapping">
+      <data-sources db="64b3cfe8-ad7b-4858-b113-fc5ed1e1f99a" ddl="c6b0f654-cf0b-42e8-ab5e-f1e522ac90e3" />
+    </mapping>
+    <mapping uuid="18fa855e-95d1-4ebe-91ec-2e329dd6aebd" name="pain@localhost (DDL) Mapping">
+      <data-sources db="64b3cfe8-ad7b-4858-b113-fc5ed1e1f99a" ddl="90f3a875-1c89-4b67-a955-f0fd4cf0f0c2" />
+      <scope>
+        <node kind="database" qname="d0024e">
+          <node kind="schema" qname="bibliotekssystem" />
+        </node>
+      </scope>
+    </mapping>
+  </component>
+  <component name="SqlDataSourceStorage">
+    <option name="dataSources">
+      <list>
+        <State>
+          <option name="id" value="4c943333-5222-4d8d-8c0a-7a769f448fa8" />
+          <option name="name" value="postgres@localhost (DDL)" />
+          <option name="dbmsName" value="POSTGRES" />
+          <option name="urls">
+            <array>
+              <option value="file://$PROJECT_DIR$/db_ddl" />
+            </array>
+          </option>
+          <option name="remarks" value="Bibliotekssystemets DDL" />
+          <option name="outLayout" value="File per object by schema.groovy" />
+          <option name="scriptOptions">
+            <map>
+              <entry key="CreateIfNotExists" value="1" />
+              <entry key="CreateOrReplace" value="1" />
+              <entry key="QualifyWithSchema" value="ALWAYS" />
+            </map>
+          </option>
+          <option name="scopes">
+            <map>
+              <entry key="$PROJECT_DIR$/db_ddl" value="d0024e" />
+            </map>
+          </option>
+        </State>
+      </list>
+    </option>
+  </component>
+</project>

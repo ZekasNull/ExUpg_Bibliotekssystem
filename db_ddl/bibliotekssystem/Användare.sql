@@ -10,8 +10,7 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Användare"
         CONSTRAINT användare_pk
             UNIQUE,
     pin          VARCHAR(4)  NOT NULL,
-    fullt_namn   VARCHAR(50) NOT NULL,
-    efternamn    VARCHAR(25) NOT NULL
+    fullt_namn   VARCHAR(50) NOT NULL
 );
 
 COMMENT ON CONSTRAINT användare_pk ON bibliotekssystem."Användare" IS 'Användarnamn måste vara unikt';

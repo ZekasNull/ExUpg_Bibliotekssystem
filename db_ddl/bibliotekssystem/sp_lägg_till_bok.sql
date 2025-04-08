@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE bibliotekssystem.sp_add_book_with_keywords_and_author(IN p_bok_titel text, IN p_isbn_13 character varying, IN "p_ämnesord_arr" text[], IN "p_förf_förnamn" character varying, IN "p_förf_efternamn" character varying, OUT status_kod integer, OUT status_meddelande text)
+CREATE OR REPLACE PROCEDURE bibliotekssystem.sp_lägg_till_bok(IN p_bok_titel text, IN p_isbn_13 character varying, IN "p_ämnesord_arr" text[], IN "p_förf_förnamn" character varying, IN "p_förf_efternamn" character varying, OUT status_kod integer, OUT status_meddelande text)
     LANGUAGE plpgsql
 AS
 $$
@@ -75,7 +75,7 @@ EXCEPTION
         -- hantera om isbn inte är unikt
         IF debug_constraint = 'bok_isbn_ak' THEN
             status_kod := 1;
-            status_meddelande := 'Detta ISBN-13 (' || p_isbn_13 || ') finns redan i databasen';
+            status_meddelande := 'Detta ISBN-13 (' || p_isbn_13 || ') finns redan i databasen.';
         END IF;
         ROLLBACK;
 END;

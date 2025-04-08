@@ -17,5 +17,5 @@ CREATE TRIGGER check_loan_limit_trigger
     BEFORE INSERT
     ON bibliotekssystem."Lån"
     FOR EACH ROW
-EXECUTE PROCEDURE bibliotekssystem.check_loan_limit();
+EXECUTE PROCEDURE bibliotekssystem.st_check_loan_limit();
 

@@ -13,9 +13,6 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Lån"
     lånedatum    TIMESTAMP DEFAULT LOCALTIMESTAMP NOT NULL
 );
 
-ALTER TABLE bibliotekssystem."Lån"
-    OWNER TO postgres;
-
 CREATE TRIGGER check_loan_limit_trigger
     BEFORE INSERT
     ON bibliotekssystem."Lån"

@@ -5,6 +5,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Låneperiod"
     lånperiod INTERVAL    NOT NULL
 );
 
-ALTER TABLE bibliotekssystem."Låneperiod"
-    OWNER TO postgres;
-

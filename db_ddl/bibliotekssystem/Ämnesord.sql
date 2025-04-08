@@ -9,6 +9,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Ämnesord"
 
 COMMENT ON CONSTRAINT "Ämnesord_pk" ON bibliotekssystem."Ämnesord" IS 'Ämnesord måste vara unika';
 
-ALTER TABLE bibliotekssystem."Ämnesord"
-    OWNER TO postgres;
-

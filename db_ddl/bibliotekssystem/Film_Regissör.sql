@@ -11,6 +11,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Film_Regissör"
     PRIMARY KEY (film_id, regissör_id)
 );
 
-ALTER TABLE bibliotekssystem."Film_Regissör"
-    OWNER TO postgres;
-

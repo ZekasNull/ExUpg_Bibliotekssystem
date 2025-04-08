@@ -15,5 +15,3 @@ BEGIN
 END;
 $$;
 
-ALTER FUNCTION bibliotekssystem.sf_getcurrentloanscount(INTEGER) OWNER TO postgres;
-

@@ -5,6 +5,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Användartyp"
     max_lån     SMALLINT    NOT NULL
 );
 
-ALTER TABLE bibliotekssystem."Användartyp"
-    OWNER TO postgres;
-

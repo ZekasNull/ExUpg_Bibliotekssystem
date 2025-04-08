@@ -7,6 +7,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Film"
     åldersgräns     INTEGER DEFAULT 0 NOT NULL
 );
 
-ALTER TABLE bibliotekssystem."Film"
-    OWNER TO postgres;
-

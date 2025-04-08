@@ -18,6 +18,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Exemplar"
         CHECK (((film_id IS NULL) AND (bok_id IS NOT NULL)) OR ((bok_id IS NULL) AND (film_id IS NOT NULL)))
 );
 
-ALTER TABLE bibliotekssystem."Exemplar"
-    OWNER TO postgres;
-

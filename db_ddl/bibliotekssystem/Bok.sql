@@ -10,6 +10,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Bok"
 
 COMMENT ON CONSTRAINT bok_isbn_ak ON bibliotekssystem."Bok" IS 'ISBN är alltid unikt';
 
-ALTER TABLE bibliotekssystem."Bok"
-    OWNER TO postgres;
-

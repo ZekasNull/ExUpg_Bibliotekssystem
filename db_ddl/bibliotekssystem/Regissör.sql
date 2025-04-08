@@ -6,6 +6,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Regissör"
     efternamn   VARCHAR(25) NOT NULL
 );
 
-ALTER TABLE bibliotekssystem."Regissör"
-    OWNER TO postgres;
-

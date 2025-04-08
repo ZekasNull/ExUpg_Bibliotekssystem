@@ -9,6 +9,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Genre"
 
 COMMENT ON CONSTRAINT genre_pk ON bibliotekssystem."Genre" IS 'Genre måste vara unik';
 
-ALTER TABLE bibliotekssystem."Genre"
-    OWNER TO postgres;
-

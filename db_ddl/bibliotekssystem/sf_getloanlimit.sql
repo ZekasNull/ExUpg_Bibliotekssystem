@@ -15,5 +15,3 @@ BEGIN
 END;
 $$;
 
-ALTER FUNCTION bibliotekssystem.sf_getloanlimit(INTEGER) OWNER TO postgres;
-

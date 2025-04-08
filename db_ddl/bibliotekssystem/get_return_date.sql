@@ -19,5 +19,3 @@ BEGIN
 END;
 $$;
 
-ALTER FUNCTION bibliotekssystem.get_return_date(INTEGER) OWNER TO postgres;
-

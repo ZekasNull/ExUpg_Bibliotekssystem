@@ -16,6 +16,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Användare"
 
 COMMENT ON CONSTRAINT användare_pk ON bibliotekssystem."Användare" IS 'Användarnamn måste vara unikt';
 
-ALTER TABLE bibliotekssystem."Användare"
-    OWNER TO postgres;
-

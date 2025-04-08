@@ -14,5 +14,3 @@ BEGIN
 END;
 $$;
 
-ALTER FUNCTION bibliotekssystem.check_loan_limit() OWNER TO postgres;
-

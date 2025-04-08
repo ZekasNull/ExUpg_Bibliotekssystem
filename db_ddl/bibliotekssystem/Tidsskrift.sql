@@ -9,6 +9,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Tidsskrift"
 
 COMMENT ON CONSTRAINT tidsskrift_pk ON bibliotekssystem."Tidsskrift" IS 'Tidsskriftens namn måste vara unikt';
 
-ALTER TABLE bibliotekssystem."Tidsskrift"
-    OWNER TO postgres;
-

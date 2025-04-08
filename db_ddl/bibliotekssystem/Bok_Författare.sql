@@ -11,6 +11,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Bok_Författare"
     PRIMARY KEY (bok_id, författare_id)
 );
 
-ALTER TABLE bibliotekssystem."Bok_Författare"
-    OWNER TO postgres;
-

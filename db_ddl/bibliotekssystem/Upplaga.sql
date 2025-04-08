@@ -10,6 +10,3 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Upplaga"
     år            INTEGER NOT NULL
 );
 
-ALTER TABLE bibliotekssystem."Upplaga"
-    OWNER TO postgres;
-

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/db/lookup_table_constants.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Genre.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/db_ddl/lookup_table_constants.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sp_add_book_with_keywords_and_author.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>

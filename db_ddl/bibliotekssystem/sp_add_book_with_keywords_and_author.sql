@@ -1,10 +1,4 @@
-CREATE OR REPLACE PROCEDURE bibliotekssystem.sp_add_book_with_keywords_and_author(IN p_bok_titel TEXT,
-                                                                                  IN p_isbn_13 CHARACTER VARYING,
-                                                                                  IN "p_ämnesord_arr" TEXT[],
-                                                                                  IN "p_förf_förnamn" CHARACTER VARYING,
-                                                                                  IN "p_förf_efternamn" CHARACTER VARYING,
-                                                                                  OUT "status_kod" INT,
-                                                                                  OUT "status_meddelande" TEXT)
+CREATE OR REPLACE PROCEDURE bibliotekssystem.sp_add_book_with_keywords_and_author(IN p_bok_titel text, IN p_isbn_13 character varying, IN "p_ämnesord_arr" text[], IN "p_förf_förnamn" character varying, IN "p_förf_efternamn" character varying, OUT status_kod integer, OUT status_meddelande text)
     LANGUAGE plpgsql
 AS
 $$
@@ -83,6 +77,7 @@ EXCEPTION
             status_kod := 1;
             status_meddelande := 'Detta ISBN-13 (' || p_isbn_13 || ') finns redan i databasen';
         END IF;
+        ROLLBACK;
 END;
 $$;
 

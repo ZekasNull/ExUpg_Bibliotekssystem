@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="205.0" prefWidth="237.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="d0024e.exupg_bibliotekssystem.UserFirstViewController">
+   <children>
+      <Button fx:id="goBackButton" mnemonicParsing="false" onAction="#goBackToViewChoice" prefHeight="22.0" prefWidth="85.0" text="Return">
+         <VBox.margin>
+            <Insets left="75.0" top="80.0" />
+         </VBox.margin>
+      </Button>
+   </children>
+</VBox>

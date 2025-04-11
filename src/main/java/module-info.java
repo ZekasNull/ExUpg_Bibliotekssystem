@@ -10,6 +10,7 @@ module d0024e.exupg_bibliotekssystem {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires jdk.compiler;
 
     opens d0024e.exupg_bibliotekssystem to javafx.fxml;
     exports d0024e.exupg_bibliotekssystem;

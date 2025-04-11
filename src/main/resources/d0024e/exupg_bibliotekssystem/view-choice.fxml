@@ -9,7 +9,22 @@
     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
   </padding>
 
-  <Label prefHeight="22.0" prefWidth="131.0" text="Please choose a view: " />
-  <Button fx:id="goToUserFirstViewButton" onAction="#onUserButtonClick" text="User" />
-   <Button layoutX="56.0" layoutY="67.0" text="Librarian" />
+  <Label prefHeight="22.0" prefWidth="131.0" text="Please choose a view: ">
+      <VBox.margin>
+         <Insets left="10.0" />
+      </VBox.margin></Label>
+   <HBox prefHeight="100.0" prefWidth="200.0">
+      <children>
+         <Button text="Librarian">
+            <HBox.margin>
+               <Insets left="20.0" top="30.0" />
+            </HBox.margin>
+         </Button>
+        <Button fx:id="goToUserFirstViewButton" onAction="#onUserButtonClick" text="User">
+            <HBox.margin>
+               <Insets left="50.0" top="30.0" />
+            </HBox.margin>
+         </Button>
+      </children>
+   </HBox>
 </VBox>

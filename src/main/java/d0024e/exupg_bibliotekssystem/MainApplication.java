@@ -26,6 +26,7 @@ public class MainApplication extends Application {
         e.printStackTrace();
         }
     }
+    TODO: Add in prompt to check if user is logged in? - Should be done in controllers
     * */
     public static void openViewChoice() {
         try{
@@ -56,6 +57,30 @@ public class MainApplication extends Application {
             primaryStage.show();
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openUserSearchView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-search-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Search View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openUserLoginView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-login-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Login View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
             e.printStackTrace();
         }
     }

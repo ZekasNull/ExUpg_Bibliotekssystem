@@ -3,12 +3,24 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="205.0" prefWidth="237.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="d0024e.exupg_bibliotekssystem.UserFirstViewController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="224.0" prefWidth="237.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="d0024e.exupg_bibliotekssystem.UserFirstViewController">
    <children>
-      <Button fx:id="goBackButton" mnemonicParsing="false" onAction="#goBackToViewChoice" prefHeight="22.0" prefWidth="85.0" text="Return">
+      <TextFlow prefHeight="38.0" prefWidth="237.0" />
+      <Pane prefHeight="107.0" prefWidth="237.0">
+         <children>
+            <Button layoutX="93.0" layoutY="68.0" mnemonicParsing="false" text="Return" />
+            <Button fx:id="loginButton"  layoutX="144.0" layoutY="16.0" mnemonicParsing="false" onAction="#onUserGoToLoanViewChoiceClick"  text="Loan" />
+            <Button fx:id="searchButton" layoutX="41.0" layoutY="16.0" mnemonicParsing="false" onAction="#onUserGoToSearchViewChoiceClick" text="Search" />
+         </children>
          <VBox.margin>
-            <Insets left="75.0" top="80.0" />
+            <Insets top="20.0" />
+         </VBox.margin>
+      </Pane>
+      <Button fx:id="goBackButton" mnemonicParsing="false" onAction="#onUserGoBackToViewChoiceClick" prefHeight="22.0" prefWidth="85.0" text="Go back">
+         <VBox.margin>
+            <Insets left="75.0" top="15.0" />
          </VBox.margin>
       </Button>
    </children>

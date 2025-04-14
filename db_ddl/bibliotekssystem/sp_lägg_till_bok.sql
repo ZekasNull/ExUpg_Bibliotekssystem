@@ -4,6 +4,7 @@ AS
 $$
 DECLARE
     -- Instansvariabler prefix med f för funktion
+    -- FIXME klarar för närvarande inte om boken har flera författare - bör uppdateras till att hantera det.
     f_bok_id         INT;
     f_ämnesord       TEXT;
     f_ämnesord_id    INT;
@@ -68,6 +69,7 @@ BEGIN
     RAISE NOTICE 'Proceduren lyckades'; -- endast db-konsol
 
 EXCEPTION
+    -- TODO bör kanske skriva i sina outputs om andra fel än bok_isbn_ak inträffar.
     WHEN UNIQUE_VIOLATION THEN
         GET STACKED DIAGNOSTICS
             debug_constraint = CONSTRAINT_NAME;

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION bibliotekssystem.get_return_date(loan_id integer) RETURNS date
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_get_return_date(loan_id integer) RETURNS date
     LANGUAGE plpgsql
 AS
 $$

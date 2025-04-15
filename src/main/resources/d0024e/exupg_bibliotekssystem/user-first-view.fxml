@@ -10,7 +10,7 @@
       <TextFlow prefHeight="38.0" prefWidth="237.0" />
       <Pane prefHeight="107.0" prefWidth="237.0">
          <children>
-            <Button layoutX="93.0" layoutY="68.0" mnemonicParsing="false" text="Return" />
+            <Button fx:id="returnButton" layoutX="93.0" layoutY="68.0" mnemonicParsing="false" onAction="#onUserGoToReturnViewChoiceClick" text="Return" />
             <Button fx:id="loginButton"  layoutX="144.0" layoutY="16.0" mnemonicParsing="false" onAction="#onUserGoToLoanViewChoiceClick"  text="Loan" />
             <Button fx:id="searchButton" layoutX="41.0" layoutY="16.0" mnemonicParsing="false" onAction="#onUserGoToSearchViewChoiceClick" text="Search" />
          </children>

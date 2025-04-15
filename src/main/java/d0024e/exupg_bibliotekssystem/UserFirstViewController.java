@@ -7,10 +7,12 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 public class UserFirstViewController {
+    //TODO: Check if the user is logged in (after loan) and add a log out button, alt always log the user out after a loan
 
     @FXML
     public Button searchButton;
     public Button loginButton;
+    public Button returnButton;
     @FXML
     private Button goBackButton;
 
@@ -34,5 +36,12 @@ public class UserFirstViewController {
         currentStage.close();
 
         MainApplication.openUserLoginView();
+    }
+
+    public void onUserGoToReturnViewChoiceClick(ActionEvent event) {
+        Stage currentStage = (Stage) returnButton.getScene().getWindow();
+        currentStage.close();
+
+        MainApplication.openUserReturnView();
     }
 }

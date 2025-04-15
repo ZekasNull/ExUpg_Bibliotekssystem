@@ -10,5 +10,7 @@ public class UserLoanConfirmationController {
     public void onUserContinueToRecieptButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) ContinueToRecieptButton.getScene().getWindow();
         currentStage.close();
+
+        MainApplication.openUserRecieptView();
     }
 }

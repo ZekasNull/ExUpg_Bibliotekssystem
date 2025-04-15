@@ -109,7 +109,54 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
+    public static void openUserRecieptView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-reciept-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Reciept View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
 
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openUserReturnView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-return-register-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Return View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openUserReturnConfirmationView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-return-confirmation-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Return Confirmation View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openUserReturnLastView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-return-last-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Return Last View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public static void main(String[] args) {
         launch();
     }

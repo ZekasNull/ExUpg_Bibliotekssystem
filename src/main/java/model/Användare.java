@@ -1,4 +1,4 @@
-package test;
+package model;
 
 import javax.persistence.*;
 
@@ -6,10 +6,13 @@ import javax.persistence.*;
 @Table(name = "\"Användare\"", schema = "bibliotekssystem")
 public class Användare {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Användare_id_gen")
-    @SequenceGenerator(name = "Användare_id_gen", sequenceName = "Användare_användare_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "\"användare_id\"", nullable = false)
     private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "\"användartyp\"", nullable = false)
+    private Användartyp användartyp;
 
     @Column(name = "\"användarnamn\"", nullable = false, length = 10)
     private String användarnamn;
@@ -26,6 +29,14 @@ public class Användare {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Användartyp getAnvändartyp() {
+        return användartyp;
+    }
+
+    public void setAnvändartyp(Användartyp användartyp) {
+        this.användartyp = användartyp;
     }
 
     public String getAnvändarnamn() {

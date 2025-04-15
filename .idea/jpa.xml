@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JpaBuddyIdeaProjectConfig" ddlActionDbType="postgres">
-    <option name="reLastEntityCreationPackage" value="src/main/java/test" />
+    <option name="reLastEntityCreationPackage" value="src/main/java/model" />
     <option name="reverseEngineeringLastDbConnectionId" value="64b3cfe8-ad7b-4858-b113-fc5ed1e1f99a" />
   </component>
 </project>

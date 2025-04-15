@@ -9,8 +9,20 @@
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <!-- Klasser -->
 
-    <class>test.Användartyp</class>
-    <class>test.Användare</class>
+    <class>model.Användare</class>
+    <class>model.Användartyp</class>
+    <class>model.Bok</class>
+    <class>model.Film</class>
+    <class>model.Exemplar</class>
+    <class>model.Författare</class>
+    <class>model.Genre</class>
+    <class>model.Lån</class>
+    <class>model.Låneperiod</class>
+    <class>model.Regissör</class>
+    <class>model.Skådespelare</class>
+    <class>model.Tidsskrift</class>
+    <class>model.Upplaga</class>
+    <class>model.Ämnesord</class>
     <!-- Database Connection Settings -->
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/d0024e"/>

@@ -11,8 +11,11 @@ module d0024e.exupg_bibliotekssystem {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires jdk.compiler;
-    requires java.persistence;
+    requires java.persistence; //fixme ambiguous
 
-    opens d0024e.exupg_bibliotekssystem to javafx.fxml;
+    opens test to org.hibernate.orm.core;
+    exports test;
+
     exports d0024e.exupg_bibliotekssystem;
+    opens d0024e.exupg_bibliotekssystem to javafx.fxml, javafx.graphics;
 }

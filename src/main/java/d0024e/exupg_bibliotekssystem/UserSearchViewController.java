@@ -1,5 +1,6 @@
 package d0024e.exupg_bibliotekssystem;
 
+import com.sun.tools.javac.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -21,10 +22,12 @@ public class UserSearchViewController {
     }
 
     @FXML
-    public void onUserSearchClick(ActionEvent event) throws Exception {
+    public void onUserSearchForObjectButtonClick(ActionEvent event) throws Exception {
         Stage currentStage = (Stage) searchForObjectButton.getScene().getWindow();
-        /* TODO:
-         * Connect the search bar as a "requirement" for the button to base it's search on
-         * */
+        currentStage.close();
+
+        MainApplication.openUserSearchResultView();
+        // TODO: Connect the search bar as a "requirement" for the button to base it's search on
+
     }
 }

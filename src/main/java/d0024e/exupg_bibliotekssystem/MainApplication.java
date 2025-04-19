@@ -28,6 +28,7 @@ public class MainApplication extends Application {
     }
     TODO: Add in prompt to check if user is logged in? - Should be done in controllers
     TODO: Se till så allt matchar med hur jag namngivit det (man kan tro att det är olika personer ibland)
+    Kolla Eventhandler TipCalculator, anonymous inner class Tiplabel.setTitle, eller med Lambda, lambda är att föredra
     * */
     public static void openViewChoice() {
         try{
@@ -150,6 +151,30 @@ public class MainApplication extends Application {
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-return-last-view.fxml"));
             Scene scene = new Scene(loader.load());
             primaryStage.setTitle("User Return Last View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openUserSearchResultView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-search-result-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Search Result View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openUserSearchResultDetailsView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-search-result-details-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("User Search Result Details View");
             primaryStage.setScene(scene);
             primaryStage.show();
 

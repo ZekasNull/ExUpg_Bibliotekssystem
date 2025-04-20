@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="d0024e.exupg_bibliotekssystem.LibrarianFirstChoiceViewController">
+   <children>
+      <Button fx:id="GoToHandleUserViewButton" layoutX="379.0" layoutY="268.0" mnemonicParsing="false" onAction="#onLibrarianGoToHandleUserViewButtonClick" text="Handle users" />
+      <Button fx:id="GoToHandleInventoryViewButton" layoutX="117.0" layoutY="281.0" mnemonicParsing="false" onAction="#onUserGoToHandleInventoryViewButtonClick" text="Handle inventory" />
+      <Button layoutX="369.0" layoutY="122.0" mnemonicParsing="false" text="Loan?" />
+      <Button layoutX="133.0" layoutY="122.0" mnemonicParsing="false" text="Search?" />
+   </children>
+</AnchorPane>

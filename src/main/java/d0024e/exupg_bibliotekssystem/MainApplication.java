@@ -182,6 +182,66 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
+    public static void openLibrarianLoginView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-login-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Librarian Login View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openLibrarianFirstChoiceView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-first-choice-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Librarian First Choice View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openLibrarianHandleUserChoiceView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-handle-user-choice-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Librarian Handle User Choice View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openLibrarianChangeUserInformationView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-change-user-information.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Librarian Change User Information View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void openLibrarianDeleteUserView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-delete-user-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Librarian Delete User View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public static void main(String[] args) {
         launch();
     }

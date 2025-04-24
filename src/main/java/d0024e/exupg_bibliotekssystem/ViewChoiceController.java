@@ -4,9 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import state.ApplicationState;
 
 public class ViewChoiceController {
-
+    public ApplicationState state;
     public Button GoToLibrarianLoginViewButton;
     @FXML
     private Button goToUserFirstViewButton;
@@ -16,13 +17,13 @@ public class ViewChoiceController {
         Stage currentStage = (Stage) goToUserFirstViewButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserFirstView();
+        state.app.openUserFirstView();
     }
 
     public void onLibraryGoToLibrarianLoginViewButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) goToUserFirstViewButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openLibrarianLoginView();
+        state.app.openLibrarianLoginView();
     }
 }

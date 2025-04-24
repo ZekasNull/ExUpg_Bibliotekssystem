@@ -1,16 +1,52 @@
 package d0024e.exupg_bibliotekssystem;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import state.ApplicationState;
 
-public class LibrarianLoginViewController {
+import java.util.Observable;
+import java.util.Observer;
+
+public class LibrarianLoginViewController implements Observer {
+
+
+    private ApplicationState state;
+
+    @FXML
+    private TextField emailBoxContents;
+
+    @FXML
+    private PasswordField passwordBoxContents;
+
     public Button LogInLibrarianButton;
 
     public void onLibrarianLogInLibrarianButtonClick(ActionEvent event) {
-        Stage currentStage = (Stage) LogInLibrarianButton.getScene().getWindow();
-        currentStage.close();
+        state.databaseService.logInLibrarian(emailBoxContents.getText(), passwordBoxContents.getText());
 
-        MainApplication.openLibrarianFirstChoiceView();
+
+        //FIXME deaktiverad i testsyfte
+        /*Stage currentStage = (Stage) LogInLibrarianButton.getScene().getWindow();
+        currentStage.close();
+        MainApplication.openLibrarianFirstChoiceView();*/
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        boolean success = state.getCurrentUser() != null;
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Information");
+        alert.setHeaderText("Login attempt");
+        alert.setContentText("The login attempt was" + (success ? "n" : "n't") + " successful.");
+
+        alert.showAndWait();
+    }
+
+    public void setState(ApplicationState state) {
+        this.state = state;
     }
 }

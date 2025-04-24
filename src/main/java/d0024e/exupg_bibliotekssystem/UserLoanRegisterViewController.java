@@ -23,6 +23,6 @@ public class UserLoanRegisterViewController {
         Stage currentStage = (Stage) ContinueToLoanConfirmationButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserLoanConfirmationView();
+        //MainApplication.openUserLoanConfirmationView();
     }
 }

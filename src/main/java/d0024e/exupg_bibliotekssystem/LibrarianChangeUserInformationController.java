@@ -11,6 +11,6 @@ public class LibrarianChangeUserInformationController {
         Stage currentStage = (Stage) ReturnToLibrarianHandleUserChoiceViewButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openLibrarianHandleUserChoiceView();
+        //MainApplication.openLibrarianHandleUserChoiceView();
     }
 }

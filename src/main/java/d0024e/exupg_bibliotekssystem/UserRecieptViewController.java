@@ -11,6 +11,6 @@ public class UserRecieptViewController {
         Stage currentStage = (Stage) ReturnToUserMainMenuButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserFirstView();
+        //MainApplication.openUserFirstView();
     }
 }

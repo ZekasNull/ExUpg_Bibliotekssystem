@@ -12,6 +12,6 @@ public class UserReturnConfirmationViewController {
         Stage currentStage = (Stage) GoToReturnLastView.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserReturnLastView();
+        //MainApplication.openUserReturnLastView();
     }
 }

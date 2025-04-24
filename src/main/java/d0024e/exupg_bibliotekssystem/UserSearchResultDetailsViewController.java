@@ -11,6 +11,6 @@ public class UserSearchResultDetailsViewController {
         Stage currentStage = (Stage) ReturnToUserSearchResultViewButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserSearchResultView();
+        //MainApplication.openUserSearchResultView();
     }
 }

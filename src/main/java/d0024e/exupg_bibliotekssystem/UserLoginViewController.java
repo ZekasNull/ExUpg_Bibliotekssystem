@@ -15,6 +15,6 @@ public class UserLoginViewController {
         Stage currentStage = (Stage) logInButton.getScene().getWindow();
         currentStage.close();
 
-         MainApplication.openUserLoanViewRegisterView();
+         //MainApplication.openUserLoanViewRegisterView();
     }
 }

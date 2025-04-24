@@ -11,6 +11,6 @@ public class UserReturnRegisterViewController {
         Stage currentStage = (Stage) GoToReturnConfirmation.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserReturnConfirmationView();
+        //MainApplication.openUserReturnConfirmationView();
     }
 }

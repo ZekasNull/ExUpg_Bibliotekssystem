@@ -11,6 +11,6 @@ public class LibrarianDeleteUserViewController {
         Stage currentStage = (Stage) ReturnToLibrarianHandleUserViewFromDeleteUserViewButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openLibrarianHandleUserChoiceView();
+        //MainApplication.openLibrarianHandleUserChoiceView();
     }
 }

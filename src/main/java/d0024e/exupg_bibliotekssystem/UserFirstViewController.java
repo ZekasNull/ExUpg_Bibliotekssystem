@@ -21,27 +21,27 @@ public class UserFirstViewController {
         Stage currentStage = (Stage) goBackButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openViewChoice();
+        //MainApplication.openViewChoice();
     }
     @FXML
     protected void onUserGoToSearchViewChoiceClick(ActionEvent event) throws Exception{
         Stage currentStage = (Stage) searchButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserSearchView();
+        //MainApplication.openUserSearchView();
     }
 
     public void onUserGoToLoanViewChoiceClick(ActionEvent event) {
         Stage currentStage = (Stage) loginButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserLoginView();
+        //MainApplication.openUserLoginView();
     }
 
     public void onUserGoToReturnViewChoiceClick(ActionEvent event) {
         Stage currentStage = (Stage) returnButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserReturnView();
+        //MainApplication.openUserReturnView();
     }
 }

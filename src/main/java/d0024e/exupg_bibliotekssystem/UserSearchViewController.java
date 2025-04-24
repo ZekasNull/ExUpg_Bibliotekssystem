@@ -18,7 +18,7 @@ public class UserSearchViewController {
         Stage currentStage = (Stage) goBackToUserViewFromSearchButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserFirstView();
+        //MainApplication.openUserFirstView();
     }
 
     @FXML
@@ -26,7 +26,7 @@ public class UserSearchViewController {
         Stage currentStage = (Stage) searchForObjectButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserSearchResultView();
+        //MainApplication.openUserSearchResultView();
         // TODO: Connect the search bar as a "requirement" for the button to base it's search on
 
     }

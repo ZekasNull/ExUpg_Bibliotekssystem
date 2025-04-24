@@ -14,20 +14,20 @@ public class LibrarianHandleUserChoiceViewController {
         Stage currentStage = (Stage) ChangeUserInformationButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openLibrarianChangeUserInformationView();
+        //MainApplication.openLibrarianChangeUserInformationView();
     }
 
     public void onUserRemoveUserButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) ChangeUserInformationButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openLibrarianDeleteUserView();
+        //MainApplication.openLibrarianDeleteUserView();
     }
 
     public void onLibrarianReturnToFirstChoiceViewButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) ChangeUserInformationButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openLibrarianFirstChoiceView();
+        //MainApplication.openLibrarianFirstChoiceView();
     }
 }

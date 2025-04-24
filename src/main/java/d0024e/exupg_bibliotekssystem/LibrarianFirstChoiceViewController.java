@@ -12,7 +12,7 @@ public class LibrarianFirstChoiceViewController {
         Stage currentStage = (Stage) GoToHandleUserViewButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openLibrarianHandleUserChoiceView();
+        //MainApplication.openLibrarianHandleUserChoiceView();
     }
 
     public void onUserGoToHandleInventoryViewButtonClick(ActionEvent event) {

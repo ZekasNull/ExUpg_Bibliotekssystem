@@ -12,7 +12,7 @@ public class UserSearchResultViewController {
         Stage currentStage = (Stage) ReturnToUserSearchViewButton.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserSearchView();
+        //MainApplication.openUserSearchView();
     }
 
     public void onUserSearchResult1ButtonClick(ActionEvent event) {
@@ -20,6 +20,6 @@ public class UserSearchResultViewController {
         Stage currentStage = (Stage) SearchResult1Button.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserSearchResultDetailsView();
+        //MainApplication.openUserSearchResultDetailsView();
     }
 }

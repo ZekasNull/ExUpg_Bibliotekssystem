@@ -11,6 +11,6 @@ public class UserReturnLastViewController {
         Stage currentStage = (Stage) returnToHomepageReturnView.getScene().getWindow();
         currentStage.close();
 
-        MainApplication.openUserFirstView();
+        //MainApplication.openUserFirstView();
     }
 }

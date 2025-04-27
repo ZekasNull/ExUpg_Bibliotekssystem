@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW bibliotekssystem.view_bok_info(bok_id, titel, isbn_13, författare, ämnesord) AS
+CREATE OR REPLACE VIEW bibliotekssystem.vy_bok_info(bok_id, titel, isbn_13, författare, ämnesord) AS
 SELECT b.bok_id,
        b.titel,
        b.isbn_13,

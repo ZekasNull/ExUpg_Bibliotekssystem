@@ -10,4 +10,4 @@ VALUES ('kurslitteratur', '14 days'),
        ('bok', '1 month'),
        ('film', '7 days'),
        ('referenslitteratur', '0 days'),
-       ('tidsskrift', '0 days');
+       ('tidskrift', '0 days');

@@ -1,6 +1,6 @@
 
 --Format för böcker: Titel, isbn_13, ämnesord som array, förnamn, efternamn.
-    --svarar med två ut-parametrar statuskod och statusmeddelande
+    --svarar med två ut-parametrar statuskod och statusmeddelande (kastas bort här, därav null)
 
 -- Bok 1: unik författare och ämnesord
 CALL sp_lägg_till_bok(
@@ -56,3 +56,12 @@ CALL sp_lägg_till_bok(
         NULL,
         NULL
      );
+
+--Användare - En av varje typ räcker för test. Mest intressant är egentligen bibliotekarie
+INSERT INTO "Användare" (användartyp, användarnamn, pin, fullt_namn)
+VALUES ('allmänhet', 'svesve-1', '0000', 'Sven Svensson'),
+       ('student', 'maxove-1', '0000', 'Maximal Överlånare'),
+       ('forskare', 'marcur-1', '1867', 'Marie Curie'),
+       ('unianställda', 'jorgnil-1', '1337', 'Jörgen Nilsson'),
+       ('bibliotekarie', 'joshal-1', '0000', 'Josef Hallberg');
+

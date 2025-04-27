@@ -196,28 +196,41 @@ CREATE TABLE IF NOT EXISTS "Lån"
     lånedatum    TIMESTAMP DEFAULT LOCALTIMESTAMP NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Tidsskrift"
+CREATE TABLE IF NOT EXISTS "Tidskrift"
 (
-    tidsskrift_id INTEGER GENERATED ALWAYS AS IDENTITY
+    tidskrift_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
-    namn          VARCHAR(25) NOT NULL
-        CONSTRAINT tidsskrift_pk
+    namn         VARCHAR(25) NOT NULL
+        CONSTRAINT tidskrift_pk
             UNIQUE
 );
 
-COMMENT ON CONSTRAINT tidsskrift_pk ON "Tidsskrift" IS 'Tidsskriftens namn måste vara unikt';
+COMMENT ON CONSTRAINT tidskrift_pk ON "Tidskrift" IS 'Tidskriftens namn måste vara unikt';
 
 CREATE TABLE IF NOT EXISTS "Upplaga"
 (
-    upplaga_id    INTEGER GENERATED ALWAYS AS IDENTITY
+    upplaga_id   INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
-    tidsskrift_id INTEGER NOT NULL
+    tidskrift_id INTEGER NOT NULL
         CONSTRAINT "FK_Upplaga.tidsskrift_id"
-            REFERENCES "Tidsskrift"
+            REFERENCES "Tidskrift"
             ON UPDATE CASCADE ON DELETE RESTRICT,
-    upplaga_nr    INTEGER NOT NULL,
-    år            INTEGER NOT NULL
+    upplaga_nr   INTEGER NOT NULL,
+    år           INTEGER NOT NULL
 );
+
+CREATE OR REPLACE VIEW vy_bok_info(bok_id, titel, isbn_13, författare, ämnesord) AS
+SELECT b.bok_id,
+       b.titel,
+       b.isbn_13,
+       STRING_AGG(DISTINCT (f."förnamn"::TEXT || ' '::TEXT) || f.efternamn::TEXT, ', '::TEXT) AS "författare",
+       STRING_AGG(DISTINCT a.ord::TEXT, ', '::TEXT)                                           AS "ämnesord"
+FROM bibliotekssystem."Bok" b
+         LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_id
+         LEFT JOIN bibliotekssystem."Författare" f ON bf."författare_id" = f."författare_id"
+         LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_id
+         LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_id = a.ord_id
+GROUP BY b.bok_id, b.titel, b.isbn_13;
 
 CREATE OR REPLACE FUNCTION sf_getloanlimit("användarid" INTEGER) RETURNS INTEGER
     LANGUAGE plpgsql
@@ -532,6 +545,41 @@ BEGIN
     WHERE l.streckkod = loan_id;
 
     RETURN return_date;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION sf_sök_böcker_enkel("i_sökterm" TEXT)
+    RETURNS TABLE
+            (
+                bok_id       INTEGER,
+                isbn_13      CHARACTER VARYING,
+                titel        CHARACTER VARYING,
+                "författare" TEXT,
+                "ämnesord"   TEXT
+            )
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT b.bok_id,
+               b.isbn_13,
+               b.titel,
+               STRING_AGG(DISTINCT f.förnamn || ' ' || f.efternamn, ', ') AS författare,
+               STRING_AGG(DISTINCT a.ord, ', ')                           AS ämnesord
+        FROM bibliotekssystem."Bok" b
+                 LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_id
+                 LEFT JOIN bibliotekssystem."Författare" f ON bf.författare_id = f.författare_id
+                 LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_id
+                 LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_id = a.ord_id
+        GROUP BY b.bok_id, b.isbn_13, b.titel
+        HAVING i_sökterm IS NULL
+            OR (
+            b.titel ILIKE '%' || i_sökterm || '%' OR
+            b.isbn_13 ILIKE '%' || i_sökterm || '%' OR
+            STRING_AGG(DISTINCT f.förnamn || ' ' || f.efternamn, ', ') ILIKE '%' || i_sökterm || '%' OR
+            STRING_AGG(DISTINCT a.ord, ', ') ILIKE '%' || i_sökterm || '%'
+            );
 END;
 $$;
 

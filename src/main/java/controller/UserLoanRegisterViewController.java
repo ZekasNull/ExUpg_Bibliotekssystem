@@ -1,10 +1,12 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class UserLoanRegisterViewController {
+import java.util.Observable;
+
+public class UserLoanRegisterViewController  extends Controller {
     public Button AddItemButton;
     public Button ContinueToLoanConfirmationButton;
 
@@ -23,6 +25,11 @@ public class UserLoanRegisterViewController {
         Stage currentStage = (Stage) ContinueToLoanConfirmationButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openUserLoanConfirmationView();
+        super.getState().app.openUserLoanConfirmationView();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

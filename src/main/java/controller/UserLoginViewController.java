@@ -1,11 +1,13 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class UserLoginViewController {
+import java.util.Observable;
+
+public class UserLoginViewController  extends Controller {
     public Button logInButton;
 
     @FXML
@@ -15,6 +17,11 @@ public class UserLoginViewController {
         Stage currentStage = (Stage) logInButton.getScene().getWindow();
         currentStage.close();
 
-         //MainApplication.openUserLoanViewRegisterView();
+        super.getState().app.openUserLoanViewRegisterView();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

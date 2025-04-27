@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="405.0" prefWidth="552.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="d0024e.exupg_bibliotekssystem.UserSearchViewController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="405.0" prefWidth="552.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.UserSearchViewController">
    <children>
       <Button fx:id="goBackToUserViewFromSearchButton" layoutX="432.0" layoutY="347.0" mnemonicParsing="false" onAction="#onUserGoBackToUserViewFromSearchClick" text="Go to homepage" />
       <ComboBox layoutX="81.0" layoutY="131.0" prefWidth="150.0" visibleRowCount="3" />

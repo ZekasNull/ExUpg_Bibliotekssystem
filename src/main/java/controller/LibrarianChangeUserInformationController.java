@@ -1,16 +1,23 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class LibrarianChangeUserInformationController {
+import java.util.Observable;
+
+public class LibrarianChangeUserInformationController extends Controller {
     public Button ReturnToLibrarianHandleUserChoiceViewButton;
 
     public void onLibrarianReturnToLibrarianHandleUserChoiceViewButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) ReturnToLibrarianHandleUserChoiceViewButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openLibrarianHandleUserChoiceView();
+        super.getState().app.openLibrarianHandleUserChoiceView();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

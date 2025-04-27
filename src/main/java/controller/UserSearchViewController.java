@@ -1,12 +1,13 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
-import com.sun.tools.javac.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class UserSearchViewController {
+import java.util.Observable;
+
+public class UserSearchViewController extends Controller {
 
     @FXML
     private Button searchForObjectButton;
@@ -18,7 +19,7 @@ public class UserSearchViewController {
         Stage currentStage = (Stage) goBackToUserViewFromSearchButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openUserFirstView();
+        super.getState().app.openUserFirstView();
     }
 
     @FXML
@@ -26,8 +27,13 @@ public class UserSearchViewController {
         Stage currentStage = (Stage) searchForObjectButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openUserSearchResultView();
+        super.getState().app.openUserSearchResultView();
         // TODO: Connect the search bar as a "requirement" for the button to base it's search on
+
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
 
     }
 }

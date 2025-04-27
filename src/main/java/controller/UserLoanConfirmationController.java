@@ -1,16 +1,22 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class UserLoanConfirmationController {
+import java.util.Observable;
+
+public class UserLoanConfirmationController  extends Controller {
     public Button ContinueToRecieptButton;
 
     public void onUserContinueToRecieptButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) ContinueToRecieptButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openUserRecieptView();
+        super.getState().app.openUserRecieptView();
+    }
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

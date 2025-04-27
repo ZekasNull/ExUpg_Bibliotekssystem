@@ -1,10 +1,12 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class UserSearchResultViewController {
+import java.util.Observable;
+
+public class UserSearchResultViewController extends Controller  {
     public Button ReturnToUserSearchViewButton;
     public Button SearchResult1Button;
 
@@ -12,7 +14,7 @@ public class UserSearchResultViewController {
         Stage currentStage = (Stage) ReturnToUserSearchViewButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openUserSearchView();
+        super.getState().app.openUserSearchView();
     }
 
     public void onUserSearchResult1ButtonClick(ActionEvent event) {
@@ -20,6 +22,11 @@ public class UserSearchResultViewController {
         Stage currentStage = (Stage) SearchResult1Button.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openUserSearchResultDetailsView();
+        super.getState().app.openUserSearchResultDetailsView();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

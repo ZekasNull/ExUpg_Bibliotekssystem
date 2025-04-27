@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="d0024e.exupg_bibliotekssystem.LibrarianHandleUserChoiceViewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LibrarianHandleUserChoiceViewController">
    <children>
       <Button fx:id="ChangeUserInformationButton" layoutX="148.0" layoutY="164.0" mnemonicParsing="false" onAction="#onUserChangeUserInformationButtonClick" text="Change user information" />
       <Button fx:id="RemoveUserButton" layoutX="364.0" layoutY="229.0" mnemonicParsing="false" onAction="#onUserRemoveUserButtonClick" text="Delete user" />

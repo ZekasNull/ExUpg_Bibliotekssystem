@@ -1,16 +1,23 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class LibrarianDeleteUserViewController {
+import java.util.Observable;
+
+public class LibrarianDeleteUserViewController extends Controller {
     public Button ReturnToLibrarianHandleUserViewFromDeleteUserViewButton;
 
     public void onLibrarianReturnToLibrarianHandleUserViewFromDeleteUserViewButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) ReturnToLibrarianHandleUserViewFromDeleteUserViewButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openLibrarianHandleUserChoiceView();
+        super.getState().app.openLibrarianHandleUserChoiceView();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

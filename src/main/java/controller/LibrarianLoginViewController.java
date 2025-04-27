@@ -1,24 +1,19 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import state.ApplicationState;
-
 import java.util.Observable;
-import java.util.Observer;
 
-public class LibrarianLoginViewController implements Observer {
-
-
+public class LibrarianLoginViewController extends Controller {
     private ApplicationState state;
 
     @FXML
-    private TextField emailBoxContents;
+    private TextField emailBoxContents; //FIXME ska vara ltu-ideal
 
     @FXML
     private PasswordField passwordBoxContents;
@@ -44,6 +39,10 @@ public class LibrarianLoginViewController implements Observer {
         alert.setContentText("The login attempt was" + (success ? "n" : "n't") + " successful.");
 
         alert.showAndWait();
+    }
+
+    public ApplicationState getState() {
+        return state;
     }
 
     public void setState(ApplicationState state) {

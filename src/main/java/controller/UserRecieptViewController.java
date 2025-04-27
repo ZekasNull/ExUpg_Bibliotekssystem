@@ -1,16 +1,23 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class UserRecieptViewController {
+import java.util.Observable;
+
+public class UserRecieptViewController  extends Controller {
     public Button ReturnToUserMainMenuButton;
 
     public void onUserReturnToUserMainMenuButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) ReturnToUserMainMenuButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openUserFirstView();
+        super.getState().app.openUserFirstView();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

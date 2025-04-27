@@ -1,5 +1,9 @@
 package d0024e.exupg_bibliotekssystem;
 
+import controller.Controller;
+import controller.LibrarianLoginViewController;
+import controller.UserSearchViewController;
+import controller.ViewChoiceController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,7 +22,7 @@ public class MainApplication extends Application {
     public void init() throws Exception {
         this.APPSTATE = new ApplicationState();
         APPSTATE.app = this; //referens till MainApplication
-        //FIXME yep detta går att loopa oändligt app.state.app.state etc.
+        //yep detta går att loopa oändligt app.state.app.state etc. Kanske dåligt?
     }
 
     @Override //Starts the program and sets up the primaryStage
@@ -50,8 +54,8 @@ public class MainApplication extends Application {
             Scene scene = new Scene(loader.load());
 
             //hämta referens till controller
-            ViewChoiceController controller = loader.getController();
-            controller.state = APPSTATE; //ge referens till appstate
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
 
             //Sets up the Stage with the scene and the title and give it to our primaryStage
             primaryStage.setTitle("View Choice");
@@ -66,13 +70,14 @@ public class MainApplication extends Application {
     public void openUserFirstView() {
         try{
             //Loads the FXML file onto "loader"
-            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-first-view.fxml")); //FIXME
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-first-view.fxml"));
             //Loads the FXML file as a scene
             Scene scene = new Scene(loader.load());
 
             //hämta referens till controller
-            ViewChoiceController controller = loader.getController();
-            controller.state = APPSTATE; //ge referens till appstate
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
+
 
             //Sets up the Stage with the scene and the title and give it to our primaryStage
             primaryStage.setTitle("User First View");
@@ -84,10 +89,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    /*
-    public static void openUserSearchView() {
+    public void openUserSearchView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-search-view.fxml"));
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
+
             Scene scene = new Scene(loader.load());
             primaryStage.setTitle("User Search View");
             primaryStage.setScene(scene);
@@ -97,10 +105,15 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserLoginView() {
+    public void openUserLoginView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-login-view.fxml"));
             Scene scene = new Scene(loader.load());
+
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
+
             primaryStage.setTitle("User Login View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -109,10 +122,14 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserLoanViewRegisterView() {
+    public void openUserLoanViewRegisterView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-loan-register-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
+
             primaryStage.setTitle("User Loan Register View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -121,10 +138,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserLoanConfirmationView() {
+    public void openUserLoanConfirmationView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-loan-confirmation-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("User Loan Register View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -133,10 +153,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserRecieptView() {
+    public void openUserRecieptView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-reciept-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("User Reciept View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -145,10 +168,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserReturnView() {
+    public void openUserReturnView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-return-register-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("User Return View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -157,10 +183,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserReturnConfirmationView() {
+    public void openUserReturnConfirmationView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-return-confirmation-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("User Return Confirmation View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -169,10 +198,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserReturnLastView() {
+    public void openUserReturnLastView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-return-last-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("User Return Last View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -181,10 +213,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserSearchResultView() {
+    public void openUserSearchResultView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-search-result-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("User Search Result View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -193,10 +228,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openUserSearchResultDetailsView() {
+    public void openUserSearchResultDetailsView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("user-search-result-details-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("User Search Result Details View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -205,15 +243,16 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    */
-
     public void openLibrarianLoginView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-login-view.fxml"));
             Scene scene = new Scene(loader.load());
-            LibrarianLoginViewController controller = loader.getController();
-            controller.setState(this.APPSTATE);
+
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             APPSTATE.addObserver(controller);
+
             primaryStage.setTitle("Librarian Login View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -222,11 +261,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    /*
-    public static void openLibrarianFirstChoiceView() {
+    public void openLibrarianFirstChoiceView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-first-choice-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("Librarian First Choice View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -235,10 +276,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openLibrarianHandleUserChoiceView() {
+    public void openLibrarianHandleUserChoiceView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-handle-user-choice-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("Librarian Handle User Choice View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -247,10 +291,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openLibrarianChangeUserInformationView() {
+    public void openLibrarianChangeUserInformationView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-change-user-information.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("Librarian Change User Information View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -259,10 +306,13 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public static void openLibrarianDeleteUserView() {
+    public void openLibrarianDeleteUserView() {
         try{
             FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("librarian-delete-user-view.fxml"));
             Scene scene = new Scene(loader.load());
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
             primaryStage.setTitle("Librarian Delete User View");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -271,7 +321,7 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    */
+
     public static void main(String[] args) {
         launch();
     }

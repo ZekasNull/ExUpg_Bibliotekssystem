@@ -1,4 +1,4 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -6,8 +6,9 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import state.ApplicationState;
 
-public class ViewChoiceController {
-    public ApplicationState state;
+import java.util.Observable;
+
+public class ViewChoiceController extends Controller{
     public Button GoToLibrarianLoginViewButton;
     @FXML
     private Button goToUserFirstViewButton;
@@ -17,13 +18,18 @@ public class ViewChoiceController {
         Stage currentStage = (Stage) goToUserFirstViewButton.getScene().getWindow();
         currentStage.close();
 
-        state.app.openUserFirstView();
+        super.getState().app.openUserFirstView();
     }
 
     public void onLibraryGoToLibrarianLoginViewButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) goToUserFirstViewButton.getScene().getWindow();
         currentStage.close();
 
-        state.app.openLibrarianLoginView();
+        super.getState().app.openLibrarianLoginView();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+
     }
 }

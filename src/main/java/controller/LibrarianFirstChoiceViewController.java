@@ -1,10 +1,12 @@
-package d0024e.exupg_bibliotekssystem;
+package controller;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class LibrarianFirstChoiceViewController {
+import java.util.Observable;
+
+public class LibrarianFirstChoiceViewController extends Controller {
     public Button GoToHandleUserViewButton;
     public Button GoToHandleInventoryViewButton;
 
@@ -12,12 +14,16 @@ public class LibrarianFirstChoiceViewController {
         Stage currentStage = (Stage) GoToHandleUserViewButton.getScene().getWindow();
         currentStage.close();
 
-        //MainApplication.openLibrarianHandleUserChoiceView();
+        super.getState().app.openLibrarianHandleUserChoiceView();
     }
 
     public void onUserGoToHandleInventoryViewButtonClick(ActionEvent event) {
         Stage currentStage = (Stage) GoToHandleUserViewButton.getScene().getWindow();
         currentStage.close();
+
+    }
+    @Override
+    public void update(Observable o, Object arg) {
 
     }
 }

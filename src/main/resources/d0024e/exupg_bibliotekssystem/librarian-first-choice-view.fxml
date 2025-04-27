@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="d0024e.exupg_bibliotekssystem.LibrarianFirstChoiceViewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LibrarianFirstChoiceViewController">
    <children>
       <Button fx:id="GoToHandleUserViewButton" layoutX="379.0" layoutY="268.0" mnemonicParsing="false" onAction="#onLibrarianGoToHandleUserViewButtonClick" text="Handle users" />
       <Button fx:id="GoToHandleInventoryViewButton" layoutX="117.0" layoutY="281.0" mnemonicParsing="false" onAction="#onUserGoToHandleInventoryViewButtonClick" text="Handle inventory" />

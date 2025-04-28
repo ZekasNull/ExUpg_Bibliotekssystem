@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @Table(name = "\"Användartyp\"", schema = "bibliotekssystem")
 public class Användartyp {
     @Id
-    @Column(name = "\"användartyp\"", nullable = false, length = 20)
+    @Column(name = "\"användartyp_id\"", nullable = false, length = 20)
     private String användartyp;
 
     @Column(name = "\"max_lån\"", nullable = false)

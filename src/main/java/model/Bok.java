@@ -1,6 +1,7 @@
 package model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "\"Bok\"", schema = "bibliotekssystem")
@@ -15,6 +16,22 @@ public class Bok {
 
     @Column(name = "titel", nullable = false, length = 50)
     private String titel;
+
+    @ManyToMany
+    @JoinTable(
+            name = "bok_författare",
+            joinColumns = @JoinColumn(name = "bok_id"),
+            inverseJoinColumns = @JoinColumn(name = "författare_id")
+    )
+    private List<Författare> Författare;
+
+    @ManyToMany
+    @JoinTable(
+            name = "bok_ämnesord",
+            joinColumns = @JoinColumn(name = "bok_id"),
+            inverseJoinColumns = @JoinColumn(name = "ord_id")
+    )
+    private List<Ämnesord> Ämnesord;
 
     public Integer getId() {
         return id;

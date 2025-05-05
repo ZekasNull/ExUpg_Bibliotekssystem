@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShowNotReturnedViewController">
+   <children>
+      <ListView layoutX="47.0" layoutY="88.0" prefHeight="265.0" prefWidth="508.0" />
+      <Label layoutX="200.0" layoutY="27.0" text="Dessa objekt har ännu inte återlämnats:">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label layoutX="48.0" layoutY="124.0" prefHeight="32.0" prefWidth="508.0" text="Titel, ISBN, Identifieringsnummer? Utlånad till:, datum för utlånging, när den skulle vara tillbaka" />
+   </children>
+</AnchorPane>

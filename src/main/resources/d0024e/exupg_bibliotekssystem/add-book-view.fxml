@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddBookViewController">
+   <children>
+      <ListView layoutX="33.0" layoutY="36.0" prefHeight="330.0" prefWidth="540.0" />
+      <Label layoutX="42.0" layoutY="58.0" text="Titel:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="114.0" text="ISBN-13:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="174.0" text="Ämnesord:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="233.0" text="Författarnamn:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="titleBoxContents" layoutX="42.0" layoutY="78.0" />
+      <TextField fx:id="isbnBoxContents" layoutX="42.0" layoutY="134.0" />
+      <TextField fx:id="amnesordBoxContents" layoutX="45.0" layoutY="194.0" />
+      <TextField fx:id="authorNameBoxContents" layoutX="45.0" layoutY="253.0" />
+   </children>
+</AnchorPane>

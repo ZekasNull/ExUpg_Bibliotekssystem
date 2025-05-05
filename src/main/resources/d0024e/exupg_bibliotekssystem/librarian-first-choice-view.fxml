@@ -2,13 +2,26 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LibrarianFirstChoiceViewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LibrarianFirstChoiceViewController">
    <children>
-      <Button fx:id="GoToHandleUserViewButton" layoutX="379.0" layoutY="268.0" mnemonicParsing="false" onAction="#onLibrarianGoToHandleUserViewButtonClick" text="Handle users" />
-      <Button fx:id="GoToHandleInventoryViewButton" layoutX="117.0" layoutY="281.0" mnemonicParsing="false" onAction="#onUserGoToHandleInventoryViewButtonClick" text="Handle inventory" />
-      <Button layoutX="369.0" layoutY="122.0" mnemonicParsing="false" text="Loan?" />
-      <Button layoutX="133.0" layoutY="122.0" mnemonicParsing="false" text="Search?" />
+      <Label layoutX="208.0" layoutY="60.0" text="Vad vill du göra?">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <Label layoutX="135.0" layoutY="113.0" text="_____________________________________________________________________" />
+      <Label layoutX="234.0" layoutY="187.0" text="Hantera inventarie" onMouseClicked="#HandleInventoryClicked" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" >
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="195.0" layoutY="276.0" text="Visa ej återlämnade objekt" onMouseClicked="#HandleNotReturnedClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" >
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

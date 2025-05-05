@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.HandleInventoryViewController">
+   <children>
+      <Label layoutX="193.0" layoutY="41.0" text="Vad vill du göra?">
+         <font>
+            <Font size="29.0" />
+         </font>
+      </Label>
+      <Label fx:id="AddObjectButton" layoutX="165.0" layoutY="161.0" text="Lägg till" onMouseClicked="#onAddObjectButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <Label fx:id="RemoveObjectButton" layoutX="381.0" layoutY="161.0" text="Ta bort" onMouseClicked="#onRemoveObjectButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <Label fx:id="ChangeObjectButton" layoutX="277.0" layoutY="264.0" text="Ändra" onMouseClicked="#onChangeObjectButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

@@ -11,8 +11,8 @@ public class Upplaga {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tidsskrift_id", nullable = false)
-    private Tidsskrift tidsskrift;
+    @JoinColumn(name = "tidskrift_id", nullable = false)
+    private Tidskrift tidskrift;
 
     @Column(name = "upplaga_nr", nullable = false)
     private Integer upplagaNr;
@@ -20,20 +20,20 @@ public class Upplaga {
     @Column(name = "\"år\"", nullable = false)
     private Integer år;
 
+    public Tidskrift getTidskrift() {
+        return tidskrift;
+    }
+
+    public void setTidskrift(Tidskrift tidskrift) {
+        this.tidskrift = tidskrift;
+    }
+
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Tidsskrift getTidsskrift() {
-        return tidsskrift;
-    }
-
-    public void setTidsskrift(Tidsskrift tidsskrift) {
-        this.tidsskrift = tidsskrift;
     }
 
     public Integer getUpplagaNr() {

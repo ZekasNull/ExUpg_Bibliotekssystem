@@ -1,6 +1,8 @@
 package model;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "\"Genre\"", schema = "bibliotekssystem")
@@ -12,6 +14,17 @@ public class Genre {
 
     @Column(name = "genre_namn", nullable = false, length = 25)
     private String genreNamn;
+
+    @ManyToMany(mappedBy = "genres")
+    private Set<Film> films = new LinkedHashSet<>();
+
+    public Set<Film> getFilms() {
+        return films;
+    }
+
+    public void setFilms(Set<Film> films) {
+        this.films = films;
+    }
 
     public Integer getId() {
         return id;
@@ -29,4 +42,10 @@ public class Genre {
         this.genreNamn = genreNamn;
     }
 
+    @Override
+    public String toString() {
+        return "Genre{" +
+                ", genreNamn='" + genreNamn + '\'' +
+                '}';
+    }
 }

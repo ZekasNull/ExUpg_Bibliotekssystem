@@ -1,6 +1,8 @@
 package model;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "\"Användare\"", schema = "bibliotekssystem")
@@ -22,6 +24,17 @@ public class Användare {
 
     @Column(name = "fullt_namn", nullable = false, length = 50)
     private String fulltNamn;
+
+    @OneToMany(mappedBy = "användare")
+    private Set<Lån> låns = new LinkedHashSet<>();
+
+    public Set<Lån> getLåns() {
+        return låns;
+    }
+
+    public void setLåns(Set<Lån> låns) {
+        this.låns = låns;
+    }
 
     public Integer getId() {
         return id;
@@ -63,4 +76,15 @@ public class Användare {
         this.fulltNamn = fulltNamn;
     }
 
+    @Override
+    public String toString() {
+        return "Användare{" +
+                "id=" + id +
+                ", användartyp=" + användartyp +
+                ", användarnamn='" + användarnamn + '\'' +
+                ", pin='" + pin + '\'' +
+                ", fulltNamn='" + fulltNamn + '\'' +
+                ", låns=" + låns +
+                '}';
+    }
 }

@@ -31,4 +31,11 @@ public class Användartyp {
         this.maxLån = maxLån;
     }
 
+    @Override
+    public String toString() {
+        return "Användartyp{" +
+                "användartyp='" + användartyp + '\'' +
+                ", maxLån=" + maxLån +
+                '}';
+    }
 }

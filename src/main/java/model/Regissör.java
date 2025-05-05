@@ -1,20 +1,33 @@
 package model;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "\"Regissör\"", schema = "bibliotekssystem")
 public class Regissör {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "\"regissör_id\"", nullable = false)
+    @Column(name = "regissör_id", nullable = false)
     private Integer id;
 
-    @Column(name = "\"förnamn\"", nullable = false, length = 25)
+    @Column(name = "förnamn", nullable = false, length = 25)
     private String förnamn;
 
     @Column(name = "efternamn", nullable = false, length = 25)
     private String efternamn;
+
+    @ManyToMany(mappedBy = "regissörs")
+    private Set<Film> films = new LinkedHashSet<>();
+
+    public Set<Film> getFilms() {
+        return films;
+    }
+
+    public void setFilms(Set<Film> films) {
+        this.films = films;
+    }
 
     public Integer getId() {
         return id;
@@ -40,4 +53,11 @@ public class Regissör {
         this.efternamn = efternamn;
     }
 
+    @Override
+    public String toString() {
+        return "Regissör{" +
+                "efternamn='" + efternamn + '\'' +
+                ", förnamn='" + förnamn + '\'' +
+                '}';
+    }
 }

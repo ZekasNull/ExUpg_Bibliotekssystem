@@ -54,4 +54,11 @@ public class Exemplar {
         this.låntyp = låntyp;
     }
 
+    @Override
+    public String toString() {
+        return "Exemplar{" +
+                "id=" + id +
+                ", låntyp=" + låntyp +
+                '}';
+    }
 }

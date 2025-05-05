@@ -1,7 +1,9 @@
 package model;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "\"Bok\"", schema = "bibliotekssystem")
@@ -19,19 +21,32 @@ public class Bok {
 
     @ManyToMany
     @JoinTable(
-            name = "bok_författare",
-            joinColumns = @JoinColumn(name = "bok_id"),
-            inverseJoinColumns = @JoinColumn(name = "författare_id")
+            name = "\"Bok_Författare\"",
+            schema = "bibliotekssystem",
+            joinColumns = @JoinColumn(name = "bok_jc_id"),
+            inverseJoinColumns = @JoinColumn(name = "författare_jc_id")
     )
     private List<Författare> Författare;
 
     @ManyToMany
     @JoinTable(
-            name = "bok_ämnesord",
-            joinColumns = @JoinColumn(name = "bok_id"),
-            inverseJoinColumns = @JoinColumn(name = "ord_id")
+            name = "\"Bok_Ämnesord\"",
+            schema = "bibliotekssystem",
+            joinColumns = @JoinColumn(name = "bok_jc_id"),
+            inverseJoinColumns = @JoinColumn(name = "ord_jc_id")
     )
     private List<Ämnesord> Ämnesord;
+
+    @OneToMany(mappedBy = "bok")
+    private Set<Exemplar> exemplars = new LinkedHashSet<>();
+
+    public Set<Exemplar> getExemplars() {
+        return exemplars;
+    }
+
+    public void setExemplars(Set<Exemplar> exemplars) {
+        this.exemplars = exemplars;
+    }
 
     public Integer getId() {
         return id;
@@ -57,4 +72,15 @@ public class Bok {
         this.titel = titel;
     }
 
+    @Override
+    public String toString() {
+        return "Bok{" +
+                "id=" + id +
+                ", isbn13='" + isbn13 + '\'' +
+                ", titel='" + titel + '\'' +
+                ", Författare=" + Författare +
+                ", Ämnesord=" + Ämnesord +
+                ", exemplars=" + exemplars +
+                '}';
+    }
 }

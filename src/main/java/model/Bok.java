@@ -26,7 +26,7 @@ public class Bok {
             joinColumns = @JoinColumn(name = "bok_jc_id"),
             inverseJoinColumns = @JoinColumn(name = "författare_jc_id")
     )
-    private List<Författare> Författare;
+    private Set<Författare> Författare;
 
     @ManyToMany
     @JoinTable(
@@ -35,9 +35,9 @@ public class Bok {
             joinColumns = @JoinColumn(name = "bok_jc_id"),
             inverseJoinColumns = @JoinColumn(name = "ord_jc_id")
     )
-    private List<Ämnesord> Ämnesord;
+    private Set<Ämnesord> Ämnesord;
 
-    @OneToMany(mappedBy = "bok")
+    @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER)
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
 
     public Set<Exemplar> getExemplars() {

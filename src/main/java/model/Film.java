@@ -21,7 +21,7 @@ public class Film {
     @Column(name = "åldersgräns", nullable = false)
     private Integer åldersgräns;
 
-    @OneToMany(mappedBy = "film")
+    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
 
     @ManyToMany

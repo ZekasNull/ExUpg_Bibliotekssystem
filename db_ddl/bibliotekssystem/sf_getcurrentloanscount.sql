@@ -4,14 +4,14 @@ CREATE OR REPLACE FUNCTION bibliotekssystem.sf_getcurrentloanscount("användarid
 AS
 $$
 DECLARE
-    currentLoans int;
+    currentloans INT;
 BEGIN
     SELECT COUNT(lån_id)
-    INTO currentLoans
+    INTO currentloans
     FROM "Lån"
     WHERE användarid = "Lån".användare_id;
 
-    RETURN currentLoans;
+    RETURN currentloans;
 END;
 $$;
 

@@ -13,7 +13,7 @@ DECLARE
 BEGIN
     -- Lägg till bok, spara bokid
     INSERT
-        INTO "Bok" (titel, isbn_13)
+    INTO "Bok" (titel, isbn_13)
     VALUES (p_bok_titel, p_isbn_13)
     RETURNING bok_id INTO f_bok_id;
 
@@ -28,14 +28,14 @@ BEGIN
     -- Om inte hittad, Lägg till författaren, spara id
     IF NOT found THEN
         INSERT
-            INTO "Författare" (förnamn, efternamn)
+        INTO "Författare" (förnamn, efternamn)
         VALUES (p_förf_förnamn, p_förf_efternamn)
         RETURNING författare_id INTO f_författar_id;
     END IF;
 
     -- Skapa association
     INSERT
-        INTO "Bok_Författare" (bok_id, författare_id)
+    INTO "Bok_Författare" (bok_id, författare_id)
     VALUES (f_bok_id, f_författar_id)
     ON CONFLICT DO NOTHING;
     -- tydligen best practice, om än osannolikt att det händer
@@ -52,14 +52,14 @@ BEGIN
             -- Om ej hittad, lägg till och spara ordid
             IF NOT found THEN
                 INSERT
-                    INTO "Ämnesord" (ord)
+                INTO "Ämnesord" (ord)
                 VALUES (f_ämnesord)
                 RETURNING ord_id INTO f_ämnesord_id;
             END IF;
 
             -- Skapa association
             INSERT
-                INTO "Bok_Ämnesord" (ord_id, bok_id)
+            INTO "Bok_Ämnesord" (ord_id, bok_id)
             VALUES (f_ämnesord_id, f_bok_id)
             ON CONFLICT DO NOTHING;
         END LOOP;

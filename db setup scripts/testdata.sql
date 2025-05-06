@@ -13,6 +13,11 @@ CALL sp_lägg_till_bok(
         NULL
      );
 
+INSERT INTO "Exemplar" (bok_id, låntyp)
+VALUES ((SELECT bok_id from bibliotekssystem."Bok" where isbn_13 = '9780000000001'), 'kurslitteratur'),
+       ((SELECT bok_id from bibliotekssystem."Bok" where isbn_13 = '9780000000001'), 'kurslitteratur');
+
+
 -- Bok 2: delar författare med bok 1, delar ämnesord med bok 1
 CALL sp_lägg_till_bok(
         'Avancerade databaser',

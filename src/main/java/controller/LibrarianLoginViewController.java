@@ -21,7 +21,9 @@ public class LibrarianLoginViewController extends Controller {
     public Button LogInLibrarianButton;
 
     public void onLibrarianLogInLibrarianButtonClick(ActionEvent event) {
-        state.databaseService.logInLibrarian(emailBoxContents.getText(), passwordBoxContents.getText());
+        //TODO kontrollern ska ansvara för att analysera informationen i användaren som hämtas (dvs rätt användartyp)
+        state.setCurrentUser(state.databaseService.logInUser(emailBoxContents.getText(), passwordBoxContents.getText()));
+
 
 
         //FIXME deaktiverad i testsyfte
@@ -32,11 +34,12 @@ public class LibrarianLoginViewController extends Controller {
 
     @Override
     public void update(Observable o, Object arg) {
+        System.out.println("State changed, updating loginview");
         boolean success = state.getCurrentUser() != null;
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Alert alert = new Alert(success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
         alert.setTitle("Information");
         alert.setHeaderText("Login attempt");
-        alert.setContentText("The login attempt was" + (success ? "n" : "n't") + " successful.");
+        alert.setContentText("The login attempt was" + (success ? "" : "n't") + " successful.");
 
         alert.showAndWait();
     }

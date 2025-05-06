@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION bibliotekssystem.sf_getloanlimit("användarid" intege
 AS
 $$
 DECLARE
-    loanLimit INT;
+    loanlimit INT;
 BEGIN
     SELECT ut.max_lån
     INTO loanlimit

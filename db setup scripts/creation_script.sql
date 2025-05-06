@@ -23,15 +23,15 @@ COMMENT ON CONSTRAINT "Ämnesord_pk" ON "Ämnesord" IS 'Ämnesord måste vara un
 
 CREATE TABLE IF NOT EXISTS "Bok_Ämnesord"
 (
-    ord_id INTEGER NOT NULL
+    ord_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Ämnesord.ord_id"
             REFERENCES "Ämnesord"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    bok_id INTEGER NOT NULL
+    bok_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Ämnesord.bok_id"
             REFERENCES "Bok"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (ord_id, bok_id)
+    PRIMARY KEY (ord_jc_id, bok_jc_id)
 );
 
 CREATE TABLE IF NOT EXISTS "Författare"
@@ -44,15 +44,15 @@ CREATE TABLE IF NOT EXISTS "Författare"
 
 CREATE TABLE IF NOT EXISTS "Bok_Författare"
 (
-    bok_id        INTEGER NOT NULL
+    bok_jc_id        INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Författare.bok_id"
             REFERENCES "Bok"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    författare_id INTEGER NOT NULL
+    författare_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Författare.författare_id"
             REFERENCES "Författare"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (bok_id, författare_id)
+    PRIMARY KEY (bok_jc_id, författare_jc_id)
 );
 
 CREATE TABLE IF NOT EXISTS "Skådespelare"
@@ -74,15 +74,15 @@ CREATE TABLE IF NOT EXISTS "Film"
 
 CREATE TABLE IF NOT EXISTS "Film_Skådespelare"
 (
-    skådespelare_id INTEGER NOT NULL
+    skådespelare_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Film_Skådespelare.skådespelare_id"
             REFERENCES "Skådespelare"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    film_id         INTEGER NOT NULL
+    film_jc_id         INTEGER NOT NULL
         CONSTRAINT "FK_Film_Skådespelare.film_id"
             REFERENCES "Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (skådespelare_id, film_id)
+    PRIMARY KEY (skådespelare_jc_id, film_jc_id)
 );
 
 CREATE TABLE IF NOT EXISTS "Regissör"
@@ -95,15 +95,15 @@ CREATE TABLE IF NOT EXISTS "Regissör"
 
 CREATE TABLE IF NOT EXISTS "Film_Regissör"
 (
-    film_id     INTEGER NOT NULL
+    film_jc_id     INTEGER NOT NULL
         CONSTRAINT "FK_Film_Regissör.film_id"
             REFERENCES "Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    regissör_id INTEGER NOT NULL
+    regissör_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Film_Regissör.regissör_id"
             REFERENCES "Regissör"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (film_id, regissör_id)
+    PRIMARY KEY (film_jc_id, regissör_jc_id)
 );
 
 CREATE TABLE IF NOT EXISTS "Genre"
@@ -119,29 +119,29 @@ COMMENT ON CONSTRAINT genre_pk ON "Genre" IS 'Genre måste vara unik';
 
 CREATE TABLE IF NOT EXISTS "Film_Genre"
 (
-    film_id  INTEGER NOT NULL
+    film_jc_id  INTEGER NOT NULL
         CONSTRAINT "FK_Film_Genre.film_id"
             REFERENCES "Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    genre_id INTEGER NOT NULL
+    genre_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Film_Genre.genre_id"
             REFERENCES "Genre"
             ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (film_id, genre_id)
+    PRIMARY KEY (film_jc_id, genre_jc_id)
 );
 
 CREATE TABLE IF NOT EXISTS "Användartyp"
 (
-    användartyp VARCHAR(20) NOT NULL
+    användartyp_id VARCHAR(20) NOT NULL
         PRIMARY KEY,
-    max_lån     SMALLINT    NOT NULL
+    max_lån        SMALLINT    NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "Användare"
 (
     användare_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
-    användartyp  VARCHAR(10) NOT NULL
+    användartyp  VARCHAR(20) NOT NULL
         CONSTRAINT "FK_Användare.användartyp"
             REFERENCES "Användartyp"
             ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS "Exemplar"
         CONSTRAINT "FK_Exemplar.bok_id"
             REFERENCES "Bok"
             ON UPDATE CASCADE ON DELETE RESTRICT,
-    låntyp    VARCHAR(10) NOT NULL
+    låntyp    VARCHAR(20) NOT NULL
         CONSTRAINT "FK_Exemplar.låntyp"
             REFERENCES "Låneperiod"
             ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -226,10 +226,10 @@ SELECT b.bok_id,
        STRING_AGG(DISTINCT (f."förnamn"::TEXT || ' '::TEXT) || f.efternamn::TEXT, ', '::TEXT) AS "författare",
        STRING_AGG(DISTINCT a.ord::TEXT, ', '::TEXT)                                           AS "ämnesord"
 FROM bibliotekssystem."Bok" b
-         LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_id
-         LEFT JOIN bibliotekssystem."Författare" f ON bf."författare_id" = f."författare_id"
-         LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_id
-         LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_id = a.ord_id
+         LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_jc_id
+         LEFT JOIN bibliotekssystem."Författare" f ON bf."författare_jc_id" = f."författare_id"
+         LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_jc_id
+         LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_jc_id = a.ord_id
 GROUP BY b.bok_id, b.titel, b.isbn_13;
 
 CREATE OR REPLACE FUNCTION sf_getloanlimit("användarid" INTEGER) RETURNS INTEGER
@@ -242,7 +242,7 @@ BEGIN
     SELECT ut.max_lån
     INTO loanlimit
     FROM "Användartyp" ut
-             JOIN "Användare" u ON ut.användartyp = u.användartyp
+             JOIN "Användare" u ON ut.användartyp_id = u.användartyp
     WHERE u.användare_id = användarid;
 
     RETURN loanlimit;
@@ -306,7 +306,7 @@ BEGIN
 
     -- Skapa association
     INSERT
-    INTO "Bok_Författare" (bok_id, författare_id)
+    INTO "Bok_Författare" (bok_jc_id, författare_jc_id)
     VALUES (f_bok_id, f_författar_id)
     ON CONFLICT DO NOTHING;
     -- tydligen best practice, om än osannolikt att det händer
@@ -330,7 +330,7 @@ BEGIN
 
             -- Skapa association
             INSERT
-            INTO "Bok_Ämnesord" (ord_id, bok_id)
+            INTO "Bok_Ämnesord" (ord_jc_id, bok_jc_id)
             VALUES (f_ämnesord_id, f_bok_id)
             ON CONFLICT DO NOTHING;
         END LOOP;
@@ -403,7 +403,7 @@ BEGIN
                 RETURNING regissör_id INTO f_regissörid;
             END IF;
 
-            INSERT INTO "Film_Regissör" (film_id, regissör_id)
+            INSERT INTO "Film_Regissör" (film_jc_id, regissör_jc_id)
             VALUES (f_filmid, f_regissörid)
             ON CONFLICT DO NOTHING;
         END LOOP;
@@ -423,7 +423,7 @@ BEGIN
                 RETURNING skådespelare_id INTO f_skådespelarid;
             END IF;
 
-            INSERT INTO "Film_Skådespelare" (skådespelare_id, film_id)
+            INSERT INTO "Film_Skådespelare" (skådespelare_jc_id, film_jc_id)
             VALUES (f_skådespelarid, f_filmid)
             ON CONFLICT DO NOTHING;
         END LOOP;
@@ -442,7 +442,7 @@ BEGIN
                 RETURNING genre_id INTO f_genreid;
             END IF;
 
-            INSERT INTO "Film_Genre" (film_id, genre_id)
+            INSERT INTO "Film_Genre" (film_jc_id, genre_jc_id)
             VALUES (f_filmid, f_genreid)
             ON CONFLICT DO NOTHING;
         END LOOP;
@@ -505,10 +505,10 @@ BEGIN
                STRING_AGG(DISTINCT f.förnamn || ' ' || f.efternamn, ', ') AS författare, -- kombinera författarens för och efternamn
                STRING_AGG(DISTINCT a.ord, ', ')                           AS ämnesord    --aggregera ord till kommaseparerad lista
         FROM bibliotekssystem."Bok" b
-                 LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_id
-                 LEFT JOIN bibliotekssystem."Författare" f ON bf.författare_id = f.författare_id
-                 LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_id
-                 LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_id = a.ord_id
+                 LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_jc_id
+                 LEFT JOIN bibliotekssystem."Författare" f ON bf.författare_jc_id = f.författare_id
+                 LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_jc_id
+                 LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_jc_id = a.ord_id
         WHERE (i_titel IS NULL OR b.titel ILIKE '%' || i_titel || '%')
           AND (i_isbn IS NULL OR b.isbn_13 = i_isbn)
           AND (i_förnamn IS NULL OR f.förnamn ILIKE '%' || i_förnamn || '%')
@@ -523,8 +523,8 @@ BEGIN
             */
             (i_ämnesord IS NULL OR EXISTS (SELECT 1
                                            FROM bibliotekssystem."Bok_Ämnesord" ba2
-                                                    JOIN bibliotekssystem."Ämnesord" a2 ON ba2.ord_id = a2.ord_id
-                                           WHERE ba2.bok_id = b.bok_id
+                                                    JOIN bibliotekssystem."Ämnesord" a2 ON ba2.ord_jc_id = a2.ord_id
+                                           WHERE ba2.bok_jc_id = b.bok_id
                                              AND a2.ord = ANY (i_ämnesord)))
         GROUP BY b.bok_id, b.isbn_13, b.titel;
 END;
@@ -568,10 +568,10 @@ BEGIN
                STRING_AGG(DISTINCT f.förnamn || ' ' || f.efternamn, ', ') AS författare,
                STRING_AGG(DISTINCT a.ord, ', ')                           AS ämnesord
         FROM bibliotekssystem."Bok" b
-                 LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_id
-                 LEFT JOIN bibliotekssystem."Författare" f ON bf.författare_id = f.författare_id
-                 LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_id
-                 LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_id = a.ord_id
+                 LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_jc_id
+                 LEFT JOIN bibliotekssystem."Författare" f ON bf.författare_jc_id = f.författare_id
+                 LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_jc_id
+                 LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_jc_id = a.ord_id
         GROUP BY b.bok_id, b.isbn_13, b.titel
         HAVING i_sökterm IS NULL
             OR (

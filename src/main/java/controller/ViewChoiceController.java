@@ -18,7 +18,8 @@ public class ViewChoiceController extends Controller{
         Stage currentStage = (Stage) goToUserFirstViewButton.getScene().getWindow();
         currentStage.close();
 
-        super.getState().app.openUserFirstView();
+        //FIXME anrop saknas/ska ändras
+        //super.getState().app.openUserFirstView();
     }
 
     public void onLibraryGoToLibrarianLoginViewButtonClick(ActionEvent event) {

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Användare"
 (
     användare_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
-    användartyp  VARCHAR(10) NOT NULL
+    användartyp  VARCHAR(20) NOT NULL
         CONSTRAINT "FK_Användare.användartyp"
             REFERENCES bibliotekssystem."Användartyp"
             ON UPDATE CASCADE ON DELETE RESTRICT,

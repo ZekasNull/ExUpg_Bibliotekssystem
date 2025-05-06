@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS bibliotekssystem."Exemplar"
         CONSTRAINT "FK_Exemplar.bok_id"
             REFERENCES bibliotekssystem."Bok"
             ON UPDATE CASCADE ON DELETE RESTRICT,
-    låntyp    VARCHAR(10) NOT NULL
+    låntyp    VARCHAR(20) NOT NULL
         CONSTRAINT "FK_Exemplar.låntyp"
             REFERENCES bibliotekssystem."Låneperiod"
             ON UPDATE CASCADE ON DELETE RESTRICT,

@@ -28,6 +28,10 @@ CALL sp_lägg_till_bok(
         NULL,
         NULL
      );
+INSERT INTO "Exemplar" (bok_id, låntyp)
+VALUES ((SELECT bok_id from bibliotekssystem."Bok" where isbn_13 = '9780000000002'), 'referenslitteratur'),
+       ((SELECT bok_id from bibliotekssystem."Bok" where isbn_13 = '9780000000002'), 'referenslitteratur');
+
 
 -- Bok 3: ny författare, delar ämnesord med bok 2
 CALL sp_lägg_till_bok(
@@ -39,8 +43,12 @@ CALL sp_lägg_till_bok(
         NULL,
         NULL
      );
+INSERT INTO "Exemplar" (bok_id, låntyp)
+VALUES ((SELECT bok_id from bibliotekssystem."Bok" where isbn_13 = '9780000000003'), 'bok'),
+       ((SELECT bok_id from bibliotekssystem."Bok" where isbn_13 = '9780000000003'), 'bok');
 
--- Bok 4: delar författare med bok 3, nya ämnesord
+
+-- Bok 4: delar författare med bok 3, nya ämnesord, endast 1 exemplar
 CALL sp_lägg_till_bok(
         'Systemutveckling i praktiken',
         '9780000000004',
@@ -50,8 +58,10 @@ CALL sp_lägg_till_bok(
         NULL,
         NULL
      );
+INSERT INTO "Exemplar" (bok_id, låntyp)
+VALUES ((SELECT bok_id from bibliotekssystem."Bok" where isbn_13 = '9780000000004'), 'bok');
 
--- Bok 5: ny författare, delar ämnesord med bok 4 och bok 1
+-- Bok 5: ny författare, delar ämnesord med bok 4 och bok 1, inga exemplar
 CALL sp_lägg_till_bok(
         'Projektledning för systemvetare',
         '9780000000005',
@@ -61,6 +71,79 @@ CALL sp_lägg_till_bok(
         NULL,
         NULL
      );
+
+-- Testfilmer (godtyckliga)
+CALL sp_lägg_till_film(
+        'The Matrix',
+        'USA',
+        15,
+        ARRAY['Lana', 'Lilly'], -- Director first names
+        ARRAY['Wachowski', 'Wachowski'], -- Director last names
+        ARRAY['Keanu', 'Laurence', 'Carrie-Anne', 'Hugo', 'Joe'],
+        ARRAY['Reeves', 'Fishburne', 'Moss', 'Weaving', 'Pantoliano'],
+        ARRAY['Science Fiction', 'Action'],
+        NULL, NULL
+     );
+INSERT INTO "Exemplar" (film_id, låntyp)
+VALUES ((SELECT film_id from bibliotekssystem."Film" where titel = 'The Matrix'), 'film');
+
+-- Gemensam skådespelare med The Matrix (Bruce) och genre (action)
+CALL sp_lägg_till_film(
+        'Die Hard',
+        'USA',
+        16,
+        ARRAY['John'],
+        ARRAY['McTiernan'],
+        ARRAY['Bruce', 'Alan', 'Bonnie', 'Reginald', 'Alexander'],
+        ARRAY['Willis', 'Rickman', 'Bedelia', 'VelJohnson', 'Goddunov'],
+        ARRAY['Action', 'Thriller'],
+        NULL, NULL
+     );
+INSERT INTO "Exemplar" (film_id, låntyp)
+VALUES ((SELECT film_id from bibliotekssystem."Film" where titel = 'Die Hard'), 'film');
+
+CALL sp_lägg_till_film(
+        'Pulp Fiction',
+        'USA',
+        18,
+        ARRAY['Quentin'],
+        ARRAY['Tarantino'],
+        ARRAY['John', 'Samuel', 'Uma', 'Bruce', 'Ving'],
+        ARRAY['Travolta', 'Jackson', 'Thurman', 'Willis', 'Rhames'],
+        ARRAY['Crime', 'Drama'],
+        NULL, NULL
+     );
+INSERT INTO "Exemplar" (film_id, låntyp)
+VALUES ((SELECT film_id from bibliotekssystem."Film" where titel = 'Pulp Fiction'), 'film');
+
+CALL sp_lägg_till_film(
+        'Peruna',
+        'Finland',
+        12,
+        ARRAY['Janne'],
+        ARRAY['Koukkari'],
+        ARRAY['Joonas', 'Mikko', 'Hannu-Pekka', 'Kari', 'Jaana'],
+        ARRAY['Saartamo', 'Kouki', 'Björkman', 'Hietalahti', 'Sundqvist'],
+        ARRAY['Comedy', 'Adventure'],
+        NULL, NULL
+     );
+INSERT INTO "Exemplar" (film_id, låntyp)
+VALUES ((SELECT film_id from bibliotekssystem."Film" where titel = 'Peruna'), 'film');
+
+CALL sp_lägg_till_film(
+        'Ghost in the Shell',
+        'Japan',
+        15,
+        ARRAY['Mamoru'],
+        ARRAY['Oshii'],
+        ARRAY['Atsuko', 'Akio', 'Iemasa', 'Tamio', 'Kōichi'],
+        ARRAY['Tanaka', 'Ōtsuka', 'Kayumi', 'Ōki', 'Yamadera'],
+        ARRAY['Animation', 'Science Fiction'],
+        NULL, NULL
+     );
+INSERT INTO "Exemplar" (film_id, låntyp)
+VALUES ((SELECT film_id from bibliotekssystem."Film" where titel = 'Ghost in the Shell'), 'film');
+
 
 --Användare - En av varje typ räcker för test. Mest intressant är egentligen bibliotekarie
 INSERT INTO "Användare" (användartyp, användarnamn, pin, fullt_namn)

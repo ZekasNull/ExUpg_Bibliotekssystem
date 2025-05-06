@@ -8,6 +8,7 @@ import state.ApplicationState;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import java.util.List;
 
 public class DatabaseService {
     private final DBConnector dbc = DBConnector.getInstance();
@@ -59,25 +60,78 @@ public class DatabaseService {
 
     /**
      * Söker efter böcker med hjälp av sökterm, matchande något av titel, isbn-13, ämnesord eller författare (för/efternamn)
-     * @param searchterm som matchar något av författare,
-     * @return
+     * @param searchterm en enkel string
+     * @return List<Bok> av alla resultat, eller null om det inte fanns något resultat.
      */
-    public Bok searchAndGetBooks(String searchterm) {
-        String search = searchterm.toLowerCase();
+    public List<Bok> searchAndGetBooks(String searchterm) {
+        //metodvariabler
+        List<Bok> resultlist;
         EntityManager em = dbc.getEntityManager();
 
-        //em.createStoredProcedureQuery()
+        //query
+        try {
+            em.getTransaction().begin();
 
-        return null; //TODO remove this line
+            // JPQL query for searching across title, isbn13, author name, and keyword word
+            TypedQuery<Bok> query = em.createQuery(
+                    "SELECT DISTINCT b FROM Bok b " +
+                            "LEFT JOIN FETCH b.Författare a " +
+                            "LEFT JOIN FETCH b.Ämnesord k " +
+                            "WHERE LOWER(b.titel) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(b.isbn13) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(a.förnamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(a.efternamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(k.ord) LIKE LOWER(CONCAT('%', :searchTerm, '%'))", Bok.class);
+
+            query.setParameter("searchTerm", searchterm);
+
+            resultlist = query.getResultList();
+
+            em.getTransaction().commit(); //run query
+
+            return resultlist;
+
+        } finally {
+            //runs after return in try block is encountered, but before it is executed
+            em.close();
+        }
     }
 
 
 
-    public Film searchFilm() {
+    public List<Film> searchFilm(String searchTerm) {
+        EntityManager em = dbc.getEntityManager();
 
-        return null; //TODO remove
+        try {
+            em.getTransaction().begin();
+
+            TypedQuery<Film> query = em.createQuery(
+                    "SELECT DISTINCT f FROM Film f " +
+                            "LEFT JOIN FETCH f.skådespelares a " +
+                            "LEFT JOIN FETCH f.regissörs d " +
+                            "LEFT JOIN FETCH f.genres g " +
+                            "WHERE LOWER(f.titel) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(f.produktionsland) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR CAST(f.åldersgräns AS string) LIKE CONCAT('%', :searchTerm, '%')" +
+                            "OR LOWER(a.förnamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(a.efternamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(d.förnamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(d.efternamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(g.genreNamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))"
+                    , Film.class);
+
+            query.setParameter("searchTerm", searchTerm);
+            List<Film> results = query.getResultList();
+
+            em.getTransaction().commit();
+
+            return results;
+        } finally {
+            em.close();
+        }
     }
 
+    //TODO Implementera men inte prioritet
     public Bok searchTidskrift() {
 
         return null; //TODO remove

@@ -35,15 +35,4 @@ public class Låneperiod {
                 '}';
     }
 
-    /*
-Då låneperiod är ett intervall så kunde det inte läggas in direkt. Det finns två val:
-1. Använd någon sorts hårdkodad enum då vi har begränsad antal typer av perioder
-2. Koda logik att hämta intervallet i ett format Java kan hantera (stödjer då att databasen ändrar sig)
-/*
- TODO [Reverse Engineering] create field to map the '\"lånperiod\"' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @Column(name = "\"lånperiod\"", columnDefinition = "interval not null")
-    private java.lang.Object lånperiod;
-*/
-
 }

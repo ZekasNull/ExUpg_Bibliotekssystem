@@ -12,7 +12,7 @@ public class Användare {
     @Column(name = "\"användare_id\"", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "\"användartyp\"", nullable = false)
     private Användartyp användartyp;
 
@@ -25,7 +25,7 @@ public class Användare {
     @Column(name = "fullt_namn", nullable = false, length = 50)
     private String fulltNamn;
 
-    @OneToMany(mappedBy = "användare")
+    @OneToMany(mappedBy = "användare", fetch = FetchType.EAGER)
     private Set<Lån> låns = new LinkedHashSet<>();
 
     public Set<Lån> getLåns() {

@@ -11,15 +11,15 @@ public class Lån {
     @Column(name = "\"lån_id\"", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "streckkod", nullable = false)
     private Exemplar streckkod;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "\"användare_id\"", nullable = false)
     private Användare användare;
 
-    @Column(name = "\"lånedatum\"", nullable = false)
+    @Column(name = "\"lånedatum\"", nullable = false, insertable = false, updatable = false)
     private Instant lånedatum;
 
     public Integer getId() {
@@ -54,4 +54,12 @@ public class Lån {
         this.lånedatum = lånedatum;
     }
 
+    @Override
+    public String toString() {
+        return "Lån{" +
+                "id=" + id +
+                ", streckkod=" + streckkod +
+                ", lånedatum=" + lånedatum +
+                '}';
+    }
 }

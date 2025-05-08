@@ -1,12 +1,12 @@
 package db;
 
-import model.Användare;
-import model.Bok;
-import model.Film;
+import model.*;
+import org.postgresql.util.PSQLException;
 import state.ApplicationState;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
@@ -23,10 +23,45 @@ public class DatabaseService {
         this.state = state;
     }
 
-    /* public static void main(String[] args) {
-        DatabaseService test = new DatabaseService(new ApplicationState());
-        test.logInLibrarian("aaaasdf", "0000");
-    } */
+
+    /**
+     * Registrerar exemplaren användaren ska låna i databasen
+     * @param exlista Lista över exemplaren som ska lånas
+     * @param anv Användaren som lånen tillhör
+     * @throws PSQLException om fel uppstår i databasen
+     */
+    public void registreraLån(List<Exemplar> exlista, Användare anv) throws PSQLException
+    {
+        Användare tempanv;
+        EntityManager em = dbc.getEntityManager();
+        try {
+            em.getTransaction().begin(); //börja transaktion
+            tempanv = em.merge(anv); //re-add user to em (returns managed entity)
+            //skapa lån för varje exemplar
+            for (Exemplar exemplar : exlista) {
+                Lån nyttLån = new Lån();
+                nyttLån.setAnvändare(tempanv);
+                nyttLån.setStreckkod(exemplar);
+                em.persist(nyttLån);
+            }
+            em.getTransaction().commit(); //utför transaktionen (uppdatera användarens lån i databasen till att matcha anv)
+
+            System.out.println("Databaseservice: Lån (förmodligen) registrerade"); //debug
+        } catch (PersistenceException e) { //fånga fel
+            System.out.println("databaseservice: we erroring");
+            Throwable cause = e.getCause();
+            while(cause != null){ //klättra callstack tills antingen null eller rätt fel hittas
+                if(cause instanceof PSQLException){ //hitta serverfeltypen
+                    throw (PSQLException)cause; //rethrow med rätt typ
+                }
+                cause = cause.getCause(); //klättra upp i callstack
+            }
+            throw e; //om det är av annan typ, kasta om utan cast
+        }finally{
+            em.close(); //stäng entitymanager
+        }
+
+    }
 
     /**
      * "Loggar in" genom att kolla om en användare med den pin-koden existerar.
@@ -98,8 +133,13 @@ public class DatabaseService {
     }
 
 
-
-    public List<Film> searchFilm(String searchTerm) {
+    /**
+     * Söker efter filmer med hjälp av sökterm, matchande något av titel, produktionsland, åldersgräns,
+     * genre, regissör (för/efternamn) eller skådespelare (för/efternamn)
+     * @param searchTerm en enkel string
+     * @return en List<Film> av resultat, eller null om inget hittades
+     */
+    public List<Film> searchAndGetFilms(String searchTerm) {
         EntityManager em = dbc.getEntityManager();
 
         try {

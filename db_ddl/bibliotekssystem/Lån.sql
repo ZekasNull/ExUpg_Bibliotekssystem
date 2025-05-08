@@ -19,3 +19,9 @@ CREATE TRIGGER check_loan_limit_trigger
     FOR EACH ROW
 EXECUTE PROCEDURE bibliotekssystem.st_check_loan_limit();
 
+CREATE TRIGGER trg_uppdatera_exemplar_tillgänglighet
+    AFTER INSERT OR DELETE
+    ON bibliotekssystem."Lån"
+    FOR EACH ROW
+EXECUTE PROCEDURE bibliotekssystem.st_uppdatera_exemplar_tillgänglighet();
+

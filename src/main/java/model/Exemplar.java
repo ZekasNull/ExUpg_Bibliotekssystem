@@ -22,6 +22,17 @@ public class Exemplar {
     @JoinColumn(name = "\"låntyp\"", nullable = false)
     private Låneperiod låntyp;
 
+    @Column(name = "\"tillgänglig\"", nullable = false)
+    private Boolean tillgänglig = false;
+
+    public Boolean getTillgänglig() {
+        return tillgänglig;
+    }
+
+    public void setTillgänglig(Boolean tillgänglig) {
+        this.tillgänglig = tillgänglig;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -59,6 +70,7 @@ public class Exemplar {
         return "Exemplar{" +
                 "id=" + id +
                 ", låntyp=" + låntyp +
+                ", tillgänglig=" + tillgänglig +
                 '}';
     }
 }

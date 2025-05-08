@@ -11,10 +11,10 @@ BEGIN
                STRING_AGG(DISTINCT f.förnamn || ' ' || f.efternamn, ', ') AS författare, -- kombinera författarens för och efternamn
                STRING_AGG(DISTINCT a.ord, ', ')                           AS ämnesord    --aggregera ord till kommaseparerad lista
         FROM bibliotekssystem."Bok" b
-                 LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_id
-                 LEFT JOIN bibliotekssystem."Författare" f ON bf.författare_id = f.författare_id
-                 LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_id
-                 LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_id = a.ord_id
+                 LEFT JOIN bibliotekssystem."Bok_Författare" bf ON b.bok_id = bf.bok_jc_id
+                 LEFT JOIN bibliotekssystem."Författare" f ON bf.författare_jc_id = f.författare_id
+                 LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_jc_id
+                 LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_jc_id = a.ord_id
         WHERE (i_titel IS NULL OR b.titel ILIKE '%' || i_titel || '%')
           AND (i_isbn IS NULL OR b.isbn_13 = i_isbn)
           AND (i_förnamn IS NULL OR f.förnamn ILIKE '%' || i_förnamn || '%')
@@ -29,8 +29,8 @@ BEGIN
             */
             (i_ämnesord IS NULL OR EXISTS (SELECT 1
                                            FROM bibliotekssystem."Bok_Ämnesord" ba2
-                                                    JOIN bibliotekssystem."Ämnesord" a2 ON ba2.ord_id = a2.ord_id
-                                           WHERE ba2.bok_id = b.bok_id
+                                                    JOIN bibliotekssystem."Ämnesord" a2 ON ba2.ord_jc_id = a2.ord_id
+                                           WHERE ba2.bok_jc_id = b.bok_id
                                              AND a2.ord = ANY (i_ämnesord)))
         GROUP BY b.bok_id, b.isbn_13, b.titel;
 END;

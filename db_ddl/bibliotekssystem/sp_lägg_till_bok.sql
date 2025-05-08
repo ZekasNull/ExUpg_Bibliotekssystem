@@ -35,7 +35,7 @@ BEGIN
 
     -- Skapa association
     INSERT
-    INTO "Bok_Författare" (bok_id, författare_id)
+    INTO "Bok_Författare" (bok_jc_id, författare_jc_id)
     VALUES (f_bok_id, f_författar_id)
     ON CONFLICT DO NOTHING;
     -- tydligen best practice, om än osannolikt att det händer
@@ -59,7 +59,7 @@ BEGIN
 
             -- Skapa association
             INSERT
-            INTO "Bok_Ämnesord" (ord_id, bok_id)
+            INTO "Bok_Ämnesord" (ord_jc_id, bok_jc_id)
             VALUES (f_ämnesord_id, f_bok_id)
             ON CONFLICT DO NOTHING;
         END LOOP;

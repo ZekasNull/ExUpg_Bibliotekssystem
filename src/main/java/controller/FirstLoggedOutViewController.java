@@ -1,5 +1,6 @@
 package controller;
 
+import com.sun.prism.shader.FillEllipse_Color_AlphaTest_Loader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -7,13 +8,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.Bok;
-import model.Film;
-import model.Tidskrift;
-import model.Ämnesord;
+import model.*;
 import state.ApplicationState;
+
+import javax.persistence.SecondaryTable;
 import java.util.List;
 import java.util.Observable;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FirstLoggedOutViewController extends Controller {
@@ -32,6 +33,15 @@ public class FirstLoggedOutViewController extends Controller {
 
     public Button NotLoggedInSearchButton;
 
+    //Tableview för film och dess kolumner
+    public TableView<Film> notLoggedInFilmSearchTable;
+    public TableColumn<Film, String> filmTitleColumn;
+    public TableColumn<Film, String> productionCountryColumn;
+    public TableColumn<Film, Integer> ageLimitColumn;
+    public TableColumn<Film, String> directorsColumn;
+    public TableColumn<Film, String> actorsColumn;
+    public TableColumn<Film, String> genreColumn;
+
     private String selectedObject;
 
     public void onUserGoToLoginViewButtonClick(ActionEvent actionEvent) {
@@ -39,11 +49,15 @@ public class FirstLoggedOutViewController extends Controller {
     }
 
     public void handleBokOption(ActionEvent actionEvent) {
+        notLoggedInBookSearchTable.setVisible(true);
+        notLoggedInFilmSearchTable.setVisible(false);
         selectedObject = "Bok";
         objektTypFlerVal.setText(selectedObject); //Sätter vilket typ av objekt som ska sökas efter
     }
 
     public void handleFilmOption(ActionEvent actionEvent) {
+        notLoggedInBookSearchTable.setVisible(false);
+        notLoggedInFilmSearchTable.setVisible(true);
         selectedObject = "Film";
         objektTypFlerVal.setText(selectedObject);
     }
@@ -52,14 +66,20 @@ public class FirstLoggedOutViewController extends Controller {
         selectedObject = "Tidskrift";
         objektTypFlerVal.setText(selectedObject);
     }
-
+//TODO: Se till att det inte blir randomized ämnesord
     public void onNotLoggedInSearchButtonClick(ActionEvent actionEvent) {
 /*Faktiska som körs och inte bara hämtar information
 * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
 * */
+        if (selectedObject == null){
+            System.out.println("Gnäll");
+        }
+        if (searchtermBoxContents.getText().trim().isEmpty()){
+            return; //TODO pop up om att du får inte söka på inget
+        }
         try{
             if(selectedObject.equals("Bok")){
-                List<Bok> searchTerm = state.databaseService.searchAndGetBooks(searchtermBoxContents.getText());
+                List<Bok> searchTerm = state.databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
 
                 ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInBookSearchTable.setItems(data);
@@ -89,12 +109,37 @@ public class FirstLoggedOutViewController extends Controller {
                 });
             }
             else if (selectedObject.equals("Film")){
-                List<Film> searchTerm = state.databaseService.searchAndGetFilms(searchtermBoxContents.getText());
+                List<Film> searchTerm = state.databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
 
                 ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
-                //notLoggedInFilmSearchTable.setItems(data); - Kräver ett annat table?
+                notLoggedInFilmSearchTable.setItems(data);
+                System.out.println("Rows added to table: " + data.size() + " (Film");
+
+                filmTitleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
+                productionCountryColumn.setCellValueFactory(new PropertyValueFactory<>("produktionsland"));
+                ageLimitColumn.setCellValueFactory(new PropertyValueFactory<>("åldersgräns"));
+                directorsColumn.setCellValueFactory(cellData -> {
+                    Film film = cellData.getValue();
+                    String directorName = film.getRegissörs().stream()
+                            .map(regissör -> regissör.getFörnamn() + " " + regissör.getEfternamn())
+                            .collect(Collectors.joining(", "));
+                    return new SimpleStringProperty(directorName);
+                });
+                actorsColumn.setCellValueFactory(cellData -> {
+                    Set<Skådespelare> actors = cellData.getValue().getSkådespelares();
+                    String fullNamn = actors.stream()
+                            .map(actor -> actor.getFörnamn() + " " + actor.getEfternamn())
+                            .collect(Collectors.joining(","));
+                    return new SimpleStringProperty(fullNamn);
+                });
+                genreColumn.setCellValueFactory(cellData -> {
+                    Set<Genre> genres = cellData.getValue().getGenres();
+                    String allaGenre = genres.stream()
+                            .map(Genre::getGenreNamn)
+                            .collect(Collectors.joining(", "));
+                    return new SimpleStringProperty(allaGenre);
+                });
             }
-            //TODO: Fungerar inte för film ännu, tänker den får ett eget tableview och behöver då sina egna lambda I think
             /*else if (selectedObject.equals("Tidskrift")){
                 List<Tidskrift> searchTerm = state.databaseService.searchTidskrift(searchtermBoxContents.getText());
 

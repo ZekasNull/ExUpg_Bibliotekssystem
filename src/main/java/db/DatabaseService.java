@@ -111,7 +111,7 @@ public class DatabaseService {
             TypedQuery<Bok> query = em.createQuery(
                     "SELECT DISTINCT b FROM Bok b " +
                             "LEFT JOIN FETCH b.Författare a " +
-                            "LEFT JOIN FETCH b.Ämnesord k " +
+                            "LEFT JOIN b.Ämnesord k " +
                             "WHERE LOWER(b.titel) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
                             "OR LOWER(b.isbn13) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
                             "OR LOWER(a.förnamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
@@ -121,6 +121,10 @@ public class DatabaseService {
             query.setParameter("searchTerm", searchterm);
 
             resultlist = query.getResultList();
+
+            for (Bok bok : resultlist) {
+                bok.getÄmnesord().size();
+            } //tvinga em att ladda ämnesord för att undvika en fetch som inte beter sig i query
 
             em.getTransaction().commit(); //run query
 

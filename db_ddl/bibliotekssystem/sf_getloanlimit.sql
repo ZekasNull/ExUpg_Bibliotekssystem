@@ -7,8 +7,8 @@ DECLARE
 BEGIN
     SELECT ut.max_lån
     INTO loanlimit
-    FROM "Användartyp" ut
-             JOIN "Användare" u ON ut.användartyp = u.användartyp
+    FROM bibliotekssystem."Användartyp" ut
+             JOIN bibliotekssystem."Användare" u ON ut.användartyp_id = u.användartyp
     WHERE u.användare_id = användarid;
 
     RETURN loanlimit;

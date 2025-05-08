@@ -8,7 +8,7 @@ DECLARE
 BEGIN
     SELECT COUNT(lån_id)
     INTO currentloans
-    FROM "Lån"
+    FROM bibliotekssystem."Lån"
     WHERE användarid = "Lån".användare_id;
 
     RETURN currentloans;

@@ -3,8 +3,8 @@ CREATE OR REPLACE FUNCTION bibliotekssystem.st_check_loan_limit() RETURNS trigge
 AS
 $$
 DECLARE
-    current_loans  INT := sf_getcurrentloanscount(new.användare_id);
-    loan_limit     INT := sf_getloanlimit(new.användare_id);
+    current_loans  INT := bibliotekssystem.sf_getcurrentloanscount(new.användare_id);
+    loan_limit     INT := bibliotekssystem.sf_getloanlimit(new.användare_id);
     incoming_loans INT;
 BEGIN
     SELECT COUNT(new.lån_id) INTO incoming_loans;

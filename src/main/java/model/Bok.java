@@ -37,6 +37,15 @@ public class Bok {
     )
     private Set<Ämnesord> Ämnesord;
 
+    //Getters för båda så sökningen kan skriva ut de i deras separata kolumner
+    public Set<Ämnesord> getÄmnesord() {
+        return Ämnesord;
+    }
+
+    public Set<Författare> getFörfattare() {
+        return Författare;
+    }
+
     @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER)
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
 

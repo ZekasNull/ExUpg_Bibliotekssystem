@@ -12,8 +12,8 @@
             <Font size="20.0" />
          </font>
       </Label>
-      <TextField fx:id="searchtermBoxContents" layoutX="182.0" layoutY="77.0" prefHeight="25.0" prefWidth="237.0" text="Sökterm..." />
-      <Button fx:id="" layoutX="419.0" layoutY="77.0" mnemonicParsing="false" text="Sök" />
+      <TextField fx:id="searchtermBoxContents" layoutX="182.0" layoutY="77.0" prefHeight="25.0" prefWidth="237.0" />
+      <Button fx:id="NotLoggedInSearchButton" layoutX="419.0" layoutY="77.0" mnemonicParsing="false" onAction="#onNotLoggedInSearchButtonClick" text="Sök" />
       <Label layoutX="182.0" layoutY="109.0" text="Objekttyp" />
       <SplitMenuButton fx:id="objektTypFlerVal" layoutX="182.0" layoutY="133.0" mnemonicParsing="false" text="Välj objekt">
         <items>
@@ -22,6 +22,13 @@
             <MenuItem mnemonicParsing="false" onAction="#handleTidskriftOption" text="Tidskrift" />
         </items>
       </SplitMenuButton>
-      <Button fx:id="BorrowObjectButton" layoutX="498.0" layoutY="200.0" mnemonicParsing="false" text="Låna" style="-fx-opacity:0.3; -fx-background-color: transparent;"  />
+      <TableView fx:id="notLoggedInBookSearchTable" layoutX="44.0" layoutY="170.0" prefHeight="200.0" prefWidth="526.0">
+        <columns>
+          <TableColumn fx:id="titleColumn" prefWidth="150.0" text="Titel" />
+          <TableColumn fx:id="isbnColumn" prefWidth="107.0" text="ISBN-13" />
+            <TableColumn fx:id="subjectColumn" prefWidth="143.0" text="Ämnesord" />
+            <TableColumn fx:id="authorNameColumn" prefWidth="125.0" text="Författare namn" />
+        </columns>
+      </TableView>
    </children>
 </AnchorPane>

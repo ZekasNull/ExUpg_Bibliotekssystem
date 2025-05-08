@@ -2,6 +2,8 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/db setup scripts/creation_script.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db setup scripts/lookup_table_constants.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db setup scripts/testdata.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_sök_böcker_enkel.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/vy_bok_info.sql" dialect="PostgreSQL" />
   </component>

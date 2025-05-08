@@ -4,6 +4,7 @@ import d0024e.exupg_bibliotekssystem.MainApplication;
 import db.DatabaseService;
 import model.Användare;
 
+import java.awt.print.Book;
 import java.util.Observable;
 
 /**
@@ -31,6 +32,13 @@ public class ApplicationState extends Observable {
 
     public ApplicationState() {
         this.databaseService = new DatabaseService(this);
+    }
+
+    public static ApplicationState getInstance() {
+        if (instance == null) {
+            instance = new ApplicationState();
+        }
+        return instance;
     }
 
 

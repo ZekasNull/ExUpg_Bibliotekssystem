@@ -25,7 +25,9 @@ public class MainApplication extends Application {
     @Override //Starts the program and sets up the primaryStage
     public void start(Stage var1) throws Exception {
         primaryStage = var1;
-        openViewChoice();
+        //openViewChoice();
+        openLoggedOutView();
+        //NOTE: översta för det gamla UIt(inlogg), understa för det nya(sökning)
     }
     /* For me and my lousey memory :P - essentially the outline for it to work
     public static void openWindowName() {
@@ -79,6 +81,23 @@ public class MainApplication extends Application {
         }catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public void openLoggedOutView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("first-logged-out-view.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE);
+            APPSTATE.addObserver(controller);
+
+            primaryStage.setTitle("Logged Out View");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void main(String[] args) {

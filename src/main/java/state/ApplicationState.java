@@ -42,7 +42,6 @@ public class ApplicationState extends Observable {
     }
 
 
-
     public Användare getCurrentUser() {
         return currentUser;
     }

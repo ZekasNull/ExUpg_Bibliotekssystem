@@ -1,14 +1,22 @@
 package controller;
 
 import com.sun.prism.shader.FillEllipse_Color_AlphaTest_Loader;
+import d0024e.exupg_bibliotekssystem.MainApplication;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javassist.Loader;
 import model.*;
+import org.jboss.jandex.Main;
 import state.ApplicationState;
 
 import javax.persistence.SecondaryTable;
@@ -16,9 +24,12 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javafx.stage.Popup;
 
 public class FirstLoggedOutViewController extends Controller {
-    private final ApplicationState state = ApplicationState.getInstance(); //... JUSTE det här behövdes för state lämnades null och jag kom inte på ett bättre sätt
+    private ApplicationState state = ApplicationState.getInstance(); //... JUSTE det här behövdes för state lämnades null och jag kom inte på ett bättre sätt
+    private ApplicationState APPSTATE;
+
     @FXML
     public Button GoToLoginViewButton; //Knapp för att logga in
     public TextField searchtermBoxContents; //Vad som står i själva sökboxen
@@ -45,7 +56,7 @@ public class FirstLoggedOutViewController extends Controller {
     private String selectedObject;
 
     public void onUserGoToLoginViewButtonClick(ActionEvent actionEvent) {
-        //TODO: lägg till en väg att gå till inlogget
+        super.getState().app.openLoginView();
     }
 
     public void handleBokOption(ActionEvent actionEvent) {
@@ -83,7 +94,7 @@ public class FirstLoggedOutViewController extends Controller {
 
                 ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInBookSearchTable.setItems(data);
-                System.out.println("Rows added to table: " + data.size() + " (Bok");
+                System.out.println("Rows added to table: " + data.size() + " Bok");
 
                 //Sätter in det returnerade värdet från sökningens titel i titelkolumnen osv (Ligger här för att dela upp det mellan bok,film, och tidsskrift)
                 titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
@@ -113,7 +124,7 @@ public class FirstLoggedOutViewController extends Controller {
 
                 ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInFilmSearchTable.setItems(data);
-                System.out.println("Rows added to table: " + data.size() + " (Film");
+                System.out.println("Rows added to table: " + data.size() + " Film");
 
                 filmTitleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
                 productionCountryColumn.setCellValueFactory(new PropertyValueFactory<>("produktionsland"));
@@ -155,6 +166,11 @@ public class FirstLoggedOutViewController extends Controller {
 //Nu har jag helt ärligt glömt varför jag behövde den men jag provade utan och det fick jag inte
     @Override
     public void update(Observable o, Object arg) {
-
+        System.out.println("System");
+        if (state.getCurrentUser() == null) {return;}
+        if(state.getCurrentUser().getAnvändartyp().getAnvändartyp().equalsIgnoreCase("allmänhet")) {
+            //state av en scene har en currentUser, vi hämtar dens användartyp(klass) som vi sen behöver hämta exakt användartyp(type) ifrån, sen .equals
+            System.out.println("I work :D");
+        }
     }
 }

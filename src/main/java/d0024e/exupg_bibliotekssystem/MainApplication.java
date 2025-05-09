@@ -4,6 +4,7 @@ import controller.Controller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import state.ApplicationState;
 
@@ -29,20 +30,6 @@ public class MainApplication extends Application {
         openLoggedOutView();
         //NOTE: översta för det gamla UIt(inlogg), understa för det nya(sökning)
     }
-    /* For me and my lousey memory :P - essentially the outline for it to work
-    public static void openWindowName() {
-    try{
-        FXMLLoader lname = new FXMLLoader(MainApplication.class.getResource("fxml-file-name.fxml));
-        Scene sname = new Scene(lname.load());
-        primaryStage.setTitle("Window name");
-        primaryStage.setScene(sname);
-        primaryStage.show();
-    }catch()Exception e){
-        e.printStackTrace();
-        }
-    }
-    Kolla Eventhandler TipCalculator, anonymous inner class Tiplabel.setTitle, eller med Lambda, lambda är att föredra
-    * */
     public void openViewChoice() {
         try{
             //Load the fxml file onto "loader"
@@ -98,6 +85,25 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
 
+    }
+    public void openLoginView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("login-view.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
+
+            Stage loginStage = new Stage();
+            loginStage.setTitle("Login View");
+            loginStage.setScene(scene);
+            loginStage.initModality(Modality.APPLICATION_MODAL); //Så inget kan göras runtom pop-up fönstret
+            loginStage.show();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

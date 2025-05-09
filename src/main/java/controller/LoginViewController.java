@@ -1,29 +1,35 @@
 package controller;
 
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import model.Användare;
+import model.Användartyp;
 import state.ApplicationState;
+
 import java.util.Observable;
 
-public class LibrarianLoginViewController extends Controller {
-    private ApplicationState state;
-
+public class LoginViewController extends Controller{
+    private ApplicationState state = ApplicationState.getInstance();
     @FXML
-    private TextField emailBoxContents; //FIXME ska vara ltu-ideal
+    public Button logInButton;
+    public TextField idealBoxContents;
+    public PasswordField pinBoxContents;
+    public Scene scene;
 
-    @FXML
-    private PasswordField passwordBoxContents;
+    public FirstLoggedOutViewController mainMenuController;
 
-    public Button LogInLibrarianButton;
-
-    public void onLibrarianLogInLibrarianButtonClick(ActionEvent event) {
+    public void setMainMenuController(FirstLoggedOutViewController mainMenuController) {
+        this.mainMenuController = mainMenuController;
+    }
+    public void onLogInButtonCLick(ActionEvent actionEvent) {
         //TODO kontrollern ska ansvara för att analysera informationen i användaren som hämtas (dvs rätt användartyp)
-        state.setCurrentUser(state.databaseService.logInUser(emailBoxContents.getText(), passwordBoxContents.getText()));
-
+        System.out.println("onloginbutton");
+        state.setCurrentUser(state.databaseService.logInUser(idealBoxContents.getText(), pinBoxContents.getText()));
     }
 
     @Override
@@ -38,11 +44,12 @@ public class LibrarianLoginViewController extends Controller {
         alert.showAndWait();
     }
 
-  /*  public ApplicationState getState() {
+    public ApplicationState getState() {
         return state;
     }
 
     public void setState(ApplicationState state) {
         this.state = state;
-    }*/
+    }
 }
+

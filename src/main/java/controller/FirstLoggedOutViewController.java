@@ -34,6 +34,7 @@ public class FirstLoggedOutViewController extends Controller {
     public Button GoToLoginViewButton; //Knapp för att logga in
     public TextField searchtermBoxContents; //Vad som står i själva sökboxen
     public SplitMenuButton objektTypFlerVal; //Vilket typ av objekt som ska filtreras
+    private String selectedObject;
     public Button BorrowObjectButton; //TODO: se till att det kommer upp ett meddelande om att logga in on hover
 
     public TableColumn<Bok, String> titleColumn;
@@ -53,7 +54,6 @@ public class FirstLoggedOutViewController extends Controller {
     public TableColumn<Film, String> actorsColumn;
     public TableColumn<Film, String> genreColumn;
 
-    private String selectedObject;
 
     public void onUserGoToLoginViewButtonClick(ActionEvent actionEvent) {
         super.getState().app.openLoginView();
@@ -163,12 +163,11 @@ public class FirstLoggedOutViewController extends Controller {
             e.printStackTrace();
         }
     }
-//Nu har jag helt ärligt glömt varför jag behövde den men jag provade utan och det fick jag inte
     @Override
     public void update(Observable o, Object arg) {
         System.out.println("System");
-        if (state.getCurrentUser() == null) {return;}
-        if(state.getCurrentUser().getAnvändartyp().getAnvändartyp().equalsIgnoreCase("allmänhet")) {
+        if (state.getCurrentUser() == null) {System.out.println("Ingen är inloggad");}
+        else if(state.getCurrentUser().getAnvändartyp().getAnvändartyp().equalsIgnoreCase("allmänhet")) {
             //state av en scene har en currentUser, vi hämtar dens användartyp(klass) som vi sen behöver hämta exakt användartyp(type) ifrån, sen .equals
             System.out.println("I work :D");
         }

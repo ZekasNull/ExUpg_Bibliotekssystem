@@ -94,6 +94,7 @@ public class MainApplication extends Application {
             //hämta referens till controller
             Controller controller = loader.getController();
             controller.setState(APPSTATE); //ge referens till appstate
+            APPSTATE.addObserver(controller);
 
             Stage loginStage = new Stage();
             loginStage.setTitle("Login View");

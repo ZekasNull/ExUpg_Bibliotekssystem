@@ -2,7 +2,6 @@
   <configuration default="false" name="db_test" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="test.db_test" />
     <module name="ExUpg_Bibliotekssystem" />
-    <option name="VM_PARAMETERS" value="--add-modules java.sql --add-opens d0024e.exupg_bibliotekssystem/test=ALL-UNNAMED --add-reads d0024e.exupg_bibliotekssystem=ALL-UNNAMED" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="test.*" />

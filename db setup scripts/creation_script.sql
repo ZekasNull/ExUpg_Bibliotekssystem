@@ -163,20 +163,21 @@ CREATE TABLE IF NOT EXISTS "Låneperiod"
 
 CREATE TABLE IF NOT EXISTS "Exemplar"
 (
-    streckkod INTEGER GENERATED ALWAYS AS IDENTITY
+    streckkod   INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
-    film_id   INTEGER
+    film_id     INTEGER
         CONSTRAINT "FK_Exemplar.film_id"
             REFERENCES "Film"
             ON UPDATE CASCADE ON DELETE RESTRICT,
-    bok_id    INTEGER
+    bok_id      INTEGER
         CONSTRAINT "FK_Exemplar.bok_id"
             REFERENCES "Bok"
             ON UPDATE CASCADE ON DELETE RESTRICT,
-    låntyp    VARCHAR(20) NOT NULL
+    låntyp      VARCHAR(20)          NOT NULL
         CONSTRAINT "FK_Exemplar.låntyp"
             REFERENCES "Låneperiod"
             ON UPDATE CASCADE ON DELETE RESTRICT,
+    tillgänglig BOOLEAN DEFAULT TRUE NOT NULL,
     CONSTRAINT must_have_single_id
         CHECK (((film_id IS NULL) AND (bok_id IS NOT NULL)) OR ((bok_id IS NULL) AND (film_id IS NOT NULL)))
 );
@@ -231,40 +232,6 @@ FROM bibliotekssystem."Bok" b
          LEFT JOIN bibliotekssystem."Bok_Ämnesord" ba ON b.bok_id = ba.bok_jc_id
          LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_jc_id = a.ord_id
 GROUP BY b.bok_id, b.titel, b.isbn_13;
-
-CREATE OR REPLACE FUNCTION sf_getloanlimit("användarid" INTEGER) RETURNS INTEGER
-    LANGUAGE plpgsql
-AS
-$$
-DECLARE
-    loanlimit INT;
-BEGIN
-    SELECT ut.max_lån
-    INTO loanlimit
-    FROM "Användartyp" ut
-             JOIN "Användare" u ON ut.användartyp_id = u.användartyp
-    WHERE u.användare_id = användarid;
-
-    RETURN loanlimit;
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION sf_getcurrentloanscount("användarid" INTEGER) RETURNS INTEGER
-    STABLE
-    LANGUAGE plpgsql
-AS
-$$
-DECLARE
-    currentloans INT;
-BEGIN
-    SELECT COUNT(lån_id)
-    INTO currentloans
-    FROM "Lån"
-    WHERE användarid = "Lån".användare_id;
-
-    RETURN currentloans;
-END;
-$$;
 
 CREATE OR REPLACE PROCEDURE sp_lägg_till_bok(IN p_bok_titel TEXT, IN p_isbn_13 CHARACTER VARYING,
                                              IN "p_ämnesord_arr" TEXT[], IN "p_förf_förnamn" CHARACTER VARYING,
@@ -464,8 +431,8 @@ CREATE OR REPLACE FUNCTION st_check_loan_limit() RETURNS TRIGGER
 AS
 $$
 DECLARE
-    current_loans  INT := sf_getcurrentloanscount(new.användare_id);
-    loan_limit     INT := sf_getloanlimit(new.användare_id);
+    current_loans  INT := bibliotekssystem.sf_getcurrentloanscount(new.användare_id);
+    loan_limit     INT := bibliotekssystem.sf_getloanlimit(new.användare_id);
     incoming_loans INT;
 BEGIN
     SELECT COUNT(new.lån_id) INTO incoming_loans;
@@ -582,4 +549,109 @@ BEGIN
             );
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION st_uppdatera_exemplar_tillgänglighet() RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    --TG_OP (text) is the operation that fired the trigger
+    IF tg_op = 'INSERT' THEN
+        UPDATE bibliotekssystem."Exemplar"
+        SET tillgänglig = FALSE
+        WHERE streckkod = new.streckkod;
+
+    ELSIF tg_op = 'DELETE' THEN
+        UPDATE bibliotekssystem."Exemplar"
+        SET tillgänglig = TRUE
+        WHERE streckkod = old.streckkod;
+    END IF;
+
+    RETURN NULL; -- return null because something has to return
+END;
+$$;
+
+CREATE TRIGGER trg_uppdatera_exemplar_tillgänglighet
+    AFTER INSERT OR DELETE
+    ON "Lån"
+    FOR EACH ROW
+EXECUTE PROCEDURE st_uppdatera_exemplar_tillgänglighet();
+
+CREATE OR REPLACE FUNCTION sf_getcurrentloanscount("användarid" INTEGER) RETURNS INTEGER
+    STABLE
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    currentloans INT;
+BEGIN
+    SELECT COUNT(lån_id)
+    INTO currentloans
+    FROM bibliotekssystem."Lån"
+    WHERE användarid = "Lån".användare_id;
+
+    RETURN currentloans;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION sf_getloanlimit("användarid" INTEGER) RETURNS INTEGER
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    loanlimit INT;
+BEGIN
+    SELECT ut.max_lån
+    INTO loanlimit
+    FROM bibliotekssystem."Användartyp" ut
+             JOIN bibliotekssystem."Användare" u ON ut.användartyp_id = u.användartyp
+    WHERE u.användare_id = användarid;
+
+    RETURN loanlimit;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION sf_find_overdue_loans()
+    RETURNS TABLE
+            (
+                "lån_id"       INTEGER,
+                streckkod      INTEGER,
+                "lånedatum"    TIMESTAMP WITHOUT TIME ZONE,
+                "användare_id" INTEGER
+            )
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT l.lån_id, l.streckkod, l.lånedatum, l.användare_id
+        FROM bibliotekssystem."Lån" l
+                 JOIN bibliotekssystem."Exemplar" e ON l.streckkod = e.streckkod
+                 JOIN bibliotekssystem."Låneperiod" lp ON e.låntyp = lp.låntyp
+        WHERE l.lånedatum + lp.lånperiod < NOW();
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION st_låneexemplar_måste_vara_tillgängligt() RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    --
+    IF NOT EXISTS (SELECT 1
+                   FROM bibliotekssystem."Exemplar"
+                   WHERE streckkod = new.streckkod
+                     AND tillgänglig = TRUE) THEN
+        RAISE EXCEPTION 'Exemplar med id % är redan utlånat.', new.streckkod;
+    END IF;
+
+    RETURN new;
+END;
+$$;
+
+CREATE TRIGGER trigger_check_copy_availability
+    BEFORE INSERT
+    ON "Lån"
+    FOR EACH ROW
+EXECUTE PROCEDURE st_låneexemplar_måste_vara_tillgängligt();
 

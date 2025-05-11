@@ -12,17 +12,25 @@ import java.util.List;
 
 public class DatabaseService {
     private final DBConnector dbc = DBConnector.getInstance();
-    private final ApplicationState state;
 
-    /**
-     * Tjänst för handlingar mot databasen.
-     *
-     * @param state Referens till applikationens state där resultat ska sparas.
-     */
-    public DatabaseService(ApplicationState state) {
-        this.state = state;
+    @SuppressWarnings("unchecked") //shush java
+    public List<Lån> visaEjÅterlämnadeBöcker () {
+        List<Lån> försenade;
+        EntityManager em = dbc.getEntityManager();
+
+        try {
+            em.getTransaction().begin();
+            försenade = em.createNativeQuery("SELECT * FROM bibliotekssystem.sf_find_overdue_loans()", Lån.class)
+                    .getResultList();
+            em.getTransaction().commit();
+            return försenade;
+
+        } finally {
+            em.close();
+        }
+
+
     }
-
 
     /**
      * Registrerar exemplaren användaren ska låna i databasen

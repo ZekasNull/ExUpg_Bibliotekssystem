@@ -65,6 +65,17 @@ public class Exemplar {
         this.låntyp = låntyp;
     }
 
+    /**
+     * Alternativ som "skapar" låntypen direkt från string.
+     * TODO implementera som enum eller liknande för bättre funktion
+     * @param låntyp String med en av låntyperna
+     */
+    public void setNewLåntyp(String låntyp) {
+        Låneperiod period = new Låneperiod();
+        period.setLåntyp(låntyp);
+        this.låntyp = period;
+    }
+
     @Override
     public String toString() {
         return "Exemplar{" +

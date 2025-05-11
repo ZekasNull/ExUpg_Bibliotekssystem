@@ -2,17 +2,23 @@ package db;
 
 import model.*;
 import org.postgresql.util.PSQLException;
-import state.ApplicationState;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 public class DatabaseService {
-    private final DBConnector dbc = DBConnector.getInstance();
+    private final DBConnector dbc;
 
+    public DatabaseService() {
+        this.dbc = DBConnector.getInstance();
+    }
+
+    /**
+     * Anropar en stored procedure för att hitta lån som inte är återlämnade.
+     * (anledningen till stored procedure är att java inte verkade hantera timestamps smidigt nog)
+     * @return En lista av lån.
+     */
     @SuppressWarnings("unchecked") //shush java
     public List<Lån> visaEjÅterlämnadeBöcker () {
         List<Lån> försenade;
@@ -32,43 +38,73 @@ public class DatabaseService {
 
     }
 
+
     /**
-     * Registrerar exemplaren användaren ska låna i databasen
-     * @param exlista Lista över exemplaren som ska lånas
-     * @param anv Användaren som lånen tillhör
-     * @throws PSQLException om fel uppstår i databasen
+     * Lägger till allt från böcker till exemplar till lån i db.
+     * Förutsätter att objektet inte har ett id, annars finns risk att existerande objekt uppdateras.
+     * @param objekt En lista med objekt som itereras över för att läggas till
+     * @throws PSQLException
      */
-    public void registreraLån(List<Exemplar> exlista, Användare anv) throws PSQLException
-    {
-        Användare tempanv;
+    public void läggTillNyaObjekt (List<?> objekt) throws PSQLException{
         EntityManager em = dbc.getEntityManager();
+
         try {
-            em.getTransaction().begin(); //börja transaktion
-            tempanv = em.merge(anv); //re-add user to em (returns managed entity)
-            //skapa lån för varje exemplar
-            for (Exemplar exemplar : exlista) {
-                Lån nyttLån = new Lån();
-                nyttLån.setAnvändare(tempanv);
-                nyttLån.setStreckkod(exemplar);
-                em.persist(nyttLån);
-            }
-            em.getTransaction().commit(); //utför transaktionen (uppdatera användarens lån i databasen till att matcha anv)
+            em.getTransaction().begin();
 
-            System.out.println("Databaseservice: Lån (förmodligen) registrerade"); //debug
-        } catch (PersistenceException e) { //fånga fel
-            System.out.println("databaseservice: we erroring");
-            Throwable cause = e.getCause();
-            while(cause != null){ //klättra callstack tills antingen null eller rätt fel hittas
-                if(cause instanceof PSQLException){ //hitta serverfeltypen
-                    throw (PSQLException)cause; //rethrow med rätt typ
-                }
-                cause = cause.getCause(); //klättra upp i callstack
+            for (Object o : objekt) {
+                em.persist(o); //nya objekt spåras med persist
+
             }
-            throw e; //om det är av annan typ, kasta om utan cast
-        }finally{
-            em.close(); //stäng entitymanager
+            em.getTransaction().commit(); //utför
+        } catch (Exception e) {
+            rollbackAndFindDatabaseError(e, em);
+        }finally {
+            em.close();
         }
+    }
 
+    /**
+     * Tar en lista objekt av obestämd typ och raderar dem från databasen.
+     * @param deletionList Lista över objekt som ska raderas (varje objekt måste ha ett giltigt ID)
+     * @throws PSQLException när fel uppstår i databasen (sannolikt att det finns andra objekt som beror på objektet - då får det inte raderas då on cascade/delete inte tillåter det)
+     */
+    public void raderaObjekt(List<?> deletionList) throws PSQLException {
+        //local
+        EntityManager em = dbc.getEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            for (Object o : deletionList) {
+                Object temp = em.merge(o); //em spårar objekt igen
+                em.remove(temp); //ta bort från db
+            }
+            em.getTransaction().commit(); //utför ändringar
+        } catch (Exception e) {
+            rollbackAndFindDatabaseError(e, em);
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * Tar en lista av ändrade objekt och uppdaterar dem i databasen. Obs, kräver existerande ID, annars finns risk att nya objekt skapas.
+     * @param changeList Listan av objekt som ska ändras
+     */
+    public void ändraObjekt(List<?> changeList) throws PSQLException {
+        EntityManager em = dbc.getEntityManager();
+
+        try {
+            em.getTransaction().begin();
+            for (Object toUpdate : changeList) {
+                em.merge(toUpdate); //attach detached entity
+            }
+            em.getTransaction().commit(); //skickar upp ändringar i databasen
+        } catch (Exception e) {
+            rollbackAndFindDatabaseError(e, em);
+        } finally {
+            em.close();
+        }
     }
 
     /**
@@ -92,19 +128,22 @@ public class DatabaseService {
         try
         {
             user = query.getSingleResult(); //användarnamn är unikt, måste vara 1 eller inget resultat
+
         }
         catch (NoResultException e)
         {
             System.out.println("dbservice: Ingen användare med den kombinationen hittades"); //debug
         }
-        em.close();
+        finally{
+            em.close();
+        }
         return user;
     }
 
     /**
      * Söker efter böcker med hjälp av sökterm, matchande något av titel, isbn-13, ämnesord eller författare (för/efternamn)
      * @param searchterm en enkel string
-     * @return List<Bok> av alla resultat, eller null om det inte fanns något resultat.
+     * @return List<Bok> av alla resultat som kan vara tom om inget hittades
      */
     public List<Bok> searchAndGetBooks(String searchterm) {
         //metodvariabler
@@ -115,7 +154,6 @@ public class DatabaseService {
         try {
             em.getTransaction().begin();
 
-            // JPQL query for searching across title, isbn13, author name, and keyword word
             TypedQuery<Bok> query = em.createQuery(
                     "SELECT DISTINCT b FROM Bok b " +
                             "LEFT JOIN FETCH b.Författare a " +
@@ -132,7 +170,7 @@ public class DatabaseService {
 
             for (Bok bok : resultlist) {
                 bok.getÄmnesord().size();
-            } //tvinga em att ladda ämnesord för att undvika en fetch som inte beter sig i query
+            } //tvinga em att ladda ämnesord lazily för att undvika en fetch som inte beter sig i query
 
             em.getTransaction().commit(); //run query
 
@@ -144,12 +182,11 @@ public class DatabaseService {
         }
     }
 
-
     /**
      * Söker efter filmer med hjälp av sökterm, matchande något av titel, produktionsland, åldersgräns,
      * genre, regissör (för/efternamn) eller skådespelare (för/efternamn)
      * @param searchTerm en enkel string
-     * @return en List<Film> av resultat, eller null om inget hittades
+     * @return en List<Film> av resultat som kan vara tom om inget hittades
      */
     public List<Film> searchAndGetFilms(String searchTerm) {
         EntityManager em = dbc.getEntityManager();
@@ -187,6 +224,25 @@ public class DatabaseService {
     public Bok searchTidskrift() {
 
         return null; //TODO remove
+    }
+
+    /**
+     * Hjälpmetod för att hitta databasfel
+     * @param e Felet som fångades
+     * @param em EntityManager inblandad
+     * @throws PSQLException om databasen hade ett fel, kastar annars om det ursprungliga felet
+     */
+    private static void rollbackAndFindDatabaseError(Exception e, EntityManager em) throws PSQLException {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+        Throwable error = e.getCause();
+        while (error != null) {
+            if(error instanceof PSQLException){
+                throw (PSQLException) error;
+            }
+            error = error.getCause();
+        }
     }
 
 

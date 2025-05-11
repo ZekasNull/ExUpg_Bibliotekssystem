@@ -1,6 +1,7 @@
 package model;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,14 @@ public class Bok {
     @Column(name = "titel", nullable = false, length = 50)
     private String titel;
 
-    @ManyToMany
+    public void setFörfattare(Set<Författare> författare) {
+        Författare = författare;
+    }
+    public Set<Författare> getFörfattare() {
+        return Författare;
+    }
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "\"Bok_Författare\"",
             schema = "bibliotekssystem",
@@ -28,7 +36,7 @@ public class Bok {
     )
     private Set<Författare> Författare;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "\"Bok_Ämnesord\"",
             schema = "bibliotekssystem",
@@ -42,9 +50,7 @@ public class Bok {
         return Ämnesord;
     }
 
-    public Set<Författare> getFörfattare() {
-        return Författare;
-    }
+
 
     @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER)
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
@@ -79,6 +85,11 @@ public class Bok {
 
     public void setTitel(String titel) {
         this.titel = titel;
+    }
+
+    public Bok() {
+        this.Författare = new HashSet<>();
+        this.Ämnesord = new HashSet<>();
     }
 
     @Override

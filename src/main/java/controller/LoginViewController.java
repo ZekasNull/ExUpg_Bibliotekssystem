@@ -7,8 +7,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import model.Användare;
-import model.Användartyp;
 import state.ApplicationState;
 
 import java.util.Observable;
@@ -21,11 +19,6 @@ public class LoginViewController extends Controller{
     public PasswordField pinBoxContents;
     public Scene scene;
 
-    public FirstLoggedOutViewController mainMenuController;
-
-    public void setMainMenuController(FirstLoggedOutViewController mainMenuController) {
-        this.mainMenuController = mainMenuController;
-    }
     public void onLogInButtonCLick(ActionEvent actionEvent) {
         //TODO kontrollern ska ansvara för att analysera informationen i användaren som hämtas (dvs rätt användartyp)
         System.out.println("onloginbutton");
@@ -41,6 +34,8 @@ public class LoginViewController extends Controller{
         alert.setHeaderText("Login attempt");
         alert.setContentText("The login attempt was" + (success ? "" : "n't") + " successful.");
 
+        System.out.println(state.getCurrentUser());
+//Sanitycheck
         alert.showAndWait();
     }
 

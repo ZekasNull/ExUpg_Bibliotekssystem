@@ -18,7 +18,7 @@ public class MainApplication extends Application {
 
     @Override
     public void init() throws Exception {
-        this.APPSTATE = new ApplicationState();
+        this.APPSTATE = ApplicationState.getInstance();
         APPSTATE.app = this; //referens till MainApplication
         //yep detta går att loopa oändligt app.state.app.state etc. Kanske dåligt?
     }
@@ -27,7 +27,7 @@ public class MainApplication extends Application {
     public void start(Stage var1) throws Exception {
         primaryStage = var1;
         //openViewChoice();
-        openLoggedOutView();
+        openMainMenuView();
         //NOTE: översta för det gamla UIt(inlogg), understa för det nya(sökning)
     }
     public void openViewChoice() {
@@ -69,16 +69,16 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public void openLoggedOutView() {
+    public void openMainMenuView() {
         try{
-            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("first-logged-out-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("main-menu.fxml"));
             Scene scene = new Scene(loader.load());
 
             Controller controller = loader.getController();
             controller.setState(APPSTATE);
             APPSTATE.addObserver(controller);
 
-            primaryStage.setTitle("Logged Out View");
+            primaryStage.setTitle("Main Menu");
             primaryStage.setScene(scene);
             primaryStage.show();
         }catch (Exception e) {

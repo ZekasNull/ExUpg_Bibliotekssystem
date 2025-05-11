@@ -1,37 +1,28 @@
 package controller;
 
-import com.sun.prism.shader.FillEllipse_Color_AlphaTest_Loader;
-import d0024e.exupg_bibliotekssystem.MainApplication;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javassist.Loader;
 import model.*;
-import org.jboss.jandex.Main;
 import state.ApplicationState;
 
-import javax.persistence.SecondaryTable;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javafx.stage.Popup;
 
-public class FirstLoggedOutViewController extends Controller {
+public class MainMenuController extends Controller {
+    public Button LogOutButton;
+    public Button ShowProfileButton;
+    public Button EmployeeViewButton;
     private ApplicationState state = ApplicationState.getInstance(); //... JUSTE det här behövdes för state lämnades null och jag kom inte på ett bättre sätt
-    private ApplicationState APPSTATE;
 
     @FXML
-    public Button GoToLoginViewButton; //Knapp för att logga in
+    public Button LogInViewButton; //Knapp för att logga in
     public TextField searchtermBoxContents; //Vad som står i själva sökboxen
     public SplitMenuButton objektTypFlerVal; //Vilket typ av objekt som ska filtreras
     private String selectedObject;
@@ -43,7 +34,7 @@ public class FirstLoggedOutViewController extends Controller {
     public TableColumn<Bok, String> authorNameColumn;
     public TableView<Bok> notLoggedInBookSearchTable; // tableView för bok, ovan är dess kolumner
 
-    public Button NotLoggedInSearchButton;
+    public Button SearchButton;
 
     //Tableview för film och dess kolumner
     public TableView<Film> notLoggedInFilmSearchTable;
@@ -55,7 +46,7 @@ public class FirstLoggedOutViewController extends Controller {
     public TableColumn<Film, String> genreColumn;
 
 
-    public void onUserGoToLoginViewButtonClick(ActionEvent actionEvent) {
+    public void onUserLogInViewButtonClick(ActionEvent actionEvent) {
         super.getState().app.openLoginView();
     }
 
@@ -78,12 +69,13 @@ public class FirstLoggedOutViewController extends Controller {
         objektTypFlerVal.setText(selectedObject);
     }
 //TODO: Se till att det inte blir randomized ämnesord
-    public void onNotLoggedInSearchButtonClick(ActionEvent actionEvent) {
+    public void onSearchButtonClick(ActionEvent actionEvent) {
 /*Faktiska som körs och inte bara hämtar information
 * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
 * */
         if (selectedObject == null){
             System.out.println("Gnäll");
+            //TODO: Se ifall selecteobject är null och då ge en varning
         }
         if (searchtermBoxContents.getText().trim().isEmpty()){
             return; //TODO pop up om att du får inte söka på inget
@@ -158,18 +150,35 @@ public class FirstLoggedOutViewController extends Controller {
                 notLoggedInSearchTable.setItems(data);
             }
             Utkommenterad tills vidare*/
-            //TODO: else sats som säger att användaren måste välja en objekttyp
         }catch (Exception e){
             e.printStackTrace();
         }
     }
+    public void onLogOutButtonClick(ActionEvent actionEvent) {
+    }
+
+    public void onShowProfileButtonClick(ActionEvent actionEvent) {
+    }
+
+    public void onEmployeeViewButton(ActionEvent actionEvent) {
+    }
+
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("System");
-        if (state.getCurrentUser() == null) {System.out.println("Ingen är inloggad");}
-        else if(state.getCurrentUser().getAnvändartyp().getAnvändartyp().equalsIgnoreCase("allmänhet")) {
-            //state av en scene har en currentUser, vi hämtar dens användartyp(klass) som vi sen behöver hämta exakt användartyp(type) ifrån, sen .equals
-            System.out.println("I work :D");
+        String currentUserType = state.getCurrentUser().getAnvändartyp().getAnvändartyp();
+        if (currentUserType == null) {
+            System.out.println("Ingen e inloggad");
+        } else if(currentUserType.equals("bibliotekarie")) {
+            System.out.println("Bibliotekarie inloggad");
+            LogOutButton.setVisible(true);
+            System.out.println("Bibliotekarie inloggad");
+            ShowProfileButton.setVisible(true);
+            EmployeeViewButton.setVisible(true);
+            LogInViewButton.setVisible(false);
+        }else{
+            LogOutButton.setVisible(true);
+            ShowProfileButton.setVisible(true);
+            LogInViewButton.setVisible(false);
         }
     }
 }

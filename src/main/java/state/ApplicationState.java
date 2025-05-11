@@ -4,7 +4,6 @@ import d0024e.exupg_bibliotekssystem.MainApplication;
 import db.DatabaseService;
 import model.Användare;
 
-import java.awt.print.Book;
 import java.util.Observable;
 
 /**
@@ -30,7 +29,7 @@ public class ApplicationState extends Observable {
     private Användare currentUser; //FIXME testvariabel
 
 
-    public ApplicationState() {
+    private ApplicationState() {
         this.databaseService = new DatabaseService(this);
     }
 

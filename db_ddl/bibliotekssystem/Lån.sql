@@ -25,3 +25,9 @@ CREATE TRIGGER trg_uppdatera_exemplar_tillgänglighet
     FOR EACH ROW
 EXECUTE PROCEDURE bibliotekssystem.st_uppdatera_exemplar_tillgänglighet();
 
+CREATE TRIGGER trigger_check_copy_availability
+    BEFORE INSERT
+    ON bibliotekssystem."Lån"
+    FOR EACH ROW
+EXECUTE PROCEDURE bibliotekssystem.st_låneexemplar_måste_vara_tillgängligt();
+

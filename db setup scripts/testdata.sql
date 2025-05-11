@@ -134,10 +134,10 @@ CALL sp_lägg_till_film(
         'Peruna',
         'Finland',
         12,
-        ARRAY ['Janne'],
-        ARRAY ['Koukkari'],
-        ARRAY ['Joonas', 'Mikko', 'Hannu-Pekka', 'Kari', 'Jaana'],
-        ARRAY ['Saartamo', 'Kouki', 'Björkman', 'Hietalahti', 'Sundqvist'],
+        ARRAY ['Joona'],
+        ARRAY ['Tena'],
+        ARRAY ['Joonas', 'Mikko', 'Alex', 'Kari', 'Linnea'],
+        ARRAY ['Nordman', 'Penttilä', 'Anton', 'Hietalahti', 'Leino'],
         ARRAY ['Comedy', 'Adventure'],
         NULL, NULL
      );
@@ -173,5 +173,12 @@ VALUES (1, (SELECT användare_id FROM "Användare" WHERE användarnamn = 'maxove
        (2, (SELECT användare_id FROM "Användare" WHERE användarnamn = 'maxove-1'), CURRENT_TIMESTAMP);
 
 -- Marie Curie får ett oåterlämnat lån för testsyften
+WITH tempid AS (
+    SELECT e.streckkod
+    FROM "Exemplar" e
+    JOIN bibliotekssystem."Bok" b ON e.bok_id = b.bok_id
+    WHERE b.titel = 'Wuthering Heights'
+    LIMIT 1
+)
 INSERT INTO "Lån" (streckkod, användare_id, lånedatum)
-VALUES (1, (SELECT användare_id FROM "Användare" WHERE användarnamn = 'marcur-1'), '1890-12-23');
+VALUES ((SELECT streckkod FROM tempid), (SELECT användare_id FROM "Användare" WHERE användarnamn = 'marcur-1'), '1890-12-23');

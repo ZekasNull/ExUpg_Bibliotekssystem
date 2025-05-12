@@ -19,8 +19,7 @@ public class MainApplication extends Application {
     @Override
     public void init() throws Exception {
         this.APPSTATE = ApplicationState.getInstance();
-        APPSTATE.app = this; //referens till MainApplication
-        //yep detta går att loopa oändligt app.state.app.state etc. Kanske dåligt?
+        APPSTATE.app = this; //referens till MainApplication, kommer förmodligen inte behövas för evigt
     }
 
     @Override //Starts the program and sets up the primaryStage

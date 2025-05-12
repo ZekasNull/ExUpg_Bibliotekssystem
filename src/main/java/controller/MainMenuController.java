@@ -10,6 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
 import state.ApplicationState;
 
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
@@ -155,6 +156,7 @@ public class MainMenuController extends Controller {
         }
     }
     public void onLogOutButtonClick(ActionEvent actionEvent) {
+
     }
 
     public void onShowProfileButtonClick(ActionEvent actionEvent) {
@@ -180,5 +182,10 @@ public class MainMenuController extends Controller {
             ShowProfileButton.setVisible(true);
             LogInViewButton.setVisible(false);
         }
+    }
+
+    public void tableViewMouseClick(javafx.scene.input.MouseEvent mouseEvent) {
+        //Skriver ut i konsol för testsyfte
+        System.out.println(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
     }
 }

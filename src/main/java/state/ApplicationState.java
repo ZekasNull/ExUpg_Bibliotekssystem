@@ -30,7 +30,7 @@ public class ApplicationState extends Observable {
 
 
     private ApplicationState() {
-        this.databaseService = new DatabaseService(this);
+        this.databaseService = new DatabaseService();
     }
 
     public static ApplicationState getInstance() {

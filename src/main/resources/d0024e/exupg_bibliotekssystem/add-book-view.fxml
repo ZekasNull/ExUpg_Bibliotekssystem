@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddBookViewController">
+<AnchorPane prefHeight="573.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddBookViewController">
    <children>
-      <ListView layoutX="33.0" layoutY="36.0" prefHeight="330.0" prefWidth="540.0" />
       <Label layoutX="42.0" layoutY="58.0" text="Titel:">
          <font>
             <Font size="14.0" />
@@ -17,19 +19,72 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="45.0" layoutY="174.0" text="Ämnesord:">
+      <Label layoutX="45.0" layoutY="174.0" text="Ämnesord (max 3)">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="45.0" layoutY="233.0" text="Författarnamn:">
+      <Label layoutX="45.0" layoutY="233.0" text="Författare 1:">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
       <TextField fx:id="titleBoxContents" layoutX="42.0" layoutY="78.0" />
       <TextField fx:id="isbnBoxContents" layoutX="42.0" layoutY="134.0" />
-      <TextField fx:id="amnesordBoxContents" layoutX="45.0" layoutY="194.0" />
-      <TextField fx:id="authorNameBoxContents" layoutX="45.0" layoutY="253.0" />
+      <TextField fx:id="amnesordBoxContents1" layoutX="45.0" layoutY="194.0" />
+      <TextField fx:id="authorNameBoxContents1" layoutX="42.0" layoutY="274.0" />
+      <TextField fx:id="authorLastNameBoxContents1" layoutX="225.0" layoutY="274.0" />
+      <Label layoutX="42.0" layoutY="253.0" text="Förnamn:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="225.0" layoutY="253.0" text="Efternamn:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="authorNameBoxContents2" layoutX="45.0" layoutY="341.0" />
+      <TextField fx:id="authorLastNameBoxContents2" layoutX="228.0" layoutY="341.0" />
+      <Label layoutX="45.0" layoutY="320.0" text="Förnamn:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="228.0" layoutY="320.0" text="Efternamn:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="authorNameBoxContents3" layoutX="45.0" layoutY="416.0" />
+      <TextField fx:id="authorLastNameBoxContents3" layoutX="228.0" layoutY="416.0" />
+      <Label layoutX="45.0" layoutY="395.0" text="Förnamn:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="228.0" layoutY="395.0" text="Efternamn:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="300.0" text="Författare 2:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="375.0" text="Författare 3:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="amnesordBoxContents2" layoutX="202.0" layoutY="194.0" />
+      <TextField fx:id="amnesordBoxContents3" layoutX="360.0" layoutY="194.0" />
+      <TableView layoutX="638.0" layoutY="60.0" prefHeight="200.0" prefWidth="200.0">
+        <columns>
+          <TableColumn fx:id="titleColumn" prefWidth="75.0" text="Titel" />
+          <TableColumn fx:id="AuthorColumn" prefWidth="75.0" text="Författare" />
+        </columns>
+      </TableView>
    </children>
 </AnchorPane>

@@ -5,6 +5,9 @@
     <file url="file://$PROJECT_DIR$/db setup scripts/lookup_table_constants.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db setup scripts/testdata.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_sök_böcker_enkel.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/st_låneexemplar_måste_vara_tillgängligt.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/vy_bok_info.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/db/DatabaseService.java" dialect="GenericSQL" />
+    <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>

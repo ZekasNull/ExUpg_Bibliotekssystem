@@ -168,11 +168,11 @@ CREATE TABLE IF NOT EXISTS "Exemplar"
     film_id     INTEGER
         CONSTRAINT "FK_Exemplar.film_id"
             REFERENCES "Film"
-            ON UPDATE CASCADE ON DELETE RESTRICT,
+            ON UPDATE CASCADE ON DELETE CASCADE,
     bok_id      INTEGER
         CONSTRAINT "FK_Exemplar.bok_id"
             REFERENCES "Bok"
-            ON UPDATE CASCADE ON DELETE RESTRICT,
+            ON UPDATE CASCADE ON DELETE CASCADE,
     låntyp      VARCHAR(20)          NOT NULL
         CONSTRAINT "FK_Exemplar.låntyp"
             REFERENCES "Låneperiod"

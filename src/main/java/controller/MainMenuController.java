@@ -75,6 +75,7 @@ public class MainMenuController extends Controller {
 * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
 * */
         if (selectedObject == null){
+            objektTypFlerVal.requestFocus();
             System.out.println("Gnäll");
             //TODO: Se ifall selecteobject är null och då ge en varning
         }

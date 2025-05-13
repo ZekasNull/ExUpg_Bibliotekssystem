@@ -2,24 +2,21 @@ package test;
 
 import db.DatabaseService;
 import model.*;
-import org.hibernate.exception.GenericJDBCException;
-import org.postgresql.util.PSQLException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class db_test {
     private static EntityManagerFactory emf;
 
     public static void main(String[] args) throws Exception {
-        låntest();
+        testBokSearchByTerm("sql");
 
 
     }
 
-    private static void testSkapaOchRaderaBokOchExemplar() throws PSQLException {
+    private static void testSkapaOchRaderaBokOchExemplar() throws Exception {
         DatabaseService dbservice = new DatabaseService();
         ArrayList<Object> testnylista = new ArrayList<>();
 
@@ -64,7 +61,7 @@ public class db_test {
         //obs! efteråt kommer testord och testförfattare fortfarande att finnas i db. cascade på sådant skulle riskera att en författare med andra böcker också tas bort, vilket inte tillåts av db's on delete.
     }
 
-    private static void låntest() throws PSQLException {
+    private static void låntest() throws Exception {
         DatabaseService test = new DatabaseService();
         Exemplar ex;
 
@@ -75,7 +72,7 @@ public class db_test {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("Bibliotek_PU");
         EntityManager emtest = emf.createEntityManager();
         emtest.getTransaction().begin();
-        TypedQuery<Exemplar> query = emtest.createQuery("SELECT e FROM Exemplar e WHERE e.id = 2", Exemplar.class); //create query
+        TypedQuery<Exemplar> query = emtest.createQuery("SELECT e FROM Exemplar e WHERE e.streckkod = 2", Exemplar.class); //create query
         ex = query.getSingleResult(); //run query and store result
 
         //skapa lån
@@ -151,6 +148,7 @@ public class db_test {
             System.out.println(results.size());
 
             for (Bok bok : results) {
+                System.out.println(bok.getFörfattare().getClass());
                 System.out.println(bok);
             }
 

@@ -8,11 +8,11 @@ public class Exemplar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "streckkod", nullable = false)
-    private Integer id;
+    private Integer streckkod;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "film_id")
-    private Film film;
+    private Film film_id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bok_id")
@@ -23,7 +23,7 @@ public class Exemplar {
     private Låneperiod låntyp;
 
     @Column(name = "\"tillgänglig\"", nullable = false)
-    private Boolean tillgänglig = false;
+    private Boolean tillgänglig = true;
 
     public Boolean getTillgänglig() {
         return tillgänglig;
@@ -33,20 +33,20 @@ public class Exemplar {
         this.tillgänglig = tillgänglig;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getStreckkod() {
+        return streckkod;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setStreckkod(Integer id) {
+        this.streckkod = id;
     }
 
-    public Film getFilm() {
-        return film;
+    public Film getFilm_id() {
+        return film_id;
     }
 
-    public void setFilm(Film film) {
-        this.film = film;
+    public void setFilm_id(Film film) {
+        this.film_id = film;
     }
 
     public Bok getBok() {
@@ -79,7 +79,7 @@ public class Exemplar {
     @Override
     public String toString() {
         return "Exemplar{" +
-                "id=" + id +
+                "id=" + streckkod +
                 ", låntyp=" + låntyp +
                 ", tillgänglig=" + tillgänglig +
                 '}';

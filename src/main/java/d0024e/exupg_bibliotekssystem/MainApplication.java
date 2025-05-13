@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import state.ApplicationState;
+import java.io.IOException;
 
 public class MainApplication extends Application {
     private ApplicationState APPSTATE;
@@ -26,9 +27,26 @@ public class MainApplication extends Application {
     public void start(Stage var1) throws Exception {
         primaryStage = var1;
         //openViewChoice();
-        openMainMenuView();
+        //openMainMenuView();
+        openAddBookView(); //FIXME test
         //NOTE: översta för det gamla UIt(inlogg), understa för det nya(sökning)
     }
+
+    public void openAddBookView() throws IOException {
+        //Load the fxml file onto "loader"
+        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("add-book-view.fxml"));
+        //Loads the FXML file as a scene
+        Scene scene = new Scene(loader.load());
+
+        Controller controller = loader.getController();
+        controller.setState(APPSTATE); //ge referens till appstate
+        APPSTATE.addObserver(controller);
+
+        primaryStage.setTitle("Hantera böcker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     public void openViewChoice() {
         try{
             //Load the fxml file onto "loader"

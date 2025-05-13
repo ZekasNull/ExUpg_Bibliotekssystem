@@ -3,7 +3,6 @@ package model;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -50,9 +49,12 @@ public class Bok {
         return Ämnesord;
     }
 
+    public void setÄmnesord(Set<Ämnesord> ämnesord) {
+        this.Ämnesord = ämnesord;
+    }
 
 
-    @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
 
     public Set<Exemplar> getExemplars() {

@@ -3,7 +3,9 @@ package state;
 import d0024e.exupg_bibliotekssystem.MainApplication;
 import db.DatabaseService;
 import model.Användare;
+import model.Bok;
 
+import java.util.List;
 import java.util.Observable;
 
 /**
@@ -13,19 +15,27 @@ import java.util.Observable;
  * (tack för beskrivningen vilken AI det nu är)
  */
 public class ApplicationState extends Observable {
-    //sub-states
-    //private final UserState userState;
-    //private final SearchState searchState;
-    //private final DatabaseService databaseService;
+    //debug
+    private final boolean debugPrints = false;
 
     //servicereferenser
+    public MainApplication app;
     public final DatabaseService databaseService;
     private static ApplicationState instance;
 
-    //testvariabler
-    public MainApplication app;
+    public List<Bok> getBookSearchResults() {
+        return bookSearchResults;
+    }
 
+    public void setBookSearchResults(List<Bok> bookSearchResults) {
+        if (debugPrints) System.out.println("ApplicationState: Setting bookSearchResults and notifying observers.");
+        this.bookSearchResults = bookSearchResults;
+        setChanged();
+        notifyObservers();
+    }
 
+    //
+    private List<Bok> bookSearchResults;
     private Användare currentUser; //FIXME testvariabel
 
 

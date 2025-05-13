@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 public class DatabaseService {
+    private final boolean debugPrints = true;
     private final DBConnector dbc;
 
     public DatabaseService() {
@@ -45,7 +46,7 @@ public class DatabaseService {
      * @param objekt En lista med objekt som itereras över för att läggas till
      * @throws PSQLException
      */
-    public void läggTillNyaObjekt (List<?> objekt) throws PSQLException{
+    public void läggTillNyaObjekt (List<?> objekt) throws Exception{
         EntityManager em = dbc.getEntityManager();
 
         try {
@@ -68,7 +69,7 @@ public class DatabaseService {
      * @param deletionList Lista över objekt som ska raderas (varje objekt måste ha ett giltigt ID)
      * @throws PSQLException när fel uppstår i databasen (sannolikt att det finns andra objekt som beror på objektet - då får det inte raderas då on cascade/delete inte tillåter det)
      */
-    public void raderaObjekt(List<?> deletionList) throws PSQLException {
+    public void raderaObjekt(List<?> deletionList) throws Exception {
         //local
         EntityManager em = dbc.getEntityManager();
 
@@ -81,6 +82,7 @@ public class DatabaseService {
             }
             em.getTransaction().commit(); //utför ändringar
         } catch (Exception e) {
+            System.out.println( "dbservice: raderaObjekt: " + e.getMessage());
             rollbackAndFindDatabaseError(e, em);
         } finally {
             em.close();
@@ -91,7 +93,7 @@ public class DatabaseService {
      * Tar en lista av ändrade objekt och uppdaterar dem i databasen. Obs, kräver existerande ID, annars finns risk att nya objekt skapas.
      * @param changeList Listan av objekt som ska ändras
      */
-    public void ändraObjekt(List<?> changeList) throws PSQLException {
+    public void ändraObjekt(List<?> changeList) throws Exception {
         EntityManager em = dbc.getEntityManager();
 
         try {
@@ -105,6 +107,26 @@ public class DatabaseService {
         } finally {
             em.close();
         }
+    }
+
+    public Ämnesord searchAmnesord(String searchterm) throws Exception {
+        EntityManager em = dbc.getEntityManager();
+        Ämnesord result = null;
+
+
+        try {
+            em.getTransaction().begin();
+            TypedQuery<Ämnesord> query = em.createQuery("SELECT am FROM Ämnesord am WHERE am.ord = :sökterm", Ämnesord.class);
+            query.setParameter("sökterm", searchterm);
+            result = query.getSingleResult();
+            em.getTransaction().commit(); //skickar ändringar
+        } catch (Exception e) {
+            rollbackAndFindDatabaseError(e, em);
+        } finally {
+            em.close();
+        }
+        if (debugPrints) System.out.println("dbservice: searchAmnesord ran and is returning " + result);
+        return result;
     }
 
     /**
@@ -232,7 +254,7 @@ public class DatabaseService {
      * @param em EntityManager inblandad
      * @throws PSQLException om databasen hade ett fel, kastar annars om det ursprungliga felet
      */
-    private static void rollbackAndFindDatabaseError(Exception e, EntityManager em) throws PSQLException {
+    private static void rollbackAndFindDatabaseError(Exception e, EntityManager em) throws Exception {
         if (em.getTransaction().isActive()) {
             em.getTransaction().rollback();
         }
@@ -243,7 +265,6 @@ public class DatabaseService {
             }
             error = error.getCause();
         }
+        throw e;
     }
-
-
 }

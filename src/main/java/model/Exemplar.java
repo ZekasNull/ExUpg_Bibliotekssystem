@@ -72,7 +72,7 @@ public class Exemplar {
      */
     public void setNewLåntyp(String låntyp) {
         Låneperiod period = new Låneperiod();
-        period.setLåntyp(låntyp);
+        period.setLåntyp(låntyp.toLowerCase());
         this.låntyp = period;
     }
 

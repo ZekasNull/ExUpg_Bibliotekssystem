@@ -5,14 +5,13 @@ import org.postgresql.util.PSQLException;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 public class DatabaseService {
-    private final boolean debugPrints = true;
-    private final DBConnector dbc;
+    private final boolean DEBUGPRINTS = true;
+    private final DBConnector DBC;
 
     public DatabaseService() {
-        this.dbc = DBConnector.getInstance();
+        this.DBC = DBConnector.getInstance();
     }
 
     /**
@@ -23,7 +22,7 @@ public class DatabaseService {
     @SuppressWarnings("unchecked") //shush java
     public List<Lån> visaEjÅterlämnadeBöcker () {
         List<Lån> försenade;
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
 
         try {
             em.getTransaction().begin();
@@ -47,7 +46,7 @@ public class DatabaseService {
      * @throws PSQLException
      */
     public void läggTillNyaObjekt (List<?> objekt) throws Exception{
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
 
         try {
             em.getTransaction().begin();
@@ -71,7 +70,7 @@ public class DatabaseService {
      */
     public void raderaObjekt(List<?> deletionList) throws Exception {
         //local
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
 
         try {
             em.getTransaction().begin();
@@ -82,7 +81,7 @@ public class DatabaseService {
             }
             em.getTransaction().commit(); //utför ändringar
         } catch (Exception e) {
-            System.out.println( "dbservice: raderaObjekt: " + e.getMessage());
+            if (DEBUGPRINTS) System.out.println( "dbservice: raderaObjekt: " + e.getMessage());
             rollbackAndFindDatabaseError(e, em);
         } finally {
             em.close();
@@ -94,7 +93,7 @@ public class DatabaseService {
      * @param changeList Listan av objekt som ska ändras
      */
     public void ändraObjekt(List<?> changeList) throws Exception {
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
 
         try {
             em.getTransaction().begin();
@@ -110,7 +109,7 @@ public class DatabaseService {
     }
 
     public Ämnesord searchAmnesord(String searchterm) throws Exception {
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
         Ämnesord result = null;
 
 
@@ -121,14 +120,14 @@ public class DatabaseService {
             result = query.getSingleResult();
             em.getTransaction().commit(); //skickar ändringar
         } catch (NoResultException e) {
-            if (debugPrints) System.out.println("dbservice: keyword not found in db, returning null");
+            if (DEBUGPRINTS) System.out.println("dbservice: keyword not found in db, returning null");
             result = null;
         } catch (Exception e) {
             rollbackAndFindDatabaseError(e, em);
         } finally {
             em.close();
         }
-        if (debugPrints) System.out.println("dbservice: searchAmnesord ran and is returning " + result);
+        if (DEBUGPRINTS) System.out.println("dbservice: searchAmnesord ran and is returning " + result);
         return result;
     }
 
@@ -140,7 +139,7 @@ public class DatabaseService {
      */
     public Användare logInUser(String användarnamn, String pin) {
         //local var
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
         Användare user = null;
 
         //query
@@ -173,7 +172,7 @@ public class DatabaseService {
     public List<Bok> searchAndGetBooks(String searchterm) {
         //metodvariabler
         List<Bok> resultlist;
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
 
         //query
         try {
@@ -214,7 +213,7 @@ public class DatabaseService {
      * @return en List<Film> av resultat som kan vara tom om inget hittades
      */
     public List<Film> searchAndGetFilms(String searchTerm) {
-        EntityManager em = dbc.getEntityManager();
+        EntityManager em = DBC.getEntityManager();
 
         try {
             em.getTransaction().begin();

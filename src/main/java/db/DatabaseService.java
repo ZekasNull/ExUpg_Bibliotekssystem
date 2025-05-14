@@ -120,6 +120,9 @@ public class DatabaseService {
             query.setParameter("sökterm", searchterm);
             result = query.getSingleResult();
             em.getTransaction().commit(); //skickar ändringar
+        } catch (NoResultException e) {
+            if (debugPrints) System.out.println("dbservice: keyword not found in db, returning null");
+            result = null;
         } catch (Exception e) {
             rollbackAndFindDatabaseError(e, em);
         } finally {

@@ -1,7 +1,6 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
-import db.DatabaseService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,7 +23,7 @@ public class AddBookViewController extends Controller {
     private final boolean debugPrintouts = false;
 
     //internt fönster för sökning
-    private Stage searchWindow; //håller det lilla sökfönstret
+
 
     //lista över exemplar och böcker som visas i tables
     private ObservableList<Exemplar> exemplarList = FXCollections.observableArrayList();
@@ -451,13 +450,7 @@ public class AddBookViewController extends Controller {
     }
 
     //hjälpmetoder
-    /**
-     * Stänger det lilla sökfönstret när dess ok-knapp trycks.
-     */
-    public void closeSmallSearchWindow(){
-        if (debugPrintouts) System.out.println("AddBookViewController: Closing small search window");
-        searchWindow.close();
-    }
+
 
     private void prepareTables() {
         ExemplarViewTable.setItems(exemplarList);
@@ -484,14 +477,15 @@ public class AddBookViewController extends Controller {
     }
 
     private List<Exemplar> getOnlyNewExemplars() {
+        //TODO borde skötas av service
         //tar exemplarlistan och ger tillbaka en lista med bara de exemplar som saknar streckkod (genereras vid insert i databasen)
         return exemplarList.stream()
                 .filter(e -> e.getStreckkod() == null)
                 .collect(Collectors.toList());
     }
 
-    private boolean onDeleteUserConfirmation() {
-
+    private boolean onDeleteUserConfirmation()
+    {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Bekräfta");
         alert.setHeaderText("Är du säker?");
@@ -519,16 +513,16 @@ public class AddBookViewController extends Controller {
     }
 
     private void openSearchWindow() throws IOException {
+        Stage searchWindow = new Stage();
         FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("smallSearchWindow.fxml"));
         Scene searchwindow = new Scene(loader.load());
 
         //hämta referens till controller
-        smallSearchWindowController controller = loader.getController();
+        SmallSearchWindowController controller = loader.getController();
         controller.setState(getState()); //ge referens till appstate
-        controller.setParentController(this);
-        getState().addObserver(controller);
+        controller.setStage(searchWindow);
+        //getState().addObserver(controller); //behöver inte vara observer på state?
 
-        searchWindow = new Stage();
         searchWindow.setTitle("Search window");
         searchWindow.setScene(searchwindow);
         searchWindow.initModality(Modality.APPLICATION_MODAL);

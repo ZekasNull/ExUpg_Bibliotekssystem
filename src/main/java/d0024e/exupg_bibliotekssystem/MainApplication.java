@@ -28,7 +28,8 @@ public class MainApplication extends Application {
         primaryStage = var1;
         //openViewChoice();
         //openMainMenuView();
-        openAddBookView(); //FIXME test
+        //openAddBookView(); //FIXME test
+        openAddFilmView(); //FIXME test
         //NOTE: översta för det gamla UIt(inlogg), understa för det nya(sökning)
     }
 
@@ -43,6 +44,21 @@ public class MainApplication extends Application {
         APPSTATE.addObserver(controller);
 
         primaryStage.setTitle("Hantera böcker");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public void openAddFilmView() throws IOException {
+        //Load the fxml file onto "loader"
+        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("add-movie-view.fxml"));
+        //Loads the FXML file as a scene
+        Scene scene = new Scene(loader.load());
+
+        Controller controller = loader.getController();
+        controller.setState(APPSTATE); //ge referens till appstate
+        APPSTATE.addObserver(controller);
+
+        primaryStage.setTitle("Hantera filmer");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

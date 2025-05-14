@@ -21,24 +21,24 @@ public class Film {
     @Column(name = "åldersgräns", nullable = false)
     private Integer åldersgräns;
 
-    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "film_id", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "\"Film_Genre\"",
             schema = "bibliotekssystem",
             joinColumns = @JoinColumn(name = "film_jc_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_jc_id"))
     private Set<Genre> genres = new LinkedHashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "\"Film_Regissör\"",
             schema = "bibliotekssystem",
             joinColumns = @JoinColumn(name = "film_jc_id", referencedColumnName = "film_id"),
             inverseJoinColumns = @JoinColumn(name = "regissör_jc_id", referencedColumnName = "regissör_id"))
     private Set<Regissör> regissörs = new LinkedHashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "\"Film_Skådespelare\"",
             schema = "bibliotekssystem",
             joinColumns = @JoinColumn(name = "film_jc_id", referencedColumnName = "film_id"),

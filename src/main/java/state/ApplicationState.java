@@ -17,7 +17,7 @@ import java.util.Observable;
  */
 public class ApplicationState extends Observable {
     //debug
-    private final boolean debugPrints = false;
+    public final boolean DEBUGPRINTS = true;
 
     //servicereferenser
     public MainApplication app;
@@ -46,7 +46,7 @@ public class ApplicationState extends Observable {
         return bookSearchResults;
     }
     public void setBookSearchResults(List<Bok> bookSearchResults) {
-        if (debugPrints) System.out.println("ApplicationState: Setting bookSearchResults and notifying observers.");
+        if (DEBUGPRINTS) System.out.println("ApplicationState: Setting bookSearchResults and notifying observers.");
         this.bookSearchResults = bookSearchResults;
         setChanged();
         notifyObservers();

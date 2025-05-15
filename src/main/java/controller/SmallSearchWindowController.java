@@ -26,7 +26,7 @@ public class SmallSearchWindowController extends Controller {
     //förälderns stage
     private Stage stage;
     //debug
-    private final boolean debugPrintouts = true;
+    private final boolean DEBUGPRINTOUTS = true;
 
     //inställning
     public enum Mode {BOK, FILM};
@@ -66,7 +66,7 @@ public class SmallSearchWindowController extends Controller {
 
 
     public void setMode(Mode mode) {
-        if(debugPrintouts) System.out.println("smallSearchWindowController: Setting mode to " + mode);
+        if(DEBUGPRINTOUTS) System.out.println("smallSearchWindowController: Setting mode to " + mode);
         this.mode = mode;
         if(mode == Mode.FILM) {
             notLoggedInBookSearchTable.setVisible(false);
@@ -143,13 +143,13 @@ public class SmallSearchWindowController extends Controller {
             case BOK:
                 if(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem() == null) return; //om inget valts
                 Bok selectedBook = notLoggedInBookSearchTable.getSelectionModel().getSelectedItem();
-                if(debugPrintouts) System.out.println("smallSearchWindowController: Adding book to state");
+                if(DEBUGPRINTOUTS) System.out.println("smallSearchWindowController: Adding book to state");
                getState().setBookSearchResults(new ArrayList<>(List.of(selectedBook)));
                 break;
             case FILM:
                 if(FilmSearchTable.getSelectionModel().getSelectedItem() == null) return;
                 Film selectedFilm = FilmSearchTable.getSelectionModel().getSelectedItem();
-                if(debugPrintouts) System.out.println("smallSearchWindowController: Adding film to state");
+                if(DEBUGPRINTOUTS) System.out.println("smallSearchWindowController: Adding film to state");
                 getState().setFilmSearchResults(new ArrayList<>(List.of(selectedFilm)));
                 break;
             default:
@@ -168,13 +168,13 @@ public class SmallSearchWindowController extends Controller {
                 bokSearchResults = super.getState().databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
                 ObservableList<Bok> bookData = FXCollections.observableArrayList(bokSearchResults);
                 notLoggedInBookSearchTable.setItems(bookData);
-                if(debugPrintouts) System.out.println("smallSearchWindowController: Rows added to table: " + bookData.size());
+                if(DEBUGPRINTOUTS) System.out.println("smallSearchWindowController: Rows added to table: " + bookData.size());
                 break;
             case FILM:
                 List<Film> searchResults = super.getState().databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
                 ObservableList<Film> filmData = FXCollections.observableArrayList(searchResults);
                 FilmSearchTable.setItems(filmData);
-                if(debugPrintouts) System.out.println("smallSearchWindowController: Rows added to table: " + filmData.size());
+                if(DEBUGPRINTOUTS) System.out.println("smallSearchWindowController: Rows added to table: " + filmData.size());
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + mode);

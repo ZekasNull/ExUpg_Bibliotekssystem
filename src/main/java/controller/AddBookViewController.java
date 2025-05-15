@@ -337,6 +337,7 @@ public class AddBookViewController extends Controller {
     void addExemplarTableButtonPressed(ActionEvent event) {
         //se till att låntyp är vald
         if(exemplarLoanType.isEmpty()) {
+            showErrorPopup("Du måste välja en låntyp.");
             chooseLoanTypeButton.requestFocus();
             return;
         };

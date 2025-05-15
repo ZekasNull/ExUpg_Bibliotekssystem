@@ -158,7 +158,10 @@ public class AddBookViewController extends Controller {
                 authorFirstNameBoxContents1,
                 authorLastNameBoxContents1
         );
-        if (requiredFields.stream().anyMatch(f -> f.getText().isBlank())) return; //ev. flytta in i adding? felmeddelande?
+        if (requiredFields.stream().anyMatch(f -> f.getText().isBlank())) {
+            showErrorPopup("Det måste finnas en titel, isbn och något på författare 1 för och efternamn.");
+            return;
+        }
 
         switch (formMode) {
             case "Adding":
@@ -421,7 +424,7 @@ public class AddBookViewController extends Controller {
             getState().databaseService.ändraObjekt(bookList);
         }
 
-        showConfirmation();
+        showInformationPopup("Ändringarna skickades!");
         setWindowToDefaultState();
         //TODO anrop för att stänga fönstret
     }
@@ -484,33 +487,7 @@ public class AddBookViewController extends Controller {
                 .collect(Collectors.toList());
     }
 
-    private boolean onDeleteUserConfirmation()
-    {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Bekräfta");
-        alert.setHeaderText("Är du säker?");
-        alert.setContentText("Vill du verkligen radera detta objekt? Om det är en bok kommer alla exemplar också raderas.");
 
-        // Set button types explicitly
-        ButtonType yesButton = new ButtonType("Ja", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("Nej", ButtonBar.ButtonData.NO);
-
-        alert.getButtonTypes().setAll(yesButton, noButton);
-
-        // Show and wait for user input
-        Optional<ButtonType> result = alert.showAndWait();
-
-        return result.isPresent() && result.get() == yesButton;
-    }
-
-    private void showConfirmation() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information");
-        alert.setHeaderText("Ändringarna skickades!");
-
-        alert.showAndWait();
-
-    }
 
     private void openSearchWindow() throws IOException {
         Stage searchWindow = new Stage();
@@ -626,5 +603,41 @@ public class AddBookViewController extends Controller {
         authorLastNameBoxContents3.setDisable(state);
         clearFormButton.setDisable(state);
         formOkButton.setDisable(state);
+    }
+
+    //notiser
+    private void showInformationPopup(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
+        alert.setHeaderText(message);
+
+        alert.showAndWait();
+    }
+
+    private void showErrorPopup(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Fel");
+        alert.setHeaderText(message);
+
+        alert.showAndWait();
+    }
+
+    private boolean onDeleteUserConfirmation()
+    {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Bekräfta");
+        alert.setHeaderText("Är du säker?");
+        alert.setContentText("Vill du verkligen radera detta objekt? Om det är en bok kommer alla exemplar också raderas.");
+
+        // Set button types explicitly
+        ButtonType yesButton = new ButtonType("Ja", ButtonBar.ButtonData.YES);
+        ButtonType noButton = new ButtonType("Nej", ButtonBar.ButtonData.NO);
+
+        alert.getButtonTypes().setAll(yesButton, noButton);
+
+        // Show and wait for user input
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return result.isPresent() && result.get() == yesButton;
     }
 }

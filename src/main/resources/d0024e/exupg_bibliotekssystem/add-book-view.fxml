@@ -9,10 +9,12 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="671.0" prefWidth="825.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddBookViewController">
    <children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#bfbfbf" height="474.0" layoutX="20.0" layoutY="54.0" opacity="0.26" stroke="BLACK" strokeType="INSIDE" width="355.0" />
       <Label layoutX="42.0" layoutY="58.0" text="Titel:">
          <font>
             <Font size="14.0" />
@@ -23,68 +25,19 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="45.0" layoutY="174.0" text="Ämnesord (max 3)">
+      <Label layoutX="39.0" layoutY="326.0" text="Ämnesord:">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="45.0" layoutY="234.0" prefHeight="20.0" prefWidth="75.0" text="Författare 1:">
+      <Label layoutX="32.0" layoutY="174.0" prefHeight="20.0" prefWidth="75.0" text="Författare:">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
       <TextField fx:id="titleBoxContents" disable="true" layoutX="42.0" layoutY="78.0" />
       <TextField fx:id="isbnBoxContents" disable="true" layoutX="42.0" layoutY="134.0" />
-      <TextField fx:id="amnesordBoxContents1" disable="true" layoutX="45.0" layoutY="194.0" />
-      <TextField fx:id="authorFirstNameBoxContents1" disable="true" layoutX="42.0" layoutY="274.0" />
-      <TextField fx:id="authorLastNameBoxContents1" disable="true" layoutX="225.0" layoutY="274.0" />
-      <Label layoutX="45.0" layoutY="253.0" text="Förnamn:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label layoutX="225.0" layoutY="253.0" text="Efternamn:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <TextField fx:id="authorFirstNameBoxContents2" disable="true" layoutX="45.0" layoutY="341.0" />
-      <TextField fx:id="authorLastNameBoxContents2" disable="true" layoutX="228.0" layoutY="341.0" />
-      <Label layoutX="45.0" layoutY="320.0" text="Förnamn:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label layoutX="228.0" layoutY="320.0" text="Efternamn:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <TextField fx:id="authorFirstNameBoxContents3" disable="true" layoutX="45.0" layoutY="416.0" />
-      <TextField fx:id="authorLastNameBoxContents3" disable="true" layoutX="228.0" layoutY="416.0" />
-      <Label layoutX="45.0" layoutY="395.0" text="Förnamn:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label layoutX="228.0" layoutY="395.0" text="Efternamn:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label layoutX="45.0" layoutY="300.0" text="Författare 2:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label layoutX="45.0" layoutY="375.0" text="Författare 3:">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <TextField fx:id="amnesordBoxContents2" disable="true" layoutX="202.0" layoutY="194.0" />
-      <TextField fx:id="amnesordBoxContents3" disable="true" layoutX="360.0" layoutY="194.0" />
-      <TableView fx:id="ExemplarViewTable" layoutX="527.0" layoutY="311.0" prefHeight="200.0" prefWidth="276.0">
+      <TableView fx:id="ExemplarViewTable" layoutX="527.0" layoutY="311.0" onMouseClicked="#exemplarTableClicked" prefHeight="200.0" prefWidth="276.0">
         <columns>
           <TableColumn fx:id="BarcodeColumn" prefWidth="75.0" text="Streckkod" />
           <TableColumn fx:id="LåntypColumn" prefWidth="133.0" text="Låntyp" />
@@ -109,8 +62,8 @@
             <MenuItem mnemonicParsing="false" onAction="#handleReferenslitteraturOption" text="Referenslitteratur" />
         </items>
       </SplitMenuButton>
-      <Button fx:id="addCopyButton" layoutX="647.0" layoutY="529.0" mnemonicParsing="false" onAction="#addExemplarTableButtonPressed" text="Lägg till" />
-      <Button fx:id="removeCopyButton" layoutX="713.0" layoutY="529.0" mnemonicParsing="false" onAction="#removeExemplarButtonPressed" text="Ta bort" />
+      <Button fx:id="addCopyButton" disable="true" layoutX="647.0" layoutY="529.0" mnemonicParsing="false" onAction="#addExemplarTableButtonPressed" text="Lägg till" />
+      <Button fx:id="removeCopyButton" disable="true" layoutX="713.0" layoutY="529.0" mnemonicParsing="false" onAction="#removeExemplarButtonPressed" text="Ta bort" />
       <Button fx:id="searchBookButton" layoutX="401.0" layoutY="37.0" mnemonicParsing="false" onAction="#searchBookButtonPressed" text="Sök existerande bok" />
       <Button layoutX="691.0" layoutY="626.0" mnemonicParsing="false" onAction="#confirmButtonPressed" text="Bekräfta ändringar" />
       <Button layoutX="622.0" layoutY="626.0" mnemonicParsing="false" onAction="#cancelButtonPressed" text="Avbryt" />
@@ -131,9 +84,9 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Button fx:id="removeBookButton" layoutX="748.0" layoutY="244.0" mnemonicParsing="false" onAction="#removeBokTableButtonPressed" text="Ta bort" />
+      <Button fx:id="removeBookButton" disable="true" layoutX="748.0" layoutY="244.0" mnemonicParsing="false" onAction="#removeBookTableButtonPressed" text="Ta bort" />
       <Button fx:id="editBookButton" disable="true" layoutX="427.0" layoutY="102.0" mnemonicParsing="false" onAction="#editBookButtonPressed" text="Ändra bok" />
-      <Button fx:id="clearFormButton" layoutX="42.0" layoutY="453.0" mnemonicParsing="false" onAction="#clearFormButtonPressed" text="Rensa" />
+      <Button fx:id="clearFormButton" disable="true" layoutX="284.0" layoutY="529.0" mnemonicParsing="false" onAction="#clearFormButtonPressed" text="Rensa" />
       <DialogPane layoutX="-575.0" layoutY="-222.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="480.0">
           <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="320.0" />
@@ -142,6 +95,21 @@
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="320.0" />
           </expandableContent>
       </DialogPane>
-      <Button fx:id="formOkButton" layoutX="101.0" layoutY="453.0" mnemonicParsing="false" onAction="#formOkButtonPressed" text="Ok" />
+      <Button fx:id="formOkButton" disable="true" layoutX="343.0" layoutY="529.0" mnemonicParsing="false" onAction="#formOkButtonPressed" text="Ok" />
+      <TableView fx:id="authorTable" layoutX="35.0" layoutY="193.0" prefHeight="120.0" prefWidth="283.0">
+        <columns>
+          <TableColumn fx:id="authorFirstNameColumn" prefWidth="143.0" text="Förnamn" />
+          <TableColumn fx:id="authorLastNameColumn" prefWidth="138.0" text="Efternamn" />
+        </columns>
+      </TableView>
+      <TableView fx:id="keywordTable" layoutX="35.0" layoutY="351.0" prefHeight="120.0" prefWidth="283.0">
+         <columns>
+            <TableColumn fx:id="keywordColumn" prefWidth="282.0" text="Ämnesord" />
+         </columns>
+      </TableView>
+      <Button fx:id="removeAuthorButton" disable="true" layoutX="256.0" layoutY="315.0" mnemonicParsing="false" onAction="#removeAuthorButtonPressed" text="Ta bort" />
+      <Button fx:id="addAuthorButton" disable="true" layoutX="192.0" layoutY="315.0" mnemonicParsing="false" onAction="#addAuthorButtonPressed" text="Lägg till" />
+      <Button fx:id="removeKeywordButton" disable="true" layoutX="255.0" layoutY="478.0" mnemonicParsing="false" onAction="#removeKeywordButtonPressed" text="Ta bort" />
+      <Button fx:id="addKeywordButton" disable="true" layoutX="191.0" layoutY="478.0" mnemonicParsing="false" onAction="#addKeywordButtonPressed" text="Lägg till" />
    </children>
 </AnchorPane>

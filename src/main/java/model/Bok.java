@@ -54,7 +54,7 @@ public class Bok {
     }
 
 
-    @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER, orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
 
     public Set<Exemplar> getExemplars() {

@@ -17,58 +17,58 @@ import model.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javafx.scene.control.Button;
+import javafx.scene.control.SplitMenuButton;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import service.BookDatabaseService;
+
 
 public class AddBookViewController extends Controller {
     //debug
     private final boolean debugPrintouts = false;
 
-    //internt fönster för sökning
-
-
     //lista över exemplar och böcker som visas i tables
     private ObservableList<Exemplar> exemplarList = FXCollections.observableArrayList();
     private ObservableList<Bok> bookList = FXCollections.observableArrayList();
+    private ObservableList<Författare> formAuthorList = FXCollections.observableArrayList();
+    private ObservableList<Ämnesord> formKeywordList = FXCollections.observableArrayList();
+
 
     //när exemplar eller böcker ska tas bort visas de inte längre och hamnar därför i en annan lista
     private ArrayList<Exemplar> exemplarDeletionList = new ArrayList<>();
     private ArrayList<Bok> bookDeletionList = new ArrayList<>();
 
-    //TODO kontrollsträngar bör inte vara string, konvertera till enums senare
-    private String exemplarLoanType = ""; //"bok" eller "kurslitteratur" eller "referenslitteratur"
-    private String formMode = ""; //"Adding", "Editing", ""
+    //enums för FormMode och böckers exemplartyp
+    private enum FormMode { ADDING, EDITING, NONE }
+    private FormMode formMode = FormMode.NONE;
+    private enum LoanType {
+        BOK("bok"),
+        KURSLITTERATUR("kurslitteratur"),
+        REFERENSLITTERATUR("referenslitteratur"),
+        NOT_SELECTED("imgoingtoFUCKINGkillmyself");
 
-    //private enum FormMode { ADDING, EDITING, NONE }
-    //private enum LoanType { BOK, KURSLITTERATUR, REFERENSLITTERATUR }
+        private final String låntyp;
 
-    //kontrollerar vad som sker när bekräfta ändringar trycks
+        LoanType(String låntyp){
+            this.låntyp = låntyp;
+        }
+        public String getLåntyp() {
+            return låntyp;
+        }
+    }
+    private LoanType selectedLoanType = LoanType.NOT_SELECTED;
+
+    //booleans för kontroll av vad som ska göras när bekräfta-knappen trycks
     private boolean
-        hasNewBooks = false,
-        hasNewExemplars = false,
-        hasChangedBooks = false,
-        hasDeletedExemplars = false,
-        hasDeletedBooks = false;
+        hasNewBooks,
+        hasChangedBooks,
+        hasDeletedExemplars = false;
 
     //form text fields
     @FXML
     private TextField idBoxContents;
-
-    @FXML
-    private TextField authorFirstNameBoxContents1;
-
-    @FXML
-    private TextField authorLastNameBoxContents1;
-
-    @FXML
-    private TextField authorFirstNameBoxContents2;
-
-    @FXML
-    private TextField authorLastNameBoxContents2;
-
-    @FXML
-    private TextField authorFirstNameBoxContents3;
-
-    @FXML
-    private TextField authorLastNameBoxContents3;
 
     @FXML
     private TextField isbnBoxContents;
@@ -76,14 +76,21 @@ public class AddBookViewController extends Controller {
     @FXML
     private TextField titleBoxContents;
 
+    //form author table
     @FXML
-    private TextField amnesordBoxContents1;
+    private TableView<Författare> authorTable;
 
     @FXML
-    private TextField amnesordBoxContents2;
+    private TableColumn<Författare, ?> authorFirstNameColumn;
 
     @FXML
-    private TextField amnesordBoxContents3;
+    private TableColumn<Författare, ?> authorLastNameColumn;
+
+    //form keyword table
+    @FXML
+    private TableView<Ämnesord> keywordTable;
+    @FXML
+    private TableColumn<?, ?> keywordColumn;
 
     //bookviewtable
     @FXML
@@ -113,6 +120,19 @@ public class AddBookViewController extends Controller {
     @FXML
     private Button addCopyButton;
 
+    @FXML
+    private Button addKeywordButton;
+
+    @FXML
+    private Button removeKeywordButton;
+
+    @FXML
+    private Button addAuthorButton;
+
+    @FXML
+    private Button removeAuthorButton;
+
+
     /**
      * När nya exemplar läggs till ska de ha en låntyp. Den väljs här
      */
@@ -120,20 +140,20 @@ public class AddBookViewController extends Controller {
     private SplitMenuButton chooseLoanTypeButton;
     @FXML
     void handleBokOption(ActionEvent event) {
-        exemplarLoanType = "bok";
-        chooseLoanTypeButton.setText("Bok");
+        selectedLoanType = LoanType.BOK;
+        chooseLoanTypeButton.setText(selectedLoanType.låntyp);
     }
 
     @FXML
     void handleKurslitteraturOption(ActionEvent event) {
-        exemplarLoanType = "kurslitteratur";
-        chooseLoanTypeButton.setText("Kurslitteratur");
+        selectedLoanType = LoanType.KURSLITTERATUR;
+        chooseLoanTypeButton.setText(selectedLoanType.låntyp);
     }
 
     @FXML
     void handleReferenslitteraturOption(ActionEvent event) {
-        exemplarLoanType = "referenslitteratur";
-        chooseLoanTypeButton.setText("Referenslitteratur");
+        selectedLoanType = LoanType.REFERENSLITTERATUR;
+        chooseLoanTypeButton.setText(selectedLoanType.låntyp);
     }
 
     @FXML
@@ -145,133 +165,70 @@ public class AddBookViewController extends Controller {
     @FXML
     private Button formOkButton;
 
+    @FXML
+    private Button clearFormButton;
+
+    @FXML
+    void clearFormButtonPressed(ActionEvent event) {
+        clearForm();
+    }
+
     /**
      * När denna knapp trycks läggs antingen en ny bok till eller så ändras en existerande bok.
      * @param event
      */
     @FXML
-    void formOkButtonPressed(ActionEvent event) throws Exception {
+    void formOkButtonPressed(ActionEvent event) {
         //se till att kritiska fält innehåller något exklusive whitespace
-        List<TextField> requiredFields = Arrays.asList(
-                isbnBoxContents,
-                titleBoxContents,
-                authorFirstNameBoxContents1,
-                authorLastNameBoxContents1
-        );
-        if (requiredFields.stream().anyMatch(f -> f.getText().isBlank())) {
-            showErrorPopup("Det måste finnas en titel, isbn och något på författare 1 för och efternamn.");
+        if (!FormHasRequiredData()) {
+            showErrorPopup("Det måste finnas en titel, ISBN-13 och minst en författare.");
             return;
         }
+        Bok bok;
+        HashSet<Författare> changedAuthors = new HashSet<>(formAuthorList);
+        HashSet<Ämnesord> changedKeywords = new HashSet<>(formKeywordList);
 
-        switch (formMode) {
-            case "Adding":
-                okAddNewBook();
+        switch(formMode) {
+            case ADDING:
+                bok = new Bok();
+                bok.setTitel(titleBoxContents.getText().trim());
+                bok.setIsbn13(isbnBoxContents.getText().trim());
+                bok.setFörfattare(changedAuthors);
+                bok.setÄmnesord(changedKeywords);
+                bookList.add(bok);
+                hasNewBooks = true;
                 break;
-            case "Editing":
-                okEditExistingBook();
+            case EDITING:
+                bok = bookViewTable.getSelectionModel().getSelectedItem();
+                bok.setTitel(titleBoxContents.getText().trim());
+                bok.setIsbn13(isbnBoxContents.getText().trim());
+                bok.setFörfattare(changedAuthors);
+                bok.setÄmnesord(changedKeywords);
+                hasChangedBooks = true;
+                bookViewTable.refresh(); //då den inte reagerar på ändrat internt innehåll
                 break;
+            case NONE:
+                System.out.println("AddBookViewController: this should never ever be visible");
             default:
-                System.out.println("AddBookViewController: formMode is neither 'Adding' nor 'Editing'");
+                System.out.println("AddBookViewController: some fucking how, none of the approved states are set");
                 break;
         }
-
+        setWindowToDefaultState();
     }
 
-    private void okEditExistingBook() throws Exception {
-        //TODO antar just nu att alla författare och ämnesord är nya
-
-
-        Bok editedBook = bookViewTable.getSelectionModel().getSelectedItem();
-
-        //ämnesordändringar
-        String[] amnesord = {amnesordBoxContents1.getText(), amnesordBoxContents2.getText(), amnesordBoxContents3.getText()};
-        HashSet<Ämnesord> newÄmnesordSet = new HashSet<>();
-        for(String ord : amnesord){
-            if (ord.isEmpty()) continue; //skippa om ord inte finns
-            Ämnesord newÄmnesOrd = getState().databaseService.searchAmnesord(ord); //hämta ord om det redan finns
-
-            if (newÄmnesOrd == null) {
-                if (debugPrintouts) System.out.println("AddBookViewController: Ord " + ord + " not found in database, creating new one");
-                newÄmnesOrd = new Ämnesord();
-                newÄmnesOrd.setOrd(ord);
-            }
-            newÄmnesordSet.add(newÄmnesOrd);
-        }
-        //författarändringar
-        String[] firstName = {authorFirstNameBoxContents1.getText(), authorFirstNameBoxContents2.getText(), authorFirstNameBoxContents3.getText()};
-        String[] lastName = {authorLastNameBoxContents1.getText(), authorLastNameBoxContents2.getText(), authorLastNameBoxContents3.getText()};
-        HashSet<Författare> newFörfattare = new HashSet<>();
-        for (int i = 0; i < firstName.length; i++) {
-            if(firstName[i].isEmpty() || lastName[i].isEmpty()) continue;
-
-            Författare f = new Författare();
-            f.setFörnamn(firstName[i]);
-            f.setEfternamn(lastName[i]);
-            newFörfattare.add(f);
-        }
-
-        //bokändringar
-        editedBook.setTitel(titleBoxContents.getText());
-        editedBook.setIsbn13(isbnBoxContents.getText());
-        editedBook.setFörfattare(newFörfattare);
-        editedBook.setÄmnesord(newÄmnesordSet);
-        //meta
-        hasChangedBooks = true;
-        bookList.remove(editedBook);
-        bookList.add(editedBook); //tvinga uppdatering för observablelist genom att ta bort och lägga till igen
-        clearForm();
-        disableForm(true);
+    /**
+     * Liten hjälpmetod som ser till att rätt info finns i fält.
+     * TODO ersätt med InputValidatorService
+     * @return false om något fält saknar nödvändig data, annars true
+     */
+    private boolean FormHasRequiredData() {
+        if (titleBoxContents.getText().trim().isEmpty()) return false;
+        if(isbnBoxContents.getText().trim().isEmpty()) return false;
+        if(formAuthorList.isEmpty()) return false;
+        return true;
     }
 
-    private void okAddNewBook() throws Exception {
-        //TODO antar just nu att alla författare och ämnesord är nya
 
-        //skapa ämnesord
-        String[] amnesord = {amnesordBoxContents1.getText(), amnesordBoxContents2.getText(), amnesordBoxContents3.getText()};
-        HashSet<Ämnesord> newÄmnesordSet = new HashSet<>();
-        for(String ord : amnesord){
-            if (ord.isEmpty()) continue; //skippa om ord inte finns
-            Ämnesord newÄmnesOrd = getState().databaseService.searchAmnesord(ord); //hämta ord om det redan finns
-
-            if (newÄmnesOrd == null) {
-                if (debugPrintouts) System.out.println("AddBookViewController: Ord " + ord + " not found in database, creating new one");
-                newÄmnesOrd = new Ämnesord();
-                newÄmnesOrd.setOrd(ord);
-            }
-            newÄmnesordSet.add(newÄmnesOrd);
-        }
-
-        //skapa författare
-        String[] firstName = {authorFirstNameBoxContents1.getText(), authorFirstNameBoxContents2.getText(), authorFirstNameBoxContents3.getText()};
-        String[] lastName = {authorLastNameBoxContents1.getText(), authorLastNameBoxContents2.getText(), authorLastNameBoxContents3.getText()};
-        HashSet<Författare> newFörfattare = new HashSet<>();
-        for (int i = 0; i < firstName.length; i++) {
-            if(firstName[i].isEmpty() || lastName[i].isEmpty()) continue;
-
-            Författare f = new Författare();
-            f.setFörnamn(firstName[i]);
-            f.setEfternamn(lastName[i]);
-            newFörfattare.add(f);
-        }
-
-        //skapa bok
-        Bok newBook = new Bok();
-        newBook.setTitel(titleBoxContents.getText());
-        newBook.setIsbn13(isbnBoxContents.getText());
-        newBook.setFörfattare(newFörfattare);
-        newBook.setÄmnesord(newÄmnesordSet);
-
-
-        //lägg till ny bok i listan
-        bookList.add(newBook);
-        //uppdatera tableview
-        clearForm();
-        disableForm(true);
-        hasNewBooks = true;
-    }
-
-    @FXML
-    private Button clearFormButton;
 
     /**
      * Om en bok är vald i bookviewtable, sätt till edit book state.
@@ -287,145 +244,227 @@ public class AddBookViewController extends Controller {
      * Förbereder klassens tables genom att ställa in deras cellvaluefactories.
      */
     public void initialize() {
-        prepareTables();
+        //author
+        authorTable.setItems(formAuthorList);
+        authorFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("förnamn"));
+        authorLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("efternamn"));
+
+        //keywords
+        keywordTable.setItems(formKeywordList);
+        keywordColumn.setCellValueFactory(new PropertyValueFactory<>("ord"));
+
+
+        //exemplar table
+        ExemplarViewTable.setItems(exemplarList);
+        BarcodeColumn.setCellValueFactory(new PropertyValueFactory<>("streckkod"));
+        LåntypColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getLåntyp().getLåntyp()));
+        TillgängligColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getTillgänglig() ? "Ja" : "Nej"));
+
+        //book table
+        bookViewTable.setItems(bookList);
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
+        //För ämnesord behövde vi ta och skriva ut varje element i listan med ett ',' mellan
+        //Här är det fråga om sammansätta förnamn och efternamn
+        AuthorColumn.setCellValueFactory(cellData -> {
+            Bok bok = cellData.getValue();
+            String authorName = bok.getFörfattare().stream()
+                    .map(författare -> författare.getFörnamn() + " " + författare.getEfternamn())
+                    .collect(Collectors.joining(","));
+            return new SimpleStringProperty(authorName);
+        });
     }
 
     @FXML
     void bookTableClicked(MouseEvent event) {
-        editBookButton.setDisable(bookList.isEmpty()); //stäng av eller sätt på knapp om boklistan innehåller något
         if (bookList.isEmpty()) return; //förhindra exekvering när listan är tom
+        Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
 
-        populateTextFields();
+        //form
+        titleBoxContents.setText(bok.getTitel());
+        isbnBoxContents.setText(bok.getIsbn13());
+        idBoxContents.setText(bok.getId() == null ? "" : bok.getId().toString()); //kan vara null
 
-        //rensa existerande exemplar i andra listan
+        //författare
+        formAuthorList.clear();
+        formAuthorList.addAll(bok.getFörfattare());
+
+        //ämnesord
+        formKeywordList.clear();
+        formKeywordList.addAll(bok.getÄmnesord());
+
+        //exemplar
         exemplarList.clear();
         exemplarList.addAll(bookViewTable.getSelectionModel().getSelectedItem().getExemplars()); //hämta ex från bok
+
+        removeBookButton.setDisable(bookList.isEmpty());
+        addCopyButton.setDisable(bookList.isEmpty());
+        editBookButton.setDisable(bookList.isEmpty());
 
 
     }
 
-    private void populateTextFields() {
-        //ta vald bok
-        Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
-        Ämnesord[] ordlista = bok.getÄmnesord().toArray(new Ämnesord[0]); //konvertera till array för att tillåta indexering
-        Författare[] författarlista = bok.getFörfattare().toArray(new Författare[0]); //storlek 0 på skickad array för att tvinga fram ny
-        //populate fields
-        if(bok.getId() != null) idBoxContents.setText(bok.getId().toString()); //id kan vara null för nya böcker
-        isbnBoxContents.setText(bok.getIsbn13());
-        titleBoxContents.setText(bok.getTitel());
-        //ämnesord
-        amnesordBoxContents1.setText(ordlista.length > 0 ?  ordlista[0].getOrd() : "");
-        amnesordBoxContents2.setText(ordlista.length > 1 ?  ordlista[1].getOrd() : "");
-        amnesordBoxContents3.setText(ordlista.length > 2 ?  ordlista[2].getOrd() : "");
-        //författare1
-        authorFirstNameBoxContents1.setText(författarlista.length > 0 ? författarlista[0].getFörnamn() : "");
-        authorLastNameBoxContents1.setText(författarlista.length > 0 ? författarlista[0].getEfternamn() : "");
-        //författare2
-        authorFirstNameBoxContents2.setText(författarlista.length > 1 ? författarlista[1].getFörnamn() : "");
-        authorLastNameBoxContents2.setText(författarlista.length > 1 ? författarlista[1].getEfternamn() : "");
-        //författare3
-        authorFirstNameBoxContents3.setText(författarlista.length > 2 ? författarlista[2].getFörnamn() : "");
-        authorLastNameBoxContents3.setText(författarlista.length > 2 ? författarlista[2].getEfternamn() : "");
+    @FXML
+    void exemplarTableClicked(MouseEvent event) {
+        removeCopyButton.setDisable(exemplarList.isEmpty());
     }
 
     @FXML
     void cancelButtonPressed(ActionEvent event) {
         //TODO Ska stänga fönstret och återgå till föregående vy
+        //för tillfället nollställer den istället fönstret
+        setWindowToResetState();
     }
 
     @FXML
     void addExemplarTableButtonPressed(ActionEvent event) {
         //se till att låntyp är vald
-        if(exemplarLoanType.isEmpty()) {
+        if(selectedLoanType == LoanType.NOT_SELECTED) {
             showErrorPopup("Du måste välja en låntyp.");
             chooseLoanTypeButton.requestFocus();
             return;
-        };
+        }
         //Skapar ett exemplar för den valda boken med den valda låntypen. Läggs in i databasen när bekräfta ändringar trycks.
 
-        //se till att bara en bok finns (och därmed bara dess exemplar)
-        Bok bok;
-        if (bookList.size() > 1) {
-            bok = bookViewTable.getSelectionModel().getSelectedItem();
-            bookList.clear();
-            bookList.add(bok);
-        } else {
-            bok = bookList.get(0);
-        }
-
-
-        //skapa nytt ex
-        Exemplar nyttex = new Exemplar();
-        nyttex.setBok(bok);
-        nyttex.setNewLåntyp(exemplarLoanType);
-        exemplarList.add(nyttex);
-        hasNewExemplars = true;
-    }
-
-    @FXML
-    void clearFormButtonPressed(ActionEvent event) {
-        clearForm();
-    }
-
-    @FXML
-    void removeBokTableButtonPressed(ActionEvent event) {
         Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
-        if (bok.getId() != null) { //böcker utan id kan tas bort direkt då de inte finns i db
-            if (onDeleteUserConfirmation()) {
-                hasDeletedBooks = true;
-                bookDeletionList.add(bok);
-            }
-        }
-        bookList.remove(bok);
-        exemplarList.clear();
-        if(bookList.isEmpty()) {
-            hasNewBooks = false;
-        }
+
+        //skapa ex
+        Exemplar nyttEx = new Exemplar();
+        nyttEx.setNewLåntyp(selectedLoanType.getLåntyp());
+        nyttEx.setBok(bok);
+
+        //lägg till i både synlig lista och bokens lista
+        exemplarList.add(nyttEx);
+        bok.getExemplars().add(nyttEx);
+
+        hasChangedBooks = true; //nya exemplar räknas som ändrad bok
     }
 
     @FXML
     void removeExemplarButtonPressed(ActionEvent event) {
         Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
         Exemplar ex = ExemplarViewTable.getSelectionModel().getSelectedItem();
+
+        //om streckkod finns, be användaren bekräfta
         if (ex.getStreckkod() != null) {
-            if (onDeleteUserConfirmation()) {
+            if (onDeleteUserConfirmation(false)) {
+                exemplarDeletionList.add(ex); //exemplar till raderingslista
                 bok.getExemplars().remove(ex); //ta bort exemplaret från bokens lista
+                exemplarList.remove(ex); //ta bort exemplaret från synlig lista
                 hasDeletedExemplars = true;
-                exemplarDeletionList.add(ex);
-                exemplarList.remove(ex);
             }
-        }else{
+        }else{ //ta bort från synlig och boklista direkt när streckkod saknas
             exemplarList.remove(ex);
+            bok.getExemplars().remove(ex);
         }
     }
+
+    @FXML
+    void addAuthorButtonPressed(ActionEvent event) throws IOException {
+        BookDatabaseService dbs = new BookDatabaseService(); //FIXME ENDAST TEST
+        String[] names = openNameInputDialog();
+        if (debugPrintouts) System.out.println("AddBookViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for directors");
+
+        formAuthorList.add(dbs.findOrCreateAuthor(names));
+    }
+
+    @FXML
+    void removeAuthorButtonPressed(ActionEvent event) {
+        if(formAuthorList.isEmpty()) return;
+        formAuthorList.remove(authorTable.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    void addKeywordButtonPressed(ActionEvent event) {
+        //instansvariabler
+        BookDatabaseService bdbs = new BookDatabaseService(); //FIXME ENDAST TEST - databaskoppling
+        TextInputDialog dialog = new TextInputDialog();
+        Optional<String> ämnesord;
+
+        //ta input med enkel dialog
+        dialog.setTitle("Ämnesord");
+        dialog.setHeaderText("Skriv in ämnesord");
+        dialog.setContentText("Ämnesord:");
+        ämnesord = dialog.showAndWait();
+        if (ämnesord.isEmpty()) {
+            if (debugPrintouts) System.out.println("AddBookViewController: No keyword entered in TextInputDialog");
+            return;
+        }
+
+        if (debugPrintouts) System.out.println("AddFilmViewController: Found "+ ämnesord.get() + " in TextInputDialog for genre");
+
+        formKeywordList.add(bdbs.findOrCreateÄmnesord(ämnesord.get())); //se om det redan finns i databas och lägg till
+    }
+
+    @FXML
+    void removeKeywordButtonPressed(ActionEvent event) {
+        if(formKeywordList.isEmpty()) return;
+        formKeywordList.remove(keywordTable.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    void removeBookTableButtonPressed(ActionEvent event) {
+        Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
+        if (bok.getId() != null) {
+            if (onDeleteUserConfirmation(!bok.getExemplars().isEmpty())) { //visa varning om boken har exemplar
+                bookDeletionList.add(bok);
+                bookList.remove(bok);
+                exemplarList.clear();
+            }
+        }else{
+            //böcker utan id kan tas bort direkt då de inte finns i db
+            bookList.remove(bok);
+            exemplarList.clear();
+            hasNewBooks = !bookList.isEmpty();
+        }
+        clearForm();
+    }
+
+
 
     /**
      * Lägger till nya böcker eller exemplar i databasen baserat på det som finns i bookList och ExemplarList
      * @param event
      */
     @FXML
-    void confirmButtonPressed(ActionEvent event) throws Exception {
+    void confirmButtonPressed(ActionEvent event) {
+        BookDatabaseService dbs = new BookDatabaseService(); //FIXME ENDAST TEST - databaskoppling
+        ArrayList<Bok> processedBooks = new ArrayList<>();
         //
-        if (hasDeletedExemplars) { //radera exemplar först
-            getState().databaseService.raderaObjekt(exemplarDeletionList);
-        }
-        if(hasDeletedBooks) {
-            getState().databaseService.raderaObjekt(bookDeletionList);
-        }
-
         if (hasNewBooks) {
-            getState().databaseService.läggTillNyaObjekt(bookList);
+            for(Bok b : bookList) {
+                if (b.getId() == null) { //hantera endast nya böcker och skippa uppdaterade
+                    dbs.addNewBook(b);
+                    processedBooks.add(b);
+                }
+            }
         }
-
-        if (hasNewExemplars) {
-            getState().databaseService.läggTillNyaObjekt(getOnlyNewExemplars());
-        }
-
         if (hasChangedBooks) {
-            getState().databaseService.ändraObjekt(bookList);
+            for(Bok b : bookList) {
+                dbs.updateBook(b);
+            }
+        }
+        bookList.removeAll(processedBooks);
+
+        if(!bookDeletionList.isEmpty()) {
+            for(Bok b : bookDeletionList) {
+                dbs.deleteBook(b);
+            }
+        }
+        if (!exemplarDeletionList.isEmpty()) {
+            for(Exemplar e : exemplarDeletionList) {
+                dbs.deleteBookCopy(e);
+            }
+        }
+        if (hasChangedBooks || hasNewBooks) {
+            showInformationPopup("Ändringarna skickades till databasen!");
+        } else {
+            showInformationPopup("Det finns inga ändringar att skicka.");
         }
 
-        showInformationPopup("Ändringarna skickades!");
+        bookList.clear();
+        exemplarList.clear(); //tvinga användare att ladda om
         setWindowToDefaultState();
         //TODO anrop för att stänga fönstret
     }
@@ -446,50 +485,186 @@ public class AddBookViewController extends Controller {
         openSearchWindow();
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        if(debugPrintouts) System.out.println("AddBookViewController: Update");
-        bookList.clear();
-        bookList.addAll(FXCollections.observableArrayList(getState().getBookSearchResults())); //interna boklistan tilldelas från appstate's sökresultat
-    }
+
 
     //hjälpmetoder
 
+    /*
+     * BEGIN WINDOWSTATES
+     */
 
-    private void prepareTables() {
-        ExemplarViewTable.setItems(exemplarList);
-        bookViewTable.setItems(bookList);
+    /**
+     * Ska motsvara fönstret i sitt default state, men utan att ta bort information från listor. Det gäller att:
+     * FormMode is NONE
+     * Form is disabled
+     * Form buttons are disabled
+     * Böcker table is enabled
+     * Böcker remove button only enabled if bookList contains something
+     * Exemplar table is enabled
+     * Exemplar remove button only enabled if exemplarList contains something
+     * Search book button is enabled
+     * Add new book button is enabled
+     * Change book button is only enabled if bookList contains something
+     */
+    private void setWindowToDefaultState() {
+        //form
+        formMode = FormMode.NONE;
+        clearForm();
+        disableForm(true);
+
+        //book table and buttons
+        bookViewTable.setDisable(false);
+        removeBookButton.setDisable(bookList.isEmpty());
 
         //exemplar table
-        BarcodeColumn.setCellValueFactory(new PropertyValueFactory<>("streckkod"));
-        LåntypColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getLåntyp().getLåntyp()));
-        TillgängligColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getTillgänglig() ? "Ja" : "Nej"));
+        ExemplarViewTable.setDisable(false);
+        chooseLoanTypeButton.setDisable(false);
+        addCopyButton.setDisable(false);
+        removeCopyButton.setDisable(exemplarList.isEmpty());
+
+        // search/add/remove
+        searchBookButton.setDisable(false);
+        addNewBookButton.setDisable(false);
+        editBookButton.setDisable(bookList.isEmpty());
+    }
+
+    /**
+     * Status för vyn när ny bok läggs till
+     * När en bok läggs till gäller följande:
+     * Form is enabled
+     * Form buttons are enabled
+     * Form is cleared
+     * FormMode is ADDING
+     *
+     * Böcker table is disabled
+     * Böcker table buttons are disabled
+     *
+     * Exemplar table is disabled
+     * Exemplar table buttons are disabled
+     *
+     * Search book button is disabled
+     * Add new book button is disabled
+     * Change book button is disabled
+     */
+    private void setWindowToAddingNewBooksState() {
+        //form
+        disableForm(false);
+        formMode = FormMode.ADDING;
+        clearForm();
 
         //book table
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
-        //För ämnesord behövde vi ta och skriva ut varje element i listan med ett ',' mellan
-        //Här är det fråga om sammansätta förnamn och efternamn
-        AuthorColumn.setCellValueFactory(cellData -> {
-            Bok bok = cellData.getValue();
-            String authorName = bok.getFörfattare().stream()
-                    .map(författare -> författare.getFörnamn() + " " + författare.getEfternamn())
-                    .collect(Collectors.joining(","));
-            return new SimpleStringProperty(authorName);
-        });
+        bookViewTable.setDisable(true);
+        removeBookButton.setDisable(true);
+
+        //exemplar table
+        ExemplarViewTable.setDisable(true);
+        chooseLoanTypeButton.setDisable(true);
+        addCopyButton.setDisable(true);
+        removeCopyButton.setDisable(true);
+
+        //other buttons
+        searchBookButton.setDisable(true);
+        addNewBookButton.setDisable(true);
+        editBookButton.setDisable(true);
     }
 
-    private List<Exemplar> getOnlyNewExemplars() {
-        //TODO borde skötas av service
-        //tar exemplarlistan och ger tillbaka en lista med bara de exemplar som saknar streckkod (genereras vid insert i databasen)
-        return exemplarList.stream()
-                .filter(e -> e.getStreckkod() == null)
-                .collect(Collectors.toList());
+    /**
+     * När en bok redigeras gäller ungefär samma som att lägga till en ny men formMode är editing och den rensas inte.
+     */
+    private void setWindowToEditingExistingBooksState() {
+        //form
+        formMode = FormMode.EDITING;
+        disableForm(false);
+        clearFormButton.setDisable(false);
+        formOkButton.setDisable(false);
+
+        //book table
+        bookViewTable.setDisable(true);
+        removeBookButton.setDisable(true);
+
+        //exemplar table
+        ExemplarViewTable.setDisable(true);
+        chooseLoanTypeButton.setDisable(true);
+        addCopyButton.setDisable(true);
+        removeCopyButton.setDisable(true);
+
+        //search/add/edit buttons
+        searchBookButton.setDisable(true);
+        addNewBookButton.setDisable(true);
+        editBookButton.setDisable(true);
+
+    }
+
+    /**
+     * Samma som defaultState men all information slängs.
+     */
+    private void setWindowToResetState() {
+        setWindowToDefaultState();
+
+        //purge information
+        exemplarList.clear();
+        bookList.clear();
+        exemplarDeletionList.clear();
+        bookDeletionList.clear();
+
+        //statusboleans
+        hasNewBooks = false;
+        hasChangedBooks = false;
+        hasDeletedExemplars = false;
+
+        //status
+        chooseLoanTypeButton.setText("Välj låntyp...");
+        formMode = FormMode.NONE;
+
     }
 
 
+    /*
+     * END WINDOWSTATES
+     */
 
+    /*
+     * BEGIN TEXT FIELD UTILITIES
+     */
+
+    /**
+     * Rensar alla textrutor från innehåll
+     */
+    private void clearForm() {
+        //rensa inte ID för existerande böcker
+        if (!(formMode == FormMode.EDITING)) idBoxContents.clear();
+        titleBoxContents.clear();
+        isbnBoxContents.clear();
+
+        //tabeller
+        formAuthorList.clear();
+        formKeywordList.clear();
+
+    }
+
+    /**
+     * Stänger av eller sätter på alla textrutor.
+     * @param state det tillstånd som önskas
+     */
+    private void disableForm(boolean state) {
+        titleBoxContents.setDisable(state);
+        isbnBoxContents.setDisable(state);
+        addAuthorButton.setDisable(state);
+        removeAuthorButton.setDisable(state);
+        addKeywordButton.setDisable(state);
+        removeKeywordButton.setDisable(state);
+        clearFormButton.setDisable(state);
+        formOkButton.setDisable(state);
+    }
+
+    /*
+     * END UTILITIES
+     */
+
+    /*
+     * POPUPS
+     * TODO passar bättre i en superklass
+     */
     private void openSearchWindow() throws IOException {
         Stage searchWindow = new Stage();
         FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("smallSearchWindow.fxml"));
@@ -509,104 +684,6 @@ public class AddBookViewController extends Controller {
         searchWindow.show();
     }
 
-    private void setWindowToDefaultState() {
-        //button states
-        searchBookButton.setDisable(false);
-        addNewBookButton.setDisable(false);
-        editBookButton.setDisable(true);
-
-
-        //clean form and disable
-        clearForm();
-        disableForm(true);
-
-        //clean up lists
-        bookList.clear();
-        exemplarList.clear();
-        exemplarDeletionList.clear();
-        bookDeletionList.clear();
-
-        //make sure tables and buttons work
-        bookViewTable.setDisable(false);
-        ExemplarViewTable.setDisable(false);
-        removeBookButton.setDisable(false);
-        chooseLoanTypeButton.setDisable(false);
-        addCopyButton.setDisable(false);
-        removeCopyButton.setDisable(false);
-    }
-
-    private void setWindowToAddingNewBooksState() {
-        formMode = "Adding";
-        searchBookButton.setDisable(true);
-
-        //form ska rensas och vara tillgänglig
-        clearForm();
-        disableForm(false);
-
-        //rensa boklistan om den innehöll något
-        if(!bookList.isEmpty()) bookList.clear();
-
-        //exemplar kan bara läggas till när boken finns i databasen
-        exemplarList.clear();
-        ExemplarViewTable.setDisable(true); //rensa, visa tom lista och disable
-        chooseLoanTypeButton.setDisable(true);
-        addCopyButton.setDisable(true);
-        removeCopyButton.setDisable(true);
-    }
-
-    private void setWindowToEditingExistingBooksState() {
-        formMode = "Editing";
-
-        //form blir enabled
-        disableForm(false);
-
-        //exemplar ska inte röras innan boken ändrats
-        removeBookButton.setDisable(true);
-        chooseLoanTypeButton.setDisable(true);
-        addCopyButton.setDisable(true);
-        removeCopyButton.setDisable(true);
-
-    }
-
-    /**
-     * Rensar alla textrutor från innehåll
-     */
-    private void clearForm() {
-        idBoxContents.clear();
-        isbnBoxContents.clear();
-        titleBoxContents.clear();
-        amnesordBoxContents1.clear();
-        amnesordBoxContents2.clear();
-        amnesordBoxContents3.clear();
-        authorFirstNameBoxContents1.clear();
-        authorLastNameBoxContents1.clear();
-        authorFirstNameBoxContents2.clear();
-        authorLastNameBoxContents2.clear();
-        authorFirstNameBoxContents3.clear();
-        authorLastNameBoxContents3.clear();
-    }
-
-    /**
-     * Stänger av eller sätter på alla textrutor.
-     * @param state det tillstånd som önskas
-     */
-    private void disableForm(boolean state) {
-        titleBoxContents.setDisable(state);
-        isbnBoxContents.setDisable(state);
-        amnesordBoxContents1.setDisable(state);
-        amnesordBoxContents2.setDisable(state);
-        amnesordBoxContents3.setDisable(state);
-        authorFirstNameBoxContents1.setDisable(state);
-        authorLastNameBoxContents1.setDisable(state);
-        authorFirstNameBoxContents2.setDisable(state);
-        authorLastNameBoxContents2.setDisable(state);
-        authorFirstNameBoxContents3.setDisable(state);
-        authorLastNameBoxContents3.setDisable(state);
-        clearFormButton.setDisable(state);
-        formOkButton.setDisable(state);
-    }
-
-    //notiser
     private void showInformationPopup(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information");
@@ -623,12 +700,12 @@ public class AddBookViewController extends Controller {
         alert.showAndWait();
     }
 
-    private boolean onDeleteUserConfirmation()
-    {
+    private boolean onDeleteUserConfirmation(boolean hasChildren) {
+        String additionalWarning = hasChildren ? " Alla exemplar kommer också att raderas" : "";
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Bekräfta");
         alert.setHeaderText("Är du säker?");
-        alert.setContentText("Vill du verkligen radera detta objekt? Om det är en bok kommer alla exemplar också raderas.");
+        alert.setContentText("Vill du verkligen radera detta objekt?" + additionalWarning);
 
         // Set button types explicitly
         ButtonType yesButton = new ButtonType("Ja", ButtonBar.ButtonData.YES);
@@ -640,5 +717,39 @@ public class AddBookViewController extends Controller {
         Optional<ButtonType> result = alert.showAndWait();
 
         return result.isPresent() && result.get() == yesButton;
+    }
+
+    private String[] openNameInputDialog() throws IOException {
+        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("nameInputDialog.fxml"));
+        Scene inputDialog = new Scene(loader.load());
+        Stage popupDialog = new Stage();
+
+        //controller references
+        NameInputDialogController controller = loader.getController();
+        controller.setStage(popupDialog);
+
+        //setup window
+        popupDialog.setTitle("Namn");
+        popupDialog.setScene(inputDialog);
+        popupDialog.setResizable(false);
+        popupDialog.showAndWait();
+
+        //when closed
+        return controller.getNames();
+    }
+
+
+    /*
+     * POPUPS
+     */
+
+    /*
+     * MISC
+     */
+    @Override
+    public void update(Observable o, Object arg) {
+        if(debugPrintouts) System.out.println("AddBookViewController: Update");
+        bookList.clear();
+        bookList.addAll(FXCollections.observableArrayList(getState().getBookSearchResults())); //interna boklistan tilldelas från appstate's sökresultat
     }
 }

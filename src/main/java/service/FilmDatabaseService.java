@@ -1,11 +1,11 @@
-package db;
+package service;
 
+import db.DBConnector;
 import model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.List;
 
 /**
  *
@@ -23,8 +23,6 @@ public class FilmDatabaseService {
     public void addNewFilm(Film film) {
         if (debugPrints) System.out.println("filmdbservice: incoming film to add: " + film.getTitel());
         EntityManager em = DBC.getEntityManager();
-
-
 
         try {
             em.getTransaction().begin();
@@ -165,7 +163,7 @@ public class FilmDatabaseService {
 
     public Genre findOrCreateGenre(String genreName) {
         EntityManager em = DBC.getEntityManager();
-        Genre result = null;
+        Genre result;
 
         TypedQuery<Genre> query = em.createQuery("SELECT g FROM Genre g WHERE g.genreNamn = :genre", Genre.class);
         query.setParameter("genre", genreName);

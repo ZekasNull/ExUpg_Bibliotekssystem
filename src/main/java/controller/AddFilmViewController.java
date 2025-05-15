@@ -1,7 +1,7 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
-import db.FilmDatabaseService;
+import service.FilmDatabaseService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,15 +38,13 @@ public class AddFilmViewController extends Controller {
     private ArrayList<Film> filmDeletionList = new ArrayList<>();
 
     //formstate
-    private enum FormState {ADDING, EDITING, NONE}
-    private FormState formState = FormState.NONE;
+    private enum FormMode {ADDING, EDITING, NONE}
+    private FormMode formMode = FormMode.NONE;
 
     //on confirm checks
     private boolean
             hasNewFilms,
-            hasChangedFilms,
-            hasDeletedFilms,
-            hasDeletedExemplars = false;
+            hasChangedFilms = false;
 
     //exemplartable
     @FXML
@@ -176,7 +174,7 @@ public class AddFilmViewController extends Controller {
         ex.setNewLåntyp("film");
         ex.setFilm_id(film);
 
-        film.getExemplars().add(ex); //lägg också
+        film.getExemplars().add(ex); //lägg också till i filmens lista för konsistens
         exemplarList.add(ex);
         hasChangedFilms = true; //nytt ex på en film räknas som att filmen ändrades och hanteras när filmer uppdateras
     }
@@ -218,32 +216,32 @@ public class AddFilmViewController extends Controller {
     @FXML
     void confirmButtonPressed(ActionEvent event) {
         FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
-        ArrayList<Film> processed = new ArrayList<>(); //filmer som har hanterats ska inte gå in i changed
+        ArrayList<Film> processedFilms = new ArrayList<>(); //filmer som har hanterats ska inte gå in i changed
         if (hasNewFilms) {
             for (Film f : filmList) {
-                if(f.getId() != null) continue; //om filmen har id hanteras den senare
+                if(f.getId() == null) //hantera endast nya filmer
                 dbs.addNewFilm(f);
-                processed.add(f);
+                processedFilms.add(f);
             }
         }
-        filmList.removeAll(processed); //när nya filmer är klara, ta bort från listan
+        filmList.removeAll(processedFilms); //när nya filmer är klara, ta bort från listan
         if (hasChangedFilms) {
             for (Film f : filmList) {
                 dbs.updateFilm(f);
             }
         }
-        if (hasDeletedFilms) {
+        if (!filmDeletionList.isEmpty()) {
             for (Film f : filmDeletionList) {
                 dbs.deleteFilm(f);
             }
         }
-        if(hasDeletedExemplars) {
+        if(!exemplarDeletionList.isEmpty()) {
             for (Exemplar ex : exemplarDeletionList) {
                 dbs.deleteFilmCopy(ex);
             }
         }
 
-        if(hasChangedFilms || hasNewFilms || hasDeletedFilms || hasDeletedExemplars) {
+        if(hasChangedFilms || hasNewFilms) {
             showInformationPopup("Ändringarna skickades till databasen!");
         }else {
             showInformationPopup("Det finns inga ändringar att skicka.");
@@ -256,15 +254,13 @@ public class AddFilmViewController extends Controller {
 
     @FXML
     void editFilmButtonPressed(ActionEvent event) {
-        formState = FormState.EDITING;
+        formMode = FormMode.EDITING;
         disableForm(false);
         updateFormView();
         searchFilmButton.setDisable(true);
         addNewFilmButton.setDisable(true);
         filmViewTable.setDisable(true);
     }
-
-
 
     @FXML
     void filmTableClicked(MouseEvent event) {
@@ -289,19 +285,15 @@ public class AddFilmViewController extends Controller {
             agelimitBoxContents.requestFocus();
         }
 
-        //regissörs
+        //new sets
         HashSet<Regissör> regissörs = new HashSet<>(regissörsList);
-
-        //skådespelare
         HashSet<Skådespelare> skådespelares = new HashSet<>(skådespelareList);
-
-        //genres
         HashSet<Genre> genres = new HashSet<>(genresList);
 
         //film
         Film film;
 
-        switch (formState){
+        switch (formMode){
             case ADDING:
                 film = new Film();
                 film.setTitel(titleBoxContents.getText());
@@ -351,7 +343,6 @@ public class AddFilmViewController extends Controller {
         }else if (onDeleteUserConfirmation(!selected.getExemplars().isEmpty())) { //annars om id finns måste användaren bekräfta
             filmDeletionList.add(selected);
             filmList.remove(selected);
-            hasDeletedFilms = true;
             purgeFormLists();
         }
 
@@ -378,7 +369,6 @@ public class AddFilmViewController extends Controller {
         } else if (onDeleteUserConfirmation(false)) {
             exemplarDeletionList.add(selected);
             exemplarList.remove(selected);
-            hasDeletedExemplars = true;
         }
 
         removeExemplarButton.setDisable(exemplarList.isEmpty());
@@ -464,7 +454,7 @@ public class AddFilmViewController extends Controller {
         searchFilmButton.setDisable(true);
         addNewFilmButton.setDisable(true);
         disableForm(false);
-        formState = FormState.ADDING;
+        formMode = FormMode.ADDING;
     }
 
     private String[] openNameInputDialog() throws IOException {

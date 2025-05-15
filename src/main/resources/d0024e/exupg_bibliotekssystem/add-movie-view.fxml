@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="752.0" prefWidth="825.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddFilmViewController">
+   <children>
+      <Label layoutX="42.0" layoutY="58.0" text="Titel:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="114.0" text="Produktionsland:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="174.0" text="Åldersgräns:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="titleBoxContents" disable="true" layoutX="42.0" layoutY="78.0" />
+      <TextField fx:id="produktionslandBoxContents" disable="true" layoutX="42.0" layoutY="134.0" />
+      <TextField fx:id="agelimitBoxContents" disable="true" layoutX="45.0" layoutY="194.0" />
+      <TableView fx:id="exemplarViewTable" layoutX="527.0" layoutY="311.0" prefHeight="200.0" prefWidth="276.0">
+        <columns>
+          <TableColumn fx:id="BarcodeColumn" prefWidth="75.0" text="Streckkod" />
+          <TableColumn fx:id="LåntypColumn" prefWidth="133.0" text="Låntyp" />
+            <TableColumn fx:id="TillgängligColumn" prefWidth="67.0" text="Tillgänglig" />
+        </columns>
+      </TableView>
+      <TableView fx:id="filmViewTable" layoutX="527.0" layoutY="38.0" onMouseClicked="#filmTableClicked" prefHeight="200.0" prefWidth="276.0">
+         <columns>
+            <TableColumn fx:id="titleColumn" prefWidth="275.0" text="Titel" />
+         </columns>
+      </TableView>
+      <Label layoutX="35.0" layoutY="14.0" text="Hantera filmer och exemplar">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="addExemplarButton" disable="true" layoutX="678.0" layoutY="517.0" mnemonicParsing="false" onAction="#addExemplarTableButtonPressed" text="Lägg till" />
+      <Button fx:id="removeExemplarButton" disable="true" layoutX="748.0" layoutY="517.0" mnemonicParsing="false" onAction="#removeExemplarButtonPressed" text="Ta bort" />
+      <Button fx:id="searchFilmButton" layoutX="401.0" layoutY="37.0" mnemonicParsing="false" onAction="#searchExistingFilmButtonPressed" text="Sök existerande film" />
+      <Button layoutX="691.0" layoutY="683.0" mnemonicParsing="false" onAction="#confirmButtonPressed" text="Bekräfta ändringar" />
+      <Button layoutX="622.0" layoutY="683.0" mnemonicParsing="false" onAction="#cancelButtonPressed" text="Avbryt" />
+      <Button fx:id="addNewFilmButton" layoutX="414.0" layoutY="66.0" mnemonicParsing="false" onAction="#addNewFilmToListButtonPressed" text="Lägg till ny film" />
+      <TextField fx:id="idBoxContents" disable="true" layoutX="218.0" layoutY="78.0" />
+      <Label layoutX="218.0" layoutY="58.0" text="ID:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="629.0" layoutY="278.0" text="Exemplar">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="629.0" layoutY="5.0" text="Filmer">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="removeFilmButton" disable="true" layoutX="748.0" layoutY="244.0" mnemonicParsing="false" onAction="#removeFilmTableButtonPressed" text="Ta bort" />
+      <Button fx:id="editFilmButton" disable="true" layoutX="427.0" layoutY="102.0" mnemonicParsing="false" onAction="#editFilmButtonPressed" text="Ändra film" />
+      <Button fx:id="clearFormButton" disable="true" layoutX="401.0" layoutY="664.0" mnemonicParsing="false" onAction="#clearFormButtonPressed" text="Rensa" />
+      <DialogPane layoutX="-575.0" layoutY="-222.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="480.0">
+          <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="320.0" />
+          </content>
+          <expandableContent>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="320.0" />
+          </expandableContent>
+      </DialogPane>
+      <Button fx:id="formOkButton" disable="true" layoutX="460.0" layoutY="664.0" mnemonicParsing="false" onAction="#formOkButtonPressed" text="Ok" />
+      <TableView fx:id="directorViewTable" layoutX="45.0" layoutY="250.0" prefHeight="111.0" prefWidth="332.0">
+        <columns>
+          <TableColumn fx:id="directorFirstName" prefWidth="166.0" text="Förnamn" />
+          <TableColumn fx:id="directorLastName" prefWidth="164.0" text="Efternamn" />
+        </columns>
+      </TableView>
+      <TableView fx:id="actorViewTable" layoutX="45.0" layoutY="419.0" prefHeight="111.0" prefWidth="332.0">
+         <columns>
+            <TableColumn fx:id="actorFirstName" prefWidth="166.0" text="Förnamn" />
+            <TableColumn fx:id="actorLastName" prefWidth="164.0" text="Efternamn" />
+         </columns>
+      </TableView>
+      <Label layoutX="48.0" layoutY="230.0" text="Regissörer:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="48.0" layoutY="399.0" text="Skådespelare:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TableView fx:id="genreViewTable" layoutX="45.0" layoutY="591.0" prefHeight="111.0" prefWidth="332.0">
+         <columns>
+            <TableColumn fx:id="genreColumn" prefWidth="331.0" text="Genre" />
+         </columns>
+      </TableView>
+      <Label layoutX="48.0" layoutY="571.0" text="Genrer:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="addDirectorButton" disable="true" layoutX="161.0" layoutY="368.0" mnemonicParsing="false" onAction="#addDirectorButtonPressed" text="Lägg till" />
+      <Button fx:id="removeDirectorButton" disable="true" layoutX="223.0" layoutY="368.0" mnemonicParsing="false" onAction="#removeDirectorButtonPressed" text="Ta bort" />
+      <Button fx:id="addActorButton" disable="true" layoutX="157.0" layoutY="536.0" mnemonicParsing="false" onAction="#addActorButtonPressed" text="Lägg till" />
+      <Button fx:id="removeActorButton" disable="true" layoutX="219.0" layoutY="536.0" mnemonicParsing="false" onAction="#removeActorButtonPressed" text="Ta bort" />
+      <Button fx:id="addGenreButton" disable="true" layoutX="153.0" layoutY="713.0" mnemonicParsing="false" onAction="#addGenreButtonPressed" text="Lägg till" />
+      <Button fx:id="removeGenreButton" disable="true" layoutX="215.0" layoutY="713.0" mnemonicParsing="false" onAction="#removeGenreButtonPressed" text="Ta bort" />
+   </children>
+</AnchorPane>

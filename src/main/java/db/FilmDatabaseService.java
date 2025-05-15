@@ -60,6 +60,24 @@ public class FilmDatabaseService {
 
         try {
             em.getTransaction().begin();
+            //hantera om det finns nya regissörer/skådespelare/genres
+            //nytt id ges av db, så saknas det är det ny entitet
+            for (Regissör r : film.getRegissörs()) {
+                if (r.getId() == null) {
+                    em.persist(r);
+                }
+            }
+            for(Genre g : film.getGenres()){
+                if(g.getId() == null){
+                    em.persist(g);
+                }
+            }
+            for (Skådespelare s : film.getSkådespelares()) {
+                if (s.getId() == null) {
+                    em.persist(s);
+                }
+            }
+
             em.merge(film); //detached objekt uppdateras
             em.getTransaction().commit(); //utför
         }finally {

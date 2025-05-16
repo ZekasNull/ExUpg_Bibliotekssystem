@@ -2,7 +2,6 @@ package controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -17,9 +16,23 @@ public class LoginViewController extends Controller{
     public Button logInButton;
     public TextField idealBoxContents;
     public PasswordField pinBoxContents;
-    public Scene scene;
+
+    private void showErrorPopup(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Fel");
+        alert.setHeaderText(message);
+
+        alert.showAndWait();
+    }
 
     public void onLogInButtonCLick(ActionEvent actionEvent) {
+        if (idealBoxContents.getText().isEmpty() && pinBoxContents.getText().isEmpty()) {
+            showErrorPopup("Du måste ange ditt ideal och ditt pinnummer");
+        } else if (idealBoxContents.getText().isEmpty()) {
+            showErrorPopup("Du måste ange ditt ideal");
+        } else if (pinBoxContents.getText().isEmpty()) {
+            showErrorPopup("Du måste ange ditt pinnummer");
+        }
         //TODO kontrollern ska ansvara för att analysera informationen i användaren som hämtas (dvs rätt användartyp)
         System.out.println("onloginbutton");
         state.setCurrentUser(state.databaseService.logInUser(idealBoxContents.getText(), pinBoxContents.getText()));
@@ -34,17 +47,9 @@ public class LoginViewController extends Controller{
         alert.setHeaderText("Login attempt");
         alert.setContentText("The login attempt was" + (success ? "" : "n't") + " successful.");
 
-        System.out.println(state.getCurrentUser());
-//Sanitycheck
+        System.out.println(state.getCurrentUser());//Sanitycheck
+
         alert.showAndWait();
-    }
-
-    public ApplicationState getState() {
-        return state;
-    }
-
-    public void setState(ApplicationState state) {
-        this.state = state;
     }
 }
 

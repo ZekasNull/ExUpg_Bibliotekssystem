@@ -43,6 +43,13 @@ public class MainMenuController extends Controller {
     public TableColumn<Film, String> actorsColumn;
     public TableColumn<Film, String> genreColumn;
 
+    private void showErrorPopup(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Fel");
+        alert.setHeaderText(message);
+
+        alert.showAndWait();
+    }
 
     public void onUserLogInViewButtonClick(ActionEvent actionEvent) {
         super.getState().app.openLoginView(); //ger pop-up istället för utbyte av scenen som viewloader skulle
@@ -66,18 +73,19 @@ public class MainMenuController extends Controller {
         selectedObject = "Tidskrift";
         objektTypFlerVal.setText(selectedObject);
     }
+
 //TODO: Se till att det inte blir randomized ämnesord
+
     public void onSearchButtonClick(ActionEvent actionEvent) {
 /*Faktiska som körs och inte bara hämtar information
 * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
 * */
-        if (selectedObject == null){
-            objektTypFlerVal.requestFocus();
-            System.out.println("Gnäll");
-            //TODO: Se ifall selecteobject är null och då ge en varning
-        }
-        if (searchtermBoxContents.getText().trim().isEmpty()){
-            return; //TODO pop up om att du får inte söka på inget
+        if (searchtermBoxContents.getText().trim().isEmpty()|| selectedObject == null){
+            showErrorPopup("Du måste välja en objekttyp och minst ett sökord");
+        } else if (searchtermBoxContents.getText().trim().isEmpty()){
+            showErrorPopup("Du måste ange sökord");
+        }else if (selectedObject == null){
+            showErrorPopup("Du måste välja en objekttyp");
         }
         try{
             if(selectedObject.equals("Bok")){

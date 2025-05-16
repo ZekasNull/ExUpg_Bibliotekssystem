@@ -18,7 +18,7 @@ import java.util.Observable;
  */
 public class ApplicationState extends Observable {
     //debug
-    public final boolean DEBUGPRINTS = true;
+    public final boolean DEBUGPRINTS = MainApplication.DEBUGPRINTS;
 
     //servicereferenser
     public MainApplication app;
@@ -30,6 +30,11 @@ public class ApplicationState extends Observable {
     private List<Bok> bookSearchResults;
     private List<Film> filmSearchResults;
     private Användare currentUser;
+
+    //updates
+    public enum UpdateType {
+        BOOK, FILM, USER
+    }
 
 
 
@@ -51,7 +56,7 @@ public class ApplicationState extends Observable {
         if (DEBUGPRINTS) System.out.println("ApplicationState: Setting bookSearchResults and notifying observers.");
         this.bookSearchResults = bookSearchResults;
         setChanged();
-        notifyObservers();
+        notifyObservers(UpdateType.BOOK);
     }
 
     public Användare getCurrentUser() {
@@ -60,7 +65,7 @@ public class ApplicationState extends Observable {
     public void setCurrentUser(Användare currentUser) {
         this.currentUser = currentUser;
         setChanged();
-        notifyObservers();
+        notifyObservers(UpdateType.USER);
     }
 
     public List<Film> getFilmSearchResults() {
@@ -69,6 +74,6 @@ public class ApplicationState extends Observable {
     public void setFilmSearchResults(List<Film> filmSearchResults) {
         this.filmSearchResults = filmSearchResults;
         setChanged();
-        notifyObservers();
+        notifyObservers(UpdateType.FILM);
     }
 }

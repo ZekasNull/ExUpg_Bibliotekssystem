@@ -10,6 +10,7 @@ import state.ApplicationState;
 import java.io.IOException;
 
 public class MainApplication extends Application {
+    public static final boolean DEBUGPRINTS = true;
     private ApplicationState APPSTATE;
     private Stage primaryStage;
 

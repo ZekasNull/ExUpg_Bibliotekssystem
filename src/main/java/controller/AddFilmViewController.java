@@ -505,7 +505,8 @@ public class AddFilmViewController extends Controller {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (debugPrintouts) System.out.println("AddFilmViewController: Adding films from search result");
+        if(arg != ApplicationState.UpdateType.FILM) return;
+        if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Adding films from search result");
         filmList.clear();
         filmList.addAll(getState().getFilmSearchResults());
     }

@@ -746,7 +746,8 @@ public class AddBookViewController extends Controller {
      */
     @Override
     public void update(Observable o, Object arg) {
-        if(debugPrintouts) System.out.println("AddBookViewController: Update");
+        if(arg != ApplicationState.UpdateType.BOOK) return;
+        if(DEBUGPRINTOUTS) System.out.println("AddBookViewController: Update");
         bookList.clear();
         bookList.addAll(FXCollections.observableArrayList(getState().getBookSearchResults())); //interna boklistan tilldelas från appstate's sökresultat
     }

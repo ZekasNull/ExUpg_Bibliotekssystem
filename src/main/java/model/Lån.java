@@ -22,6 +22,17 @@ public class Lån {
     @Column(name = "\"lånedatum\"", nullable = false, insertable = false, updatable = false)
     private Instant lånedatum;
 
+    public Instant getReturDatum() {
+        return returDatum;
+    }
+
+    public void setReturDatum(Instant returDatum) {
+        this.returDatum = returDatum;
+    }
+
+    @Transient
+    private Instant returDatum;
+
     public Integer getId() {
         return id;
     }

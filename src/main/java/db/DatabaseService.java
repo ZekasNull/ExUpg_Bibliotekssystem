@@ -4,6 +4,7 @@ import model.*;
 import org.postgresql.util.PSQLException;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class DatabaseService {
@@ -14,6 +15,8 @@ public class DatabaseService {
         this.DBC = DBConnector.getInstance();
     }
 
+
+
     /**
      * Anropar en stored procedure för att hitta lån som inte är återlämnade.
      * (anledningen till stored procedure är att java inte verkade hantera timestamps smidigt nog)
@@ -22,12 +25,29 @@ public class DatabaseService {
     @SuppressWarnings("unchecked") //shush java
     public List<Lån> visaEjÅterlämnadeBöcker () {
         List<Lån> försenade;
+        Timestamp returdatum;
+
         EntityManager em = DBC.getEntityManager();
+        Query returnDateQuery = em.createNativeQuery(
+                "SELECT lånedatum + lånperiod " +
+                        "FROM bibliotekssystem.\"Lån\" l " +
+                        "JOIN bibliotekssystem.\"Exemplar\" e ON l.streckkod = e.streckkod " +
+                        "JOIN bibliotekssystem.\"Låneperiod\" lp ON e.låntyp = lp.låntyp " +
+                        "WHERE l.lån_id = ?");
+
+        Query loanQuery = em.createNativeQuery("SELECT * FROM bibliotekssystem.sf_find_overdue_loans()", Lån.class);
+
 
         try {
             em.getTransaction().begin();
-            försenade = em.createNativeQuery("SELECT * FROM bibliotekssystem.sf_find_overdue_loans()", Lån.class)
-                    .getResultList();
+            //"Jag ska inte ha några deriverade data i databasen, det blir enklare så" - citat av idioten Linnea
+            försenade = loanQuery.getResultList();
+
+            for (Lån l : försenade) {
+                returnDateQuery.setParameter(1, l.getId());
+                returdatum = (Timestamp) returnDateQuery.getSingleResult();
+                l.setReturDatum(returdatum.toInstant());
+            }
             em.getTransaction().commit();
             return försenade;
 
@@ -106,29 +126,6 @@ public class DatabaseService {
         } finally {
             em.close();
         }
-    }
-
-    public Ämnesord searchAmnesord(String searchterm) throws Exception {
-        EntityManager em = DBC.getEntityManager();
-        Ämnesord result = null;
-
-
-        try {
-            em.getTransaction().begin();
-            TypedQuery<Ämnesord> query = em.createQuery("SELECT am FROM Ämnesord am WHERE am.ord = :sökterm", Ämnesord.class);
-            query.setParameter("sökterm", searchterm);
-            result = query.getSingleResult();
-            em.getTransaction().commit(); //skickar ändringar
-        } catch (NoResultException e) {
-            if (DEBUGPRINTS) System.out.println("dbservice: keyword not found in db, returning null");
-            result = null;
-        } catch (Exception e) {
-            rollbackAndFindDatabaseError(e, em);
-        } finally {
-            em.close();
-        }
-        if (DEBUGPRINTS) System.out.println("dbservice: searchAmnesord ran and is returning " + result);
-        return result;
     }
 
     /**

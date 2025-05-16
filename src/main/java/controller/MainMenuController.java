@@ -8,9 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
-import state.ApplicationState;
 
-import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
@@ -20,7 +18,6 @@ public class MainMenuController extends Controller {
     public Button LogOutButton;
     public Button ShowProfileButton;
     public Button EmployeeViewButton;
-    private ApplicationState state = ApplicationState.getInstance(); //... JUSTE det här behövdes för state lämnades null och jag kom inte på ett bättre sätt
 
     @FXML
     public Button LogInViewButton; //Knapp för att logga in
@@ -48,7 +45,7 @@ public class MainMenuController extends Controller {
 
 
     public void onUserLogInViewButtonClick(ActionEvent actionEvent) {
-        super.getState().app.openLoginView();
+        super.getState().app.openLoginView(); //ger pop-up istället för utbyte av scenen som viewloader skulle
     }
 
     public void handleBokOption(ActionEvent actionEvent) {
@@ -84,7 +81,7 @@ public class MainMenuController extends Controller {
         }
         try{
             if(selectedObject.equals("Bok")){
-                List<Bok> searchTerm = state.databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
+                List<Bok> searchTerm = super.getState().databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
 
                 ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInBookSearchTable.setItems(data);
@@ -114,7 +111,7 @@ public class MainMenuController extends Controller {
                 });
             }
             else if (selectedObject.equals("Film")){
-                List<Film> searchTerm = state.databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
+                List<Film> searchTerm = super.getState().databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
 
                 ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInFilmSearchTable.setItems(data);
@@ -157,18 +154,20 @@ public class MainMenuController extends Controller {
         }
     }
     public void onLogOutButtonClick(ActionEvent actionEvent) {
-
+        //FIXME: Logga ut ordentligt :|
     }
 
     public void onShowProfileButtonClick(ActionEvent actionEvent) {
+        //TODO: logik för att byta över vy till visa lån och hantera användare
     }
 
     public void onEmployeeViewButton(ActionEvent actionEvent) {
+        super.getState().vy.loadScene("librarian-first-choice-view.fxml", "Bibliotekarnas första val");
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        String currentUserType = state.getCurrentUser().getAnvändartyp().getAnvändartyp();
+        String currentUserType = super.getState().getCurrentUser().getAnvändartyp().getAnvändartyp();
         if (currentUserType == null) {
             System.out.println("Ingen e inloggad");
         } else if(currentUserType.equals("bibliotekarie")) {

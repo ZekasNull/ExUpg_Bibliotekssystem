@@ -26,12 +26,36 @@ public class MainApplication extends Application {
     @Override //Starts the program and sets up the primaryStage
     public void start(Stage var1) throws Exception {
         primaryStage = var1;
+        this.APPSTATE.vy = new ViewLoader(primaryStage);
         //openViewChoice();
-        //openMainMenuView();
+        APPSTATE.vy.loadScene("main-menu.fxml", "Main Menu");
         //openAddBookView(); //FIXME test
-        openAddFilmView(); //FIXME test
-        //NOTE: översta för det gamla UIt(inlogg), understa för det nya(sökning)
+        //openAddFilmView(); //FIXME test
     }
+
+    public void openLoginView() {
+        try{
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("login-view.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            //hämta referens till controller
+            Controller controller = loader.getController();
+            controller.setState(APPSTATE); //ge referens till appstate
+            APPSTATE.addObserver(controller);
+
+            Stage loginStage = new Stage();
+            loginStage.setTitle("Login View");
+            loginStage.setScene(scene);
+            loginStage.initModality(Modality.APPLICATION_MODAL); //Så inget kan göras runtom pop-up fönstret
+            loginStage.show();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+//NOTE: flytta upp vilken som om vi vill testa specifik sida, det ovan är det som är tänkt ska stanna
+/*
 
     public void openAddBookView() throws IOException {
         //Load the fxml file onto "loader"
@@ -102,45 +126,8 @@ public class MainApplication extends Application {
             e.printStackTrace();
         }
     }
-    public void openMainMenuView() {
-        try{
-            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("main-menu.fxml"));
-            Scene scene = new Scene(loader.load());
-
-            Controller controller = loader.getController();
-            controller.setState(APPSTATE);
-            APPSTATE.addObserver(controller);
-
-            primaryStage.setTitle("Main Menu");
-            primaryStage.setScene(scene);
-            primaryStage.show();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-    public void openLoginView() {
-        try{
-            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("login-view.fxml"));
-            Scene scene = new Scene(loader.load());
-
-            //hämta referens till controller
-            Controller controller = loader.getController();
-            controller.setState(APPSTATE); //ge referens till appstate
-            APPSTATE.addObserver(controller);
-
-            Stage loginStage = new Stage();
-            loginStage.setTitle("Login View");
-            loginStage.setScene(scene);
-            loginStage.initModality(Modality.APPLICATION_MODAL); //Så inget kan göras runtom pop-up fönstret
-            loginStage.show();
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
     public static void main(String[] args) {
         launch();
     }
-}
+}*/

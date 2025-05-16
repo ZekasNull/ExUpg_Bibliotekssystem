@@ -11,19 +11,14 @@
             <Font size="29.0" />
          </font>
       </Label>
-      <Label fx:id="AddObjectButton" layoutX="165.0" layoutY="161.0" text="Lägg till" onMouseClicked="#onAddObjectButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;">
+      <Label fx:id="HandleBooksButton" layoutX="219.0" layoutY="165.0" onMouseClicked="#onHandleBooksButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" text="Hantera böcker">
          <font>
-            <Font size="17.0" />
+            <Font size="24.0" />
          </font>
       </Label>
-      <Label fx:id="RemoveObjectButton" layoutX="381.0" layoutY="161.0" text="Ta bort" onMouseClicked="#onRemoveObjectButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;">
+      <Label fx:id="HandleMoviesButton" layoutX="225.0" layoutY="277.0" onMouseClicked="#onHandleMoviesButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" text="Hantera filmer">
          <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Label fx:id="ChangeObjectButton" layoutX="277.0" layoutY="264.0" text="Ändra" onMouseClicked="#onChangeObjectButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;">
-         <font>
-            <Font size="17.0" />
+            <Font size="24.0" />
          </font>
       </Label>
    </children>

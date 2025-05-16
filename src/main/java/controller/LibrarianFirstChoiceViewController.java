@@ -1,14 +1,18 @@
 package controller;
 
 import javafx.scene.input.MouseEvent;
+import java.util.Observable;
 
-public class LibrarianFirstChoiceViewController {
+public class LibrarianFirstChoiceViewController extends Controller{
+
     public void HandleInventoryClicked(MouseEvent mouseEvent) {
-        //Event för när labeln "Hantera inventarie" blir klickad
-        //TODO: Lägg till att gå till Hantera Inventarie
+        super.getState().vy.loadScene("handle-inventory-view.fxml", "Hantera inventarie");
     }
 
     public void HandleNotReturnedClick(MouseEvent mouseEvent) {
         //TODO: Lägg till att gå till Visa ej återlämnade objekt
+    }
+    @Override
+    public void update(Observable o, Object arg) {
     }
 }

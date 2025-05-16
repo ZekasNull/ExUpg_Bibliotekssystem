@@ -312,9 +312,7 @@ public class AddBookViewController extends Controller {
 
     @FXML
     void cancelButtonPressed(ActionEvent event) {
-        //TODO Ska stänga fönstret och återgå till föregående vy
-        //för tillfället nollställer den istället fönstret
-        setWindowToResetState();
+        super.getState().vy.loadScene("handle-inventory-view.fxml", "Hantera inventarie");
     }
 
     @FXML

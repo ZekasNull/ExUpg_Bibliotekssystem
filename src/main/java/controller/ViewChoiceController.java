@@ -26,7 +26,7 @@ public class ViewChoiceController extends Controller{
         Stage currentStage = (Stage) goToUserFirstViewButton.getScene().getWindow();
         currentStage.close();
 
-        super.getState().app.openLibrarianLoginView();
+       // super.getState().app.openLibrarianLoginView();
     }
 
     @Override

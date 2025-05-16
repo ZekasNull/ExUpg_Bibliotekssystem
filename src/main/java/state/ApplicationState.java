@@ -1,6 +1,7 @@
 package state;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
+import d0024e.exupg_bibliotekssystem.ViewLoader;
 import db.DatabaseService;
 import model.Användare;
 import model.Bok;
@@ -23,6 +24,7 @@ public class ApplicationState extends Observable {
     public MainApplication app;
     public final DatabaseService databaseService;
     private static ApplicationState instance;
+    public ViewLoader vy;
 
     //data
     private List<Bok> bookSearchResults;

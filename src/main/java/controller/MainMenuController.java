@@ -80,7 +80,7 @@ public class MainMenuController extends Controller {
 /*Faktiska som körs och inte bara hämtar information
 * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
 * */
-        if (searchtermBoxContents.getText().trim().isEmpty()|| selectedObject == null){
+        if (searchtermBoxContents.getText().trim().isEmpty()&& selectedObject == null){
             showErrorPopup("Du måste välja en objekttyp och minst ett sökord");
         } else if (searchtermBoxContents.getText().trim().isEmpty()){
             showErrorPopup("Du måste ange sökord");

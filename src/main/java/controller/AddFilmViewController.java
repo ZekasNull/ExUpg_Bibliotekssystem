@@ -1,6 +1,7 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
+import javafx.util.Pair;
 import service.FilmDatabaseService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -15,6 +16,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.*;
+import service.InputValidatorService;
+import state.ApplicationState;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +27,7 @@ import java.util.Optional;
 
 public class AddFilmViewController extends Controller {
     //debug
-    private final boolean debugPrintouts = true;
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
 
     //lists
     private ObservableList<Exemplar> exemplarList = FXCollections.observableArrayList();
@@ -152,7 +155,7 @@ public class AddFilmViewController extends Controller {
     void addActorButtonPressed(ActionEvent event) throws IOException {
         FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         String[] names = openNameInputDialog();
-        if (debugPrintouts) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for actors");
+        if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for actors");
 
         skådespelareList.add(dbs.findOrCreateActor(names));
     }
@@ -161,7 +164,7 @@ public class AddFilmViewController extends Controller {
     void addDirectorButtonPressed(ActionEvent event) throws IOException {
         FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         String[] names = openNameInputDialog();
-        if (debugPrintouts) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for directors");
+        if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for directors");
 
         regissörsList.add(dbs.findOrCreateDirector(names));
     }
@@ -189,11 +192,11 @@ public class AddFilmViewController extends Controller {
         dialog.setContentText("Genre:");
         genreNamn = dialog.showAndWait();
         if (genreNamn.isEmpty()) {
-            if (debugPrintouts) System.out.println("AddFilmViewController: No genre entered in TextInputDialog");
+            if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: No genre entered in TextInputDialog");
             return;
         }
 
-        if (debugPrintouts) System.out.println("AddFilmViewController: Found "+ genreNamn.get() + " in TextInputDialog for genre");
+        if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ genreNamn.get() + " in TextInputDialog for genre");
 
         genresList.add(dbs.findOrCreateGenre(genreNamn.get()));
     }
@@ -292,17 +295,25 @@ public class AddFilmViewController extends Controller {
 
         //film
         Film film;
+        Pair<Boolean, String> validate;
 
         switch (formMode){
             case ADDING:
                 film = new Film();
+                //update fields
                 film.setTitel(titleBoxContents.getText());
                 film.setProduktionsland(produktionslandBoxContents.getText());
-                //FIXME antar snällt att användaren bara skrev siffror
                 film.setÅldersgräns(Integer.parseInt(agelimitBoxContents.getText()));
                 film.setRegissörs(regissörs);
                 film.setSkådespelares(skådespelares);
                 film.setGenres(genres);
+                //validate
+                validate = InputValidatorService.isValidFilm(film);
+                if(!validate.getKey()){
+                    showErrorPopup(validate.getValue());
+                    return;
+                }
+
                 filmList.add(film);
                 updateHasNewFilms();
                 break;
@@ -315,6 +326,14 @@ public class AddFilmViewController extends Controller {
                 film.setRegissörs(regissörs);
                 film.setSkådespelares(skådespelares);
                 film.setGenres(genres);
+
+                //validate
+                validate = InputValidatorService.isValidFilm(film);
+                if(!validate.getKey()){
+                    showErrorPopup(validate.getValue());
+                    return;
+                }
+                //update data
                 hasChangedFilms = true;
                 filmViewTable.refresh();
                 break;

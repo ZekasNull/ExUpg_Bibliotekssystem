@@ -32,7 +32,7 @@ public class NameInputDialogController extends Controller {
 
     @FXML
     void okButtonPressed(ActionEvent event) {
-        names = new String[]{firstnameInputField.getText(), lastnameInputField.getText()};
+        names = new String[]{firstnameInputField.getText().trim(), lastnameInputField.getText().trim()};
         stage.close();
     }
 

@@ -13,6 +13,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import model.*;
 import java.io.IOException;
 import java.util.*;
@@ -23,11 +24,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import service.BookDatabaseService;
+import service.InputValidatorService;
+import state.ApplicationState;
 
 
 public class AddBookViewController extends Controller {
     //debug
-    private final boolean debugPrintouts = false;
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
 
     //lista över exemplar och böcker som visas i tables
     private ObservableList<Exemplar> exemplarList = FXCollections.observableArrayList();
@@ -61,10 +64,7 @@ public class AddBookViewController extends Controller {
     private LoanType selectedLoanType = LoanType.NOT_SELECTED;
 
     //booleans för kontroll av vad som ska göras när bekräfta-knappen trycks
-    private boolean
-        hasNewBooks,
-        hasChangedBooks,
-        hasDeletedExemplars = false;
+    private boolean hasNewBooks, hasChangedBooks = false;
 
     //form text fields
     @FXML
@@ -187,23 +187,41 @@ public class AddBookViewController extends Controller {
         Bok bok;
         HashSet<Författare> changedAuthors = new HashSet<>(formAuthorList);
         HashSet<Ämnesord> changedKeywords = new HashSet<>(formKeywordList);
+        Pair<Boolean, String> validate;
 
         switch(formMode) {
             case ADDING:
+                //set fields and new book
                 bok = new Bok();
                 bok.setTitel(titleBoxContents.getText().trim());
                 bok.setIsbn13(isbnBoxContents.getText().trim());
                 bok.setFörfattare(changedAuthors);
                 bok.setÄmnesord(changedKeywords);
+
+                //validate
+                validate = InputValidatorService.isValidBok(bok);
+                if(!validate.getKey()){
+                    showErrorPopup(validate.getValue());
+                    return;
+                }
+                //update data
                 bookList.add(bok);
                 hasNewBooks = true;
                 break;
             case EDITING:
+                //set fields
                 bok = bookViewTable.getSelectionModel().getSelectedItem();
                 bok.setTitel(titleBoxContents.getText().trim());
                 bok.setIsbn13(isbnBoxContents.getText().trim());
                 bok.setFörfattare(changedAuthors);
                 bok.setÄmnesord(changedKeywords);
+                //validate
+                validate = InputValidatorService.isValidBok(bok);
+                if(!validate.getKey()){
+                    showErrorPopup(validate.getValue());
+                    return;
+                }
+                //update data
                 hasChangedBooks = true;
                 bookViewTable.refresh(); //då den inte reagerar på ändrat internt innehåll
                 break;
@@ -278,7 +296,7 @@ public class AddBookViewController extends Controller {
 
     @FXML
     void bookTableClicked(MouseEvent event) {
-        if (bookList.isEmpty()) return; //förhindra exekvering när listan är tom
+        if (bookList.isEmpty() || bookViewTable.getSelectionModel().getSelectedItem() == null) return; //förhindra exekvering när listan är tom eller det trycks utanför
         Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
 
         //form
@@ -350,7 +368,6 @@ public class AddBookViewController extends Controller {
                 exemplarDeletionList.add(ex); //exemplar till raderingslista
                 bok.getExemplars().remove(ex); //ta bort exemplaret från bokens lista
                 exemplarList.remove(ex); //ta bort exemplaret från synlig lista
-                hasDeletedExemplars = true;
             }
         }else{ //ta bort från synlig och boklista direkt när streckkod saknas
             exemplarList.remove(ex);
@@ -361,9 +378,16 @@ public class AddBookViewController extends Controller {
     @FXML
     void addAuthorButtonPressed(ActionEvent event) throws IOException {
         BookDatabaseService dbs = new BookDatabaseService(); //FIXME ENDAST TEST
-        String[] names = openNameInputDialog();
-        if (debugPrintouts) System.out.println("AddBookViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for directors");
 
+        //input
+        String[] names = openNameInputDialog();
+        if (DEBUGPRINTOUTS) System.out.println("AddBookViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for directors");
+
+        //validate
+        if(names[0].isEmpty() || names[1].isEmpty()) {showErrorPopup("För- och efternamnet får inte vara tomt."); return;}
+
+
+        //add
         formAuthorList.add(dbs.findOrCreateAuthor(names));
     }
 
@@ -385,14 +409,14 @@ public class AddBookViewController extends Controller {
         dialog.setHeaderText("Skriv in ämnesord");
         dialog.setContentText("Ämnesord:");
         ämnesord = dialog.showAndWait();
-        if (ämnesord.isEmpty()) {
-            if (debugPrintouts) System.out.println("AddBookViewController: No keyword entered in TextInputDialog");
+        if (ämnesord.isPresent() && ämnesord.get().trim().isEmpty()) {
+            showErrorPopup("Fältet får inte vara tomt.");
             return;
         }
 
-        if (debugPrintouts) System.out.println("AddFilmViewController: Found "+ ämnesord.get() + " in TextInputDialog for genre");
+        if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ ämnesord.get() + " in TextInputDialog for genre");
 
-        formKeywordList.add(bdbs.findOrCreateÄmnesord(ämnesord.get())); //se om det redan finns i databas och lägg till
+        formKeywordList.add(bdbs.findOrCreateÄmnesord(ämnesord.get().trim())); //se om det redan finns i databas och lägg till
     }
 
     @FXML
@@ -608,7 +632,6 @@ public class AddBookViewController extends Controller {
         //statusboleans
         hasNewBooks = false;
         hasChangedBooks = false;
-        hasDeletedExemplars = false;
 
         //status
         chooseLoanTypeButton.setText("Välj låntyp...");

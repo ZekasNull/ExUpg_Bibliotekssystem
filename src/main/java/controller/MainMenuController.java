@@ -1,5 +1,6 @@
 package controller;
 
+import d0024e.exupg_bibliotekssystem.MainApplication;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
+import state.ApplicationState;
 
 import java.util.List;
 import java.util.Observable;
@@ -15,6 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MainMenuController extends Controller {
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
     public Button LogOutButton;
     public Button ShowProfileButton;
     public Button EmployeeViewButton;
@@ -69,23 +72,27 @@ public class MainMenuController extends Controller {
 //TODO: Se till att det inte blir randomized ämnesord
 
     public void onSearchButtonClick(ActionEvent actionEvent) {
-/*Faktiska som körs och inte bara hämtar information
-* Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
-* */
-        if (searchtermBoxContents.getText().trim().isEmpty()&& selectedObject == null){
+        /*Faktiska som körs och inte bara hämtar information
+         * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
+         * */
+        if (searchtermBoxContents.getText().trim().isEmpty() && selectedObject == null) {
             showErrorPopup("Du måste välja en objekttyp och minst ett sökord");
-        } else if (searchtermBoxContents.getText().trim().isEmpty()){
+            return;
+        } else if (searchtermBoxContents.getText().trim().isEmpty()) {
             showErrorPopup("Du måste ange sökord");
-        }else if (selectedObject == null){
+            return;
+        } else if (selectedObject == null) {
             showErrorPopup("Du måste välja en objekttyp");
+            return;
         }
-        try{
-            if(selectedObject.equals("Bok")){
+        try {
+            if (selectedObject.equals("Bok")) {
                 List<Bok> searchTerm = super.getState().databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
 
                 ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInBookSearchTable.setItems(data);
-                System.out.println("Rows added to table: " + data.size() + " Bok");
+                if (DEBUGPRINTOUTS)
+                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Bok");
 
                 //Sätter in det returnerade värdet från sökningens titel i titelkolumnen osv (Ligger här för att dela upp det mellan bok,film, och tidsskrift)
                 titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
@@ -109,13 +116,13 @@ public class MainMenuController extends Controller {
                             .collect(Collectors.joining(","));
                     return new SimpleStringProperty(authorName);
                 });
-            }
-            else if (selectedObject.equals("Film")){
+            } else if (selectedObject.equals("Film")) {
                 List<Film> searchTerm = super.getState().databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
 
                 ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInFilmSearchTable.setItems(data);
-                System.out.println("Rows added to table: " + data.size() + " Film");
+                if (DEBUGPRINTOUTS)
+                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Film");
 
                 filmTitleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
                 productionCountryColumn.setCellValueFactory(new PropertyValueFactory<>("produktionsland"));
@@ -149,10 +156,11 @@ public class MainMenuController extends Controller {
                 notLoggedInSearchTable.setItems(data);
             }
             Utkommenterad tills vidare*/
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public void onLogOutButtonClick(ActionEvent actionEvent) {
         //FIXME: Logga ut ordentligt :|
     }
@@ -167,17 +175,17 @@ public class MainMenuController extends Controller {
 
     @Override
     public void update(Observable o, Object arg) {
+        if(arg != ApplicationState.UpdateType.USER) return;
         String currentUserType = super.getState().getCurrentUser().getAnvändartyp().getAnvändartyp();
         if (currentUserType == null) {
-            System.out.println("Ingen e inloggad");
-        } else if(currentUserType.equals("bibliotekarie")) {
-            System.out.println("Bibliotekarie inloggad");
+            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Ingen e inloggad");
+        } else if (currentUserType.equals("bibliotekarie")) {
+            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Bibliotekarie inloggad");
             LogOutButton.setVisible(true);
-            System.out.println("Bibliotekarie inloggad");
             ShowProfileButton.setVisible(true);
             EmployeeViewButton.setVisible(true);
             LogInViewButton.setVisible(false);
-        }else{
+        } else {
             LogOutButton.setVisible(true);
             ShowProfileButton.setVisible(true);
             LogInViewButton.setVisible(false);
@@ -186,6 +194,7 @@ public class MainMenuController extends Controller {
 
     public void tableViewMouseClick(javafx.scene.input.MouseEvent mouseEvent) {
         //Skriver ut i konsol för testsyfte
-        System.out.println(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
+        if (DEBUGPRINTOUTS)
+            System.out.println("MainMenuController: " + notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
     }
 }

@@ -7,17 +7,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="818.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShowNotReturnedViewController">
    <children>
       <TableView fx:id="overdueLoansTable" layoutX="34.0" layoutY="100.0" prefHeight="200.0" prefWidth="732.0">
         <columns>
           <TableColumn fx:id="loanIdColumn" prefWidth="75.0" text="Lån_ID" />
           <TableColumn fx:id="usernameColumn" prefWidth="101.0" text="Användarnamn" />
-            <TableColumn fx:id="barcodeColumn" prefWidth="88.0" text="Ex. nr" />
-            <TableColumn fx:id="loantypeColumn" prefWidth="50.0" text="Låntyp" />
-            <TableColumn fx:id="titleColumn" prefWidth="215.0" text="Titel" />
-            <TableColumn fx:id="loanDateColumn" prefWidth="77.0" text="Lånedatum" />
+            <TableColumn fx:id="barcodeColumn" prefWidth="42.0" text="Ex. nr" />
+            <TableColumn fx:id="loantypeColumn" prefWidth="96.0" text="Låntyp" />
+            <TableColumn fx:id="titleColumn" prefWidth="168.0" text="Titel" />
+            <TableColumn fx:id="loanDateColumn" prefWidth="124.0" text="Lånedatum" />
             <TableColumn fx:id="returnDateColumn" prefWidth="125.0" text="Återlämningsdatum" />
         </columns>
       </TableView>

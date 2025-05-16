@@ -43,14 +43,6 @@ public class MainMenuController extends Controller {
     public TableColumn<Film, String> actorsColumn;
     public TableColumn<Film, String> genreColumn;
 
-    private void showErrorPopup(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Fel");
-        alert.setHeaderText(message);
-
-        alert.showAndWait();
-    }
-
     public void onUserLogInViewButtonClick(ActionEvent actionEvent) {
         super.getState().app.openLoginView(); //ger pop-up istället för utbyte av scenen som viewloader skulle
     }

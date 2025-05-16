@@ -151,39 +151,43 @@ public class AddFilmViewController extends Controller {
     @FXML
     private TextField titleBoxContents;
 
+    /*
+     * Form buttons
+     */
     @FXML
     void addActorButtonPressed(ActionEvent event) throws IOException {
         FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         String[] names = openNameInputDialog();
+        if (names == null) return;
         if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for actors");
 
         skådespelareList.add(dbs.findOrCreateActor(names));
     }
 
     @FXML
+    void removeActorButtonPressed(ActionEvent event) {
+        if (skådespelareList.isEmpty()) return;
+        skådespelareList.remove(actorViewTable.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
     void addDirectorButtonPressed(ActionEvent event) throws IOException {
         FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         String[] names = openNameInputDialog();
+        if (names == null) return;
         if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for directors");
 
         regissörsList.add(dbs.findOrCreateDirector(names));
     }
 
     @FXML
-    void addExemplarTableButtonPressed(ActionEvent event) {
-        Film film = filmViewTable.getSelectionModel().getSelectedItem(); //för vald film
-        //då det bara kan finnas en typ av exemplar för filmer, skapa det direkt
-        Exemplar ex = new Exemplar();
-        ex.setNewLåntyp("film");
-        ex.setFilm_id(film);
-
-        film.getExemplars().add(ex); //lägg också till i filmens lista för konsistens
-        exemplarList.add(ex);
-        hasChangedFilms = true; //nytt ex på en film räknas som att filmen ändrades och hanteras när filmer uppdateras
+    void removeDirectorButtonPressed(ActionEvent event) {
+        if(regissörsList.isEmpty()) return;
+        regissörsList.remove(directorViewTable.getSelectionModel().getSelectedItem());
     }
 
     @FXML
-    void addGenreButtonPressed(ActionEvent event) throws IOException {
+    void addGenreButtonPressed(ActionEvent event) {
         FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         Optional<String> genreNamn;
         TextInputDialog dialog = new TextInputDialog();
@@ -202,90 +206,26 @@ public class AddFilmViewController extends Controller {
     }
 
     @FXML
-    void addNewFilmToListButtonPressed(ActionEvent event) {
-        setWindowToAddingFilmState();
-    }
-
-    @FXML
-    void cancelButtonPressed(ActionEvent event) {
-        setWindowToDefaultState();
+    void removeGenreButtonPressed(ActionEvent event) {
+        if(genresList.isEmpty()) return;
+        genresList.remove(genreViewTable.getSelectionModel().getSelectedItem());
     }
 
     @FXML
     void clearFormButtonPressed(ActionEvent event) {
-        purgeFormLists();
-    }
-
-    @FXML
-    void confirmButtonPressed(ActionEvent event) {
-        FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
-        ArrayList<Film> processedFilms = new ArrayList<>(); //filmer som har hanterats ska inte gå in i changed
-        if (hasNewFilms) {
-            for (Film f : filmList) {
-                if(f.getId() == null) //hantera endast nya filmer
-                dbs.addNewFilm(f);
-                processedFilms.add(f);
-            }
-        }
-        filmList.removeAll(processedFilms); //när nya filmer är klara, ta bort från listan
-        if (hasChangedFilms) {
-            for (Film f : filmList) {
-                dbs.updateFilm(f);
-            }
-        }
-        if (!filmDeletionList.isEmpty()) {
-            for (Film f : filmDeletionList) {
-                dbs.deleteFilm(f);
-            }
-        }
-        if(!exemplarDeletionList.isEmpty()) {
-            for (Exemplar ex : exemplarDeletionList) {
-                dbs.deleteFilmCopy(ex);
-            }
-        }
-
-        if(hasChangedFilms || hasNewFilms) {
-            showInformationPopup("Ändringarna skickades till databasen!");
-        }else {
-            showInformationPopup("Det finns inga ändringar att skicka.");
-        }
-
-        setWindowToDefaultState(); //nollställ fönstret
-        filmList.clear(); //tvinga användaren ladda om uppdaterade filmer och exemplar
-        exemplarList.clear();
-    }
-
-    @FXML
-    void editFilmButtonPressed(ActionEvent event) {
-        formMode = FormMode.EDITING;
-        disableForm(false);
-        updateFormView();
-        searchFilmButton.setDisable(true);
-        addNewFilmButton.setDisable(true);
-        filmViewTable.setDisable(true);
-    }
-
-    @FXML
-    void filmTableClicked(MouseEvent event) {
-        if(filmViewTable.getSelectionModel().getSelectedItem() == null) return; //om det klickades utanför en rad
-
-        updateFormView();
-        exemplarList.clear();
-        exemplarList.addAll(filmViewTable.getSelectionModel().getSelectedItem().getExemplars()); //hämta ex från film
-        addExemplarButton.setDisable(filmList.isEmpty());
-        removeExemplarButton.setDisable(filmList.isEmpty());
-        removeFilmButton.setDisable(filmList.isEmpty());
-        editFilmButton.setDisable(filmList.isEmpty());
+        clearForm();
     }
 
     @FXML
     void formOkButtonPressed(ActionEvent event) {
         if (titleBoxContents.getText().isEmpty() || produktionslandBoxContents.getText().isEmpty() || agelimitBoxContents.getText().isEmpty()) {
             showErrorPopup("Ett eller flera fält är inte ifyllda");
+            return;
         }
         if(!agelimitBoxContents.getText().matches("\\d+")) {
             showErrorPopup("Ett textfält har otillåtet innehåll.");
             agelimitBoxContents.requestFocus();
+            return;
         }
 
         //new sets
@@ -339,16 +279,35 @@ public class AddFilmViewController extends Controller {
                 break;
             case NONE: //ska vara omöjlig att nå om state är none
             default:
-                System.out.println("AddFilmViewController: formState is not set to ADDING, EDITING or NONE");
+                if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: formState is not set to ADDING, EDITING or NONE");
                 return;
         }
         setWindowToDefaultState();
     }
 
+    /*
+     * Right side
+     */
     @FXML
-    void removeActorButtonPressed(ActionEvent event) {
-        if (skådespelareList.isEmpty()) return;
-        skådespelareList.remove(actorViewTable.getSelectionModel().getSelectedItem());
+    void filmTableClicked(MouseEvent event) {
+        if(filmViewTable.getSelectionModel().getSelectedItem() == null) return; //om det klickades utanför en rad
+        Film film = filmViewTable.getSelectionModel().getSelectedItem();
+        clearForm();
+
+        titleBoxContents.setText(film.getTitel());
+        if(film.getId() != null) idBoxContents.setText(film.getId().toString());
+        produktionslandBoxContents.setText(film.getProduktionsland());
+        agelimitBoxContents.setText(film.getÅldersgräns().toString());
+        regissörsList.addAll(film.getRegissörs());
+        skådespelareList.addAll(film.getSkådespelares());
+        genresList.addAll(film.getGenres());
+
+        exemplarList.clear();
+        exemplarList.addAll(filmViewTable.getSelectionModel().getSelectedItem().getExemplars()); //hämta ex från film
+        addExemplarButton.setDisable(filmList.isEmpty());
+        removeExemplarButton.setDisable(exemplarList.isEmpty());
+        removeFilmButton.setDisable(filmList.isEmpty());
+        editFilmButton.setDisable(filmList.isEmpty());
     }
 
     @FXML
@@ -362,18 +321,27 @@ public class AddFilmViewController extends Controller {
         }else if (onDeleteUserConfirmation(!selected.getExemplars().isEmpty())) { //annars om id finns måste användaren bekräfta
             filmDeletionList.add(selected);
             filmList.remove(selected);
-            purgeFormLists();
+            clearForm();
         }
 
         removeFilmButton.setDisable(filmList.isEmpty());
+        editFilmButton.setDisable(filmList.isEmpty());
+        exemplarList.clear();
         updateHasNewFilms(); //blir filmlistan tom finns inga nya
 
     }
 
     @FXML
-    void removeDirectorButtonPressed(ActionEvent event) {
-        if(regissörsList.isEmpty()) return;
-        regissörsList.remove(directorViewTable.getSelectionModel().getSelectedItem());
+    void addExemplarTableButtonPressed(ActionEvent event) {
+        Film film = filmViewTable.getSelectionModel().getSelectedItem(); //för vald film
+        //då det bara kan finnas en typ av exemplar för filmer, skapa det direkt
+        Exemplar ex = new Exemplar();
+        ex.setNewLåntyp("film");
+        ex.setFilm_id(film);
+
+        film.getExemplars().add(ex); //lägg också till i filmens lista för konsistens
+        exemplarList.add(ex);
+        hasChangedFilms = true; //nytt ex på en film räknas som att filmen ändrades och hanteras när filmer uppdateras
     }
 
     @FXML
@@ -393,15 +361,13 @@ public class AddFilmViewController extends Controller {
         removeExemplarButton.setDisable(exemplarList.isEmpty());
     }
 
-    @FXML
-    void removeGenreButtonPressed(ActionEvent event) {
-        if(genresList.isEmpty()) return;
-        genresList.remove(genreViewTable.getSelectionModel().getSelectedItem());
-    }
+    /*
+     * Middle bar buttons
+     */
 
     @FXML
     void searchExistingFilmButtonPressed(ActionEvent event) throws IOException {
-        purgeFormLists();
+        clearForm();
 
         Stage searchWindow = new Stage();
         FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("smallSearchWindow.fxml"));
@@ -419,6 +385,67 @@ public class AddFilmViewController extends Controller {
 
         //ovanstående som metodanrop i konstruktor?
         searchWindow.show();
+    }
+
+    @FXML
+    void addNewFilmToListButtonPressed(ActionEvent event) {
+        setWindowToAddingFilmState();
+    }
+
+    @FXML
+    void editFilmButtonPressed(ActionEvent event) {
+        setWindowToEditingFilmState();
+    }
+
+    /*
+     * Bottom right buttons
+     */
+
+    @FXML
+    void cancelButtonPressed(ActionEvent event) {
+        if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
+            setWindowToDefaultState();
+        }
+
+    }
+
+    @FXML
+    void confirmButtonPressed(ActionEvent event) {
+        FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
+        ArrayList<Film> processedFilms = new ArrayList<>(); //filmer som har hanterats ska inte gå in i changed
+        if (hasNewFilms) {
+            for (Film f : filmList) {
+                if(f.getId() == null) //hantera endast nya filmer
+                dbs.addNewFilm(f);
+                processedFilms.add(f);
+            }
+        }
+        filmList.removeAll(processedFilms); //när nya filmer är klara, ta bort från listan
+        if (hasChangedFilms) {
+            for (Film f : filmList) {
+                dbs.updateFilm(f);
+            }
+        }
+        if (!filmDeletionList.isEmpty()) {
+            for (Film f : filmDeletionList) {
+                dbs.deleteFilm(f);
+            }
+        }
+        if(!exemplarDeletionList.isEmpty()) {
+            for (Exemplar ex : exemplarDeletionList) {
+                dbs.deleteFilmCopy(ex);
+            }
+        }
+
+        if(hasChangedFilms || hasNewFilms) {
+            showInformationPopup("Ändringarna skickades till databasen!");
+        }else {
+            showInformationPopup("Det finns inga ändringar att skicka.");
+        }
+
+        setWindowToDefaultState(); //nollställ fönstret
+        filmList.clear(); //tvinga användaren ladda om uppdaterade filmer och exemplar
+        exemplarList.clear();
     }
 
     public void initialize() {
@@ -452,84 +479,6 @@ public class AddFilmViewController extends Controller {
 
     }
 
-    private void setWindowToDefaultState() {
-        searchFilmButton.setDisable(false);
-        addNewFilmButton.setDisable(false);
-        editFilmButton.setDisable(filmList.isEmpty());
-        removeFilmButton.setDisable(true);
-        removeExemplarButton.setDisable(true);
-        addExemplarButton.setDisable(true);
-        filmViewTable.setDisable(false);
-
-        disableForm(true);
-        purgeFormLists();
-
-        //purge deletion lists
-        filmDeletionList.clear();
-        exemplarDeletionList.clear();
-    }
-
-    private void setWindowToAddingFilmState() {
-        searchFilmButton.setDisable(true);
-        addNewFilmButton.setDisable(true);
-        disableForm(false);
-        formMode = FormMode.ADDING;
-    }
-
-    private String[] openNameInputDialog() throws IOException {
-        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("nameInputDialog.fxml"));
-        Scene inputDialog = new Scene(loader.load());
-        Stage popupDialog = new Stage();
-
-        //controller references
-        NameInputDialogController controller = loader.getController();
-        controller.setStage(popupDialog);
-
-        //setup window
-        popupDialog.setTitle("Namn");
-        popupDialog.setScene(inputDialog);
-        popupDialog.setResizable(false);
-        popupDialog.showAndWait();
-
-        //when closed
-        return controller.getNames();
-    }
-
-    private void disableForm(boolean disable) {
-        titleBoxContents.setDisable(disable);
-        produktionslandBoxContents.setDisable(disable);
-        agelimitBoxContents.setDisable(disable);
-
-        addDirectorButton.setDisable(disable);
-        removeDirectorButton.setDisable(disable);
-
-        addActorButton.setDisable(disable);
-        removeActorButton.setDisable(disable);
-
-        addGenreButton.setDisable(disable);
-        removeGenreButton.setDisable(disable);
-
-        clearFormButton.setDisable(disable);
-        formOkButton.setDisable(disable);
-    }
-
-    private void purgeFormLists() {
-        titleBoxContents.clear();
-        produktionslandBoxContents.clear();
-        agelimitBoxContents.clear();
-        skådespelareList.clear();
-        genresList.clear();
-        regissörsList.clear();
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        if(arg != ApplicationState.UpdateType.FILM) return;
-        if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Adding films from search result");
-        filmList.clear();
-        filmList.addAll(getState().getFilmSearchResults());
-    }
-
     private void updateHasNewFilms() {
         for (Film f : filmList) {
             if (f.getId() == null) {
@@ -539,51 +488,110 @@ public class AddFilmViewController extends Controller {
         }
     }
 
-    private void updateFormView() {
-        Film film = filmViewTable.getSelectionModel().getSelectedItem();
-        purgeFormLists();
-        titleBoxContents.setText(film.getTitel());
-        if(film.getId() != null) idBoxContents.setText(film.getId().toString());
-        produktionslandBoxContents.setText(film.getProduktionsland());
-        agelimitBoxContents.setText(film.getÅldersgräns().toString());
-        regissörsList.addAll(film.getRegissörs());
-        skådespelareList.addAll(film.getSkådespelares());
-        genresList.addAll(film.getGenres());
+    /*
+     * Window states
+     */
+    private void setWindowToDefaultState() {
+        //form
+        formMode = FormMode.NONE;
+        clearForm();
+        disableForm(true);
+
+        //search/add/remove
+        searchFilmButton.setDisable(false);
+        addNewFilmButton.setDisable(false);
+        editFilmButton.setDisable(filmList.isEmpty());
+
+        //right side
+        filmViewTable.setDisable(false);
+        exemplarViewTable.setDisable(false);
+        removeFilmButton.setDisable(filmList.isEmpty());
+        addExemplarButton.setDisable(filmList.isEmpty());
+        removeExemplarButton.setDisable(exemplarList.isEmpty());
+
     }
 
-    private void showInformationPopup(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information");
-        alert.setHeaderText(message);
+    private void setWindowToAddingFilmState() {
+        //form
+        formMode = FormMode.ADDING;
+        clearForm();
+        disableForm(false);
 
-        alert.showAndWait();
+        //top buttons
+        searchFilmButton.setDisable(true);
+        addNewFilmButton.setDisable(true);
+        editFilmButton.setDisable(true);
+
+        //right side
+        filmViewTable.setDisable(true);
+        exemplarViewTable.setDisable(true);
+        removeFilmButton.setDisable(true);
+        removeExemplarButton.setDisable(true);
+        addExemplarButton.setDisable(true);
+
+
     }
 
-    private void showErrorPopup(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Fel");
-        alert.setHeaderText(message);
+    private void setWindowToEditingFilmState() {
+        //form
+        formMode = FormMode.EDITING;
+        disableForm(false);
 
-        alert.showAndWait();
+        //film table
+        filmViewTable.setDisable(true);
+        removeFilmButton.setDisable(true);
+
+        //exemplar table
+        exemplarViewTable.setDisable(true);
+        removeExemplarButton.setDisable(true);
+        addExemplarButton.setDisable(true);
+
+        //search/add/edit
+        searchFilmButton.setDisable(true);
+        addNewFilmButton.setDisable(true);
+        editFilmButton.setDisable(true);
     }
 
-    private boolean onDeleteUserConfirmation(boolean hasChildren)
-    {
-        String additionalWarning = hasChildren ? " Alla exemplar kommer också att raderas" : "";
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Bekräfta");
-        alert.setHeaderText("Är du säker?");
-        alert.setContentText("Vill du verkligen radera detta objekt?" + additionalWarning);
 
-        // Set button types explicitly
-        ButtonType yesButton = new ButtonType("Ja", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("Nej", ButtonBar.ButtonData.NO);
+    /*
+     * UTILITIES
+     */
 
-        alert.getButtonTypes().setAll(yesButton, noButton);
+    private void disableForm(boolean state) {
+        titleBoxContents.setDisable(state);
+        produktionslandBoxContents.setDisable(state);
+        agelimitBoxContents.setDisable(state);
 
-        // Show and wait for user input
-        Optional<ButtonType> result = alert.showAndWait();
+        addDirectorButton.setDisable(state);
+        removeDirectorButton.setDisable(state);
 
-        return result.isPresent() && result.get() == yesButton;
+        addActorButton.setDisable(state);
+        removeActorButton.setDisable(state);
+
+        addGenreButton.setDisable(state);
+        removeGenreButton.setDisable(state);
+
+        clearFormButton.setDisable(state);
+        formOkButton.setDisable(state);
+    }
+
+    private void clearForm() {
+        titleBoxContents.clear();
+        produktionslandBoxContents.clear();
+        agelimitBoxContents.clear();
+        skådespelareList.clear();
+        genresList.clear();
+        regissörsList.clear();
+    }
+
+    /*
+     * IMPLEMENTED
+     */
+    @Override
+    public void update(Observable o, Object arg) {
+        if(arg != ApplicationState.UpdateType.FILM) return;
+        if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Adding films from search result");
+        filmList.clear();
+        filmList.addAll(getState().getFilmSearchResults());
     }
 }

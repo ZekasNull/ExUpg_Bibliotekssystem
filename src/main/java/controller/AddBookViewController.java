@@ -168,6 +168,7 @@ public class AddBookViewController extends Controller {
     @FXML
     private Button clearFormButton;
 
+    //form buttons
     @FXML
     void clearFormButtonPressed(ActionEvent event) {
         clearForm();
@@ -233,20 +234,6 @@ public class AddBookViewController extends Controller {
         }
         setWindowToDefaultState();
     }
-
-    /**
-     * Liten hjälpmetod som ser till att rätt info finns i fält.
-     * TODO ersätt med InputValidatorService
-     * @return false om något fält saknar nödvändig data, annars true
-     */
-    private boolean FormHasRequiredData() {
-        if (titleBoxContents.getText().trim().isEmpty()) return false;
-        if(isbnBoxContents.getText().trim().isEmpty()) return false;
-        if(formAuthorList.isEmpty()) return false;
-        return true;
-    }
-
-
 
     /**
      * Om en bok är vald i bookviewtable, sätt till edit book state.
@@ -324,13 +311,35 @@ public class AddBookViewController extends Controller {
     }
 
     @FXML
+    void removeBookTableButtonPressed(ActionEvent event) {
+        Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
+        if (bok.getId() != null) {
+            if (onDeleteUserConfirmation(!bok.getExemplars().isEmpty())) { //visa varning om boken har exemplar
+                bookDeletionList.add(bok);
+                bookList.remove(bok);
+                exemplarList.clear();
+            }
+        }else{
+            //böcker utan id kan tas bort direkt då de inte finns i db
+            bookList.remove(bok);
+            exemplarList.clear();
+            hasNewBooks = !bookList.isEmpty();
+        }
+        clearForm();
+    }
+
+    @FXML
     void exemplarTableClicked(MouseEvent event) {
         removeCopyButton.setDisable(exemplarList.isEmpty());
     }
 
     @FXML
     void cancelButtonPressed(ActionEvent event) {
-        super.getState().vy.loadScene("handle-inventory-view.fxml", "Hantera inventarie");
+        if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
+            setWindowToDefaultState();
+        } else {
+            getState().vy.loadScene("handle-inventory-view.fxml", "Hantera inventarie");
+        }
     }
 
     @FXML
@@ -425,23 +434,7 @@ public class AddBookViewController extends Controller {
         formKeywordList.remove(keywordTable.getSelectionModel().getSelectedItem());
     }
 
-    @FXML
-    void removeBookTableButtonPressed(ActionEvent event) {
-        Bok bok = bookViewTable.getSelectionModel().getSelectedItem();
-        if (bok.getId() != null) {
-            if (onDeleteUserConfirmation(!bok.getExemplars().isEmpty())) { //visa varning om boken har exemplar
-                bookDeletionList.add(bok);
-                bookList.remove(bok);
-                exemplarList.clear();
-            }
-        }else{
-            //böcker utan id kan tas bort direkt då de inte finns i db
-            bookList.remove(bok);
-            exemplarList.clear();
-            hasNewBooks = !bookList.isEmpty();
-        }
-        clearForm();
-    }
+
 
 
 
@@ -512,21 +505,23 @@ public class AddBookViewController extends Controller {
     //hjälpmetoder
 
     /*
-     * BEGIN WINDOWSTATES
+     * WINDOWSTATES
      */
-
     /**
      * Ska motsvara fönstret i sitt default state, men utan att ta bort information från listor. Det gäller att:
      * FormMode is NONE
      * Form is disabled
      * Form buttons are disabled
+     *
      * Böcker table is enabled
      * Böcker remove button only enabled if bookList contains something
+     *
      * Exemplar table is enabled
      * Exemplar remove button only enabled if exemplarList contains something
+     *
      * Search book button is enabled
      * Add new book button is enabled
-     * Change book button is only enabled if bookList contains something
+     * Edit book button is only enabled if bookList contains something
      */
     private void setWindowToDefaultState() {
         //form
@@ -570,8 +565,8 @@ public class AddBookViewController extends Controller {
      */
     private void setWindowToAddingNewBooksState() {
         //form
-        disableForm(false);
         formMode = FormMode.ADDING;
+        disableForm(false);
         clearForm();
 
         //book table
@@ -597,8 +592,6 @@ public class AddBookViewController extends Controller {
         //form
         formMode = FormMode.EDITING;
         disableForm(false);
-        clearFormButton.setDisable(false);
-        formOkButton.setDisable(false);
 
         //book table
         bookViewTable.setDisable(true);
@@ -639,14 +632,21 @@ public class AddBookViewController extends Controller {
 
     }
 
-
     /*
-     * END WINDOWSTATES
+     * UTILITIES
      */
 
-    /*
-     * BEGIN TEXT FIELD UTILITIES
+    /**
+     * Liten hjälpmetod som ser till att rätt info finns i fält.
+     * TODO ersätt med InputValidatorService
+     * @return false om något fält saknar nödvändig data, annars true
      */
+    private boolean FormHasRequiredData() {
+        if (titleBoxContents.getText().trim().isEmpty()) return false;
+        if(isbnBoxContents.getText().trim().isEmpty()) return false;
+        if(formAuthorList.isEmpty()) return false;
+        return true;
+    }
 
     /**
      * Rensar alla textrutor från innehåll
@@ -679,12 +679,8 @@ public class AddBookViewController extends Controller {
     }
 
     /*
-     * END UTILITIES
-     */
-
-    /*
      * POPUPS
-     * TODO passar bättre i en superklass
+     * TODO ska skötas av ViewLoader
      */
     private void openSearchWindow() throws IOException {
         Stage searchWindow = new Stage();
@@ -705,67 +701,8 @@ public class AddBookViewController extends Controller {
         searchWindow.show();
     }
 
-    private void showInformationPopup(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information");
-        alert.setHeaderText(message);
-
-        alert.showAndWait();
-    }
-
-    private void showErrorPopup(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Fel");
-        alert.setHeaderText(message);
-
-        alert.showAndWait();
-    }
-
-    private boolean onDeleteUserConfirmation(boolean hasChildren) {
-        String additionalWarning = hasChildren ? " Alla exemplar kommer också att raderas" : "";
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Bekräfta");
-        alert.setHeaderText("Är du säker?");
-        alert.setContentText("Vill du verkligen radera detta objekt?" + additionalWarning);
-
-        // Set button types explicitly
-        ButtonType yesButton = new ButtonType("Ja", ButtonBar.ButtonData.YES);
-        ButtonType noButton = new ButtonType("Nej", ButtonBar.ButtonData.NO);
-
-        alert.getButtonTypes().setAll(yesButton, noButton);
-
-        // Show and wait for user input
-        Optional<ButtonType> result = alert.showAndWait();
-
-        return result.isPresent() && result.get() == yesButton;
-    }
-
-    private String[] openNameInputDialog() throws IOException {
-        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("nameInputDialog.fxml"));
-        Scene inputDialog = new Scene(loader.load());
-        Stage popupDialog = new Stage();
-
-        //controller references
-        NameInputDialogController controller = loader.getController();
-        controller.setStage(popupDialog);
-
-        //setup window
-        popupDialog.setTitle("Namn");
-        popupDialog.setScene(inputDialog);
-        popupDialog.setResizable(false);
-        popupDialog.showAndWait();
-
-        //when closed
-        return controller.getNames();
-    }
-
-
     /*
-     * POPUPS
-     */
-
-    /*
-     * MISC
+     * IMPLEMENTED
      */
     @Override
     public void update(Observable o, Object arg) {

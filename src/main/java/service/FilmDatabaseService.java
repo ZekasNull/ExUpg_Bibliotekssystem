@@ -53,7 +53,7 @@ public class FilmDatabaseService {
     public void updateFilm(Film film) {
         EntityManager em = DBC.getEntityManager();
         if (debugPrints) System.out.println("filmdbservice: incoming film to update: " + film.getTitel() +
-                "\n State in database: " + findFilmByID(film.getId()));
+                "\n State in database: " + em.find(Film.class, film));
 
 
         try {
@@ -179,19 +179,5 @@ public class FilmDatabaseService {
             em.close();
         }
         return result;
-    }
-
-    public Film findFilmByID(int id) {
-        EntityManager em = DBC.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            TypedQuery<Film> query = em.createQuery("SELECT f FROM Film f WHERE f.id = :id", Film.class);
-            query.setParameter("id", id);
-            Film result = query.getSingleResult();
-            em.getTransaction().commit();
-            return result;
-        } finally{
-            em.close();
-        }
     }
 }

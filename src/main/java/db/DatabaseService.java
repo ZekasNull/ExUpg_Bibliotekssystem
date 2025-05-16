@@ -1,5 +1,6 @@
 package db;
 
+import d0024e.exupg_bibliotekssystem.MainApplication;
 import model.*;
 import org.postgresql.util.PSQLException;
 
@@ -8,7 +9,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class DatabaseService {
-    private final boolean DEBUGPRINTS = true;
+    private final boolean DEBUGPRINTS = MainApplication.DEBUGPRINTS;
     private final DBConnector DBC;
 
     public DatabaseService() {

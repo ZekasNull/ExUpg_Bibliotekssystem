@@ -35,6 +35,7 @@ public class LoginViewController extends Controller{
         if (DEBUGPRINTOUTS) System.out.println("LoginViewController: onloginbutton");
         Användare user = state.databaseService.logInUser(idealBoxContents.getText(), pinBoxContents.getText());
         if (user != null) state.setCurrentUser(user);
+
     }
 
     @Override

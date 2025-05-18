@@ -1,6 +1,6 @@
 package controller;
 
-import d0024e.exupg_bibliotekssystem.MainApplication;
+import db.DatabaseService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,15 +9,22 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
-import state.ApplicationState;
+
+import java.io.IOException;
+
+import net.bytebuddy.implementation.bind.annotation.Super;
+import org.hibernate.dialect.Database;
+import service.BookDatabaseService;
+import service.FilmDatabaseService;
+import state.BorrowItemInterface;
 
 import java.util.List;
 import java.util.Observable;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MainMenuController extends Controller {
-    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
     public Button LogOutButton;
     public Button ShowProfileButton;
     public Button EmployeeViewButton;
@@ -26,8 +33,11 @@ public class MainMenuController extends Controller {
     public Button LogInViewButton; //Knapp för att logga in
     public TextField searchtermBoxContents; //Vad som står i själva sökboxen
     public SplitMenuButton objektTypFlerVal; //Vilket typ av objekt som ska filtreras
+    public Button BorrowAllButton;
+    public TableColumn<BorrowItemInterface, String> BorrowListColumn;
+    public TableView<BorrowItemInterface> BorrowTable;
     private String selectedObject;
-    public Button BorrowObjectButton; //TODO: se till att det kommer upp ett meddelande om att logga in on hover
+    public Button BorrowObjectButton;
 
     public TableColumn<Bok, String> titleColumn;
     public TableColumn<Bok, String> isbnColumn;
@@ -46,8 +56,9 @@ public class MainMenuController extends Controller {
     public TableColumn<Film, String> actorsColumn;
     public TableColumn<Film, String> genreColumn;
 
-    public void onUserLogInViewButtonClick(ActionEvent actionEvent) {
-        super.getState().app.openLoginView(); //ger pop-up istället för utbyte av scenen som viewloader skulle
+    public void onUserLogInViewButtonClick(ActionEvent actionEvent) throws IOException {
+        super.getState().vy.loadPopup("login-view.fxml", "Log in view");
+        //ger pop-up istället för utbyte av scenen som viewloader skulle
     }
 
     public void handleBokOption(ActionEvent actionEvent) {
@@ -72,27 +83,26 @@ public class MainMenuController extends Controller {
 //TODO: Se till att det inte blir randomized ämnesord
 
     public void onSearchButtonClick(ActionEvent actionEvent) {
-        /*Faktiska som körs och inte bara hämtar information
-         * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
-         * */
-        if (searchtermBoxContents.getText().trim().isEmpty() && selectedObject == null) {
+/*Faktiska som körs och inte bara hämtar information
+* Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
+* */
+        if (searchtermBoxContents.getText().trim().isEmpty()&& selectedObject == null){
             showErrorPopup("Du måste välja en objekttyp och minst ett sökord");
             return;
-        } else if (searchtermBoxContents.getText().trim().isEmpty()) {
+        } else if (searchtermBoxContents.getText().trim().isEmpty()){
             showErrorPopup("Du måste ange sökord");
             return;
-        } else if (selectedObject == null) {
+        }else if (selectedObject == null){
             showErrorPopup("Du måste välja en objekttyp");
             return;
         }
-        try {
-            if (selectedObject.equals("Bok")) {
+        try{
+            if(selectedObject.equals("Bok")){
                 List<Bok> searchTerm = super.getState().databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
 
                 ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInBookSearchTable.setItems(data);
-                if (DEBUGPRINTOUTS)
-                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Bok");
+                System.out.println("Rows added to table: " + data.size() + " Bok");
 
                 //Sätter in det returnerade värdet från sökningens titel i titelkolumnen osv (Ligger här för att dela upp det mellan bok,film, och tidsskrift)
                 titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
@@ -116,13 +126,13 @@ public class MainMenuController extends Controller {
                             .collect(Collectors.joining(","));
                     return new SimpleStringProperty(authorName);
                 });
-            } else if (selectedObject.equals("Film")) {
+            }
+            else if (selectedObject.equals("Film")){
                 List<Film> searchTerm = super.getState().databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
 
                 ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInFilmSearchTable.setItems(data);
-                if (DEBUGPRINTOUTS)
-                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Film");
+                System.out.println("Rows added to table: " + data.size() + " Film");
 
                 filmTitleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
                 productionCountryColumn.setCellValueFactory(new PropertyValueFactory<>("produktionsland"));
@@ -156,45 +166,130 @@ public class MainMenuController extends Controller {
                 notLoggedInSearchTable.setItems(data);
             }
             Utkommenterad tills vidare*/
-        } catch (Exception e) {
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
-
     public void onLogOutButtonClick(ActionEvent actionEvent) {
         //FIXME: Logga ut ordentligt :|
     }
 
     public void onShowProfileButtonClick(ActionEvent actionEvent) {
-        //TODO: logik för att byta över vy till visa lån och hantera användare
+        super.getState().vy.loadScene("show-profile-view.fxml", "Profil");
     }
 
     public void onEmployeeViewButton(ActionEvent actionEvent) {
         super.getState().vy.loadScene("librarian-first-choice-view.fxml", "Bibliotekarnas första val");
     }
 
+    public void onBorrowObjectButtonClick(ActionEvent actionEvent) {
+        //Kolla så användaren är inloggad
+        if (super.getState().getCurrentUser() == null) {
+            showErrorPopup("Du måste logga in för att låna objekt");
+            return;
+        }
+        //Sätter selectedItem
+
+        BorrowItemInterface selectedItem = null;
+        if (selectedObject.equals("Bok")) {
+            selectedItem = notLoggedInBookSearchTable.getSelectionModel().getSelectedItem();
+        } else if (selectedObject.equals("Film")) {
+            selectedItem = notLoggedInFilmSearchTable.getSelectionModel().getSelectedItem();
+        }
+
+        if(selectedItem == null) {
+            showErrorPopup("Du måste välja ett objekt från en sökning först");
+            return;
+        }
+
+        //Ser ifall det finns ett exemplar ledigt
+        Optional<Exemplar> exemplarAttLåna = selectedItem
+                .getExemplars()
+                .stream()
+                .filter(Exemplar::getTillgänglig)
+                .findFirst();
+
+        if (exemplarAttLåna.isEmpty()) {
+            showErrorPopup("Inga exemplar är tillgängliga för utlåning");
+            return;
+        }
+
+        //Sätter exemplaret som är i listan som icket tillgänglig
+        super.getState().databaseService.markExemplarAsBorrowed(exemplarAttLåna.get());
+
+        if (exemplarAttLåna.isEmpty()) {
+            showErrorPopup("Inga exemplar är tillgängliga för utlåning");
+            return;
+        }
+
+        super.getState().databaseService.isItemAvailable(selectedItem);
+        if (exemplarAttLåna.isEmpty()) {
+            showErrorPopup("Inga exemplar är tillgängliga för utlåning");
+            return;
+        }
+
+        super.getState().getBorrowList().add(selectedItem);
+        BorrowTable.setItems(super.getState().getBorrowList());
+        BorrowListColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
+
+        System.out.println(super.getState().getBorrowList().size() + " rows added to Låna");
+    }
+
+    public void onBorrowAllButtonClick(ActionEvent actionEvent) {
+        //Hämtar och kollar att lånelistan inte är tom
+        List<BorrowItemInterface> borrowList = super.getState().getBorrowList();
+        if (borrowList.isEmpty()) {
+            showErrorPopup("Lånelistan är tom");
+            return;
+        }
+        //Itererar genom listan och kollar varje item
+        for (BorrowItemInterface item : borrowList) {
+            Optional<Exemplar> optionalExemplar = super.getState().databaseService.isItemAvailable(item);
+
+            if (optionalExemplar.isPresent()) {
+                Exemplar exemplar = optionalExemplar.get();
+
+                super.getState().databaseService.markExemplarAsBorrowed(exemplar);
+
+                //Skapa nytt lån
+                Lån lån = new Lån();
+                lån.setAnvändare(super.getState().getCurrentUser());
+                lån.setStreckkod(exemplar);
+
+                //Se till att lånet blir registrerat i datbasen
+                super.getState().databaseService.registerLoan (lån);
+
+            } else {
+                System.out.println("Inget tillgängligt exemplar för: " + item.getTitel());
+            }
+        }
+    }
+
     @Override
     public void update(Observable o, Object arg) {
-        if(arg != ApplicationState.UpdateType.USER) return;
         String currentUserType = super.getState().getCurrentUser().getAnvändartyp().getAnvändartyp();
         if (currentUserType == null) {
-            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Ingen e inloggad");
-        } else if (currentUserType.equals("bibliotekarie")) {
-            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Bibliotekarie inloggad");
+            System.out.println("Ingen e inloggad");
+        } else if(currentUserType.equals("bibliotekarie")) {
+            System.out.println("Bibliotekarie inloggad");
             LogOutButton.setVisible(true);
+            System.out.println("Bibliotekarie inloggad");
             ShowProfileButton.setVisible(true);
             EmployeeViewButton.setVisible(true);
             LogInViewButton.setVisible(false);
-        } else {
+            BorrowObjectButton.setOpacity(2); //FIXME: ta reda på varför den blir genomskinlig efter flera objekt läggs på borrowlist
+            BorrowAllButton.setVisible(true);
+        }else{
             LogOutButton.setVisible(true);
             ShowProfileButton.setVisible(true);
             LogInViewButton.setVisible(false);
+            BorrowObjectButton.setOpacity(2);
+            BorrowAllButton.setVisible(true);
         }
     }
 
     public void tableViewMouseClick(javafx.scene.input.MouseEvent mouseEvent) {
         //Skriver ut i konsol för testsyfte
-        if (DEBUGPRINTOUTS)
-            System.out.println("MainMenuController: " + notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
+        System.out.println(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
     }
 }

@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SplitMenuButton?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainMenuController">
+<AnchorPane prefHeight="413.0" prefWidth="748.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainMenuController">
    <children>
       <Button fx:id="LogInViewButton" layoutX="524.0" layoutY="14.0" mnemonicParsing="false" onAction="#onUserLogInViewButtonClick" text="Logga in" visible="true" />
       <Label layoutX="182.0" layoutY="39.0" text="Skriv in vad du vill söka på:">
@@ -28,26 +22,33 @@
             <MenuItem mnemonicParsing="false" onAction="#handleTidskriftOption" text="Tidskrift" />
         </items>
       </SplitMenuButton>
-      <TableView fx:id="notLoggedInBookSearchTable" layoutX="44.0" layoutY="170.0" onMouseClicked="#tableViewMouseClick" prefHeight="200.0" prefWidth="526.0" visible="false">
+      <TableView fx:id="notLoggedInBookSearchTable" layoutX="44.0" layoutY="170.0" onMouseClicked="#tableViewMouseClick" prefHeight="200.0" prefWidth="475.0" visible="false">
         <columns>
-          <TableColumn fx:id="titleColumn" prefWidth="150.0" text="Titel" />
-          <TableColumn fx:id="isbnColumn" prefWidth="107.0" text="ISBN-13" />
-            <TableColumn fx:id="subjectColumn" prefWidth="143.0" text="Ämnesord" />
-            <TableColumn fx:id="authorNameColumn" prefWidth="125.0" text="Författare namn" />
+          <TableColumn fx:id="titleColumn" prefWidth="108.0" text="Titel" />
+          <TableColumn fx:id="isbnColumn" prefWidth="120.0" text="ISBN-13" />
+            <TableColumn fx:id="subjectColumn" prefWidth="129.0" text="Ämnesord" />
+            <TableColumn fx:id="authorNameColumn" prefWidth="117.0" text="Författare namn" />
         </columns>
       </TableView>
-      <TableView fx:id="notLoggedInFilmSearchTable" layoutX="30.0" layoutY="170.0" prefHeight="200.0" prefWidth="552.0" visible="false">
+      <TableView fx:id="notLoggedInFilmSearchTable" layoutX="19.0" layoutY="170.0" prefHeight="200.0" prefWidth="499.0" visible="true">
         <columns>
           <TableColumn fx:id="filmTitleColumn" prefWidth="75.0" text="Titel" />
-          <TableColumn fx:id="productionCountryColumn" prefWidth="75.0" text="Prod. land" />
-            <TableColumn fx:id="ageLimitColumn" prefWidth="91.0" text="Åldersgräns" />
-            <TableColumn fx:id="directorsColumn" prefWidth="109.0" text="Regissör" />
-            <TableColumn fx:id="actorsColumn" prefWidth="124.0" text="Skådespelare" />
-            <TableColumn fx:id="genreColumn" prefWidth="76.0" text="Genre" />
+          <TableColumn fx:id="productionCountryColumn" prefWidth="69.0" text="Prod. land" />
+            <TableColumn fx:id="ageLimitColumn" prefWidth="75.0" text="Åldersgräns" />
+            <TableColumn fx:id="directorsColumn" prefWidth="73.0" text="Regissör" />
+            <TableColumn fx:id="actorsColumn" prefWidth="119.0" text="Skådespelare" />
+            <TableColumn fx:id="genreColumn" prefWidth="87.0" text="Genre" />
         </columns>
       </TableView>
       <Button fx:id="LogOutButton" layoutX="523.0" layoutY="14.0" mnemonicParsing="false" onAction="#onLogOutButtonClick" text="Logga ut" visible="false" />
       <Button fx:id="ShowProfileButton" layoutX="448.0" layoutY="14.0" mnemonicParsing="false" onAction="#onShowProfileButtonClick" text="Visa profil" visible="false" />
       <Button fx:id="EmployeeViewButton" layoutX="518.0" layoutY="52.0" mnemonicParsing="false" onAction="#onEmployeeViewButton" text="Personalvy" visible="false" />
+      <Button fx:id="BorrowObjectButton" layoutX="535.0" layoutY="182.0" mnemonicParsing="false" onAction="#onBorrowObjectButtonClick" text="Låna" style="-fx-opacity: 0.5;" />
+      <TableView fx:id="BorrowTable"  layoutX="597.0" layoutY="170.0" prefHeight="200.0" prefWidth="131.0">
+        <columns>
+          <TableColumn fx:id="BorrowListColumn" prefWidth="130.0" text="Lånelista" />
+        </columns>
+      </TableView>
+      <Button fx:id="BorrowAllButton" layoutX="668.0" layoutY="374.0" mnemonicParsing="false" onAction="#onBorrowAllButtonClick" text="Låna allt"  visible="false" />
    </children>
 </AnchorPane>

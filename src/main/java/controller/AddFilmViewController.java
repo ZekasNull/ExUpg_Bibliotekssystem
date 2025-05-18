@@ -369,6 +369,7 @@ public class AddFilmViewController extends Controller {
     void searchExistingFilmButtonPressed(ActionEvent event) throws IOException {
         clearForm();
 
+        //super.getState().vy.loadPopup("smallSearchWindow.fxml", "Sök Film"); hur tusan kommer Mode FILM in
         Stage searchWindow = new Stage();
         FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("smallSearchWindow.fxml"));
         Scene searchwindow = new Scene(loader.load());

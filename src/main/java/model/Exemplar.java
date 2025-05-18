@@ -65,6 +65,15 @@ public class Exemplar {
         this.låntyp = låntyp;
     }
 
+    public String getTitle() {
+        if (bok != null) {
+            return bok.getTitel();
+        } else if (film_id != null) {
+            return film_id.getTitel();
+        }
+        return "";
+    }
+
     /**
      * Alternativ som "skapar" låntypen direkt från string.
      * TODO implementera som enum eller liknande för bättre funktion

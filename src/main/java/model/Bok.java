@@ -1,13 +1,16 @@
 package model;
 
+import state.BorrowItemInterface;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "\"Bok\"", schema = "bibliotekssystem")
-public class Bok {
+public class Bok implements BorrowItemInterface {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bok_id", nullable = false)
@@ -57,6 +60,7 @@ public class Bok {
     @OneToMany(mappedBy = "bok", fetch = FetchType.EAGER, orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Exemplar> exemplars = new LinkedHashSet<>();
 
+    @Override
     public Set<Exemplar> getExemplars() {
         return exemplars;
     }
@@ -81,6 +85,7 @@ public class Bok {
         this.isbn13 = isbn13;
     }
 
+    @Override
     public String getTitel() {
         return titel;
     }

@@ -21,5 +21,6 @@
             <Font size="24.0" />
          </font>
       </Label>
+      <Button fx:id="GoBackToFirstChoiceButton" layoutX="20.0" layoutY="16.0" mnemonicParsing="false" text="Gå tillbaka" onAction="#onGoBackToFirstChoiceButtonClick" />
    </children>
 </AnchorPane>

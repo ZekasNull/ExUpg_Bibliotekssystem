@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShowProfileViewController">
+   <children>
+      <Button fx:id="ReturnToMainMenuButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onReturnToMainMenuButtonClick" text="Gå tillbaka" />
+      <TableView fx:id="UserShowProfileViewLoanTable" layoutX="60.0" layoutY="108.0" prefHeight="200.0" prefWidth="456.0">
+        <columns>
+          <TableColumn fx:id="TitleColumn" prefWidth="125.0" text="Titel" />
+          <TableColumn fx:id="BarcodeColumn" minWidth="0.0" prefWidth="102.0" text="Streckkod" />
+            <TableColumn fx:id="BorrowDateColumn" minWidth="0.0" prefWidth="102.0" text="Lånedatum" />
+            <TableColumn fx:id="ReturnDateColumn" minWidth="0.0" prefWidth="126.0" text="Återlämningsdatum" />
+        </columns>
+      </TableView>
+      <Label layoutX="192.0" layoutY="39.0" text="Välkommen ">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="ReturnLoanButton" layoutX="523.0" layoutY="108.0" mnemonicParsing="false" onAction="#onReturnLoanButtonClick" text="Återlämna" />
+   </children>
+</AnchorPane>

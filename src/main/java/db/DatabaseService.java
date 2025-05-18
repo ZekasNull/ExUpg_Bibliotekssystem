@@ -3,15 +3,11 @@ package db;
 import d0024e.exupg_bibliotekssystem.MainApplication;
 import model.*;
 import org.postgresql.util.PSQLException;
-import state.BorrowItemInterface;
 
 import javax.persistence.*;
-import javax.swing.text.html.Option;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 public class DatabaseService {
     private final boolean DEBUGPRINTS = MainApplication.DEBUGPRINTS;
@@ -59,7 +55,7 @@ public class DatabaseService {
     public Instant getReturnDateForLoan(Lån lån) {
 
         EntityManager em = DBC.getEntityManager();
-        Query returnDateQuery = em.createNamedQuery("getReturnDate");
+        Query returnDateQuery = em.createNativeQuery("SELECT bibliotekssystem.sf_get_return_date(?1)");
         returnDateQuery.setParameter(1, lån.getId());
 
         try {
@@ -281,50 +277,4 @@ public class DatabaseService {
         }
         throw e;
     }
-
-    public Optional<Exemplar> isItemAvailable(BorrowItemInterface item) {
-        return item.getExemplars().stream()
-                .filter(Exemplar::getTillgänglig)
-                .findFirst();
-    }
-
-    public void markExemplarAsBorrowed(Exemplar exemplar) {
-        EntityManager entityManager = DBC.getEntityManager();
-        try {
-            entityManager.getTransaction().begin();
-            exemplar.setTillgänglig(false);
-            entityManager.merge(exemplar);
-            entityManager.getTransaction().commit();
-        } finally {
-            entityManager.close();
-        }
-    }
-
-    public void registerLoan(Lån loan) {
-        EntityManager em = DBC.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.persist(loan);
-            em.getTransaction().commit();
-        } finally {
-            em.close();
-        }
-    }
-
-    public List<Lån> getLoanForUser(Användare användare) {
-        EntityManager entityManager = DBC.getEntityManager();
-        List<Lån> låneLista;
-
-        try {
-            TypedQuery<Lån> query = entityManager.createQuery(
-                    "SELECT ln FROM Lån ln WHERE ln.användare = :user", Lån.class);
-            query.setParameter("user", användare);
-            låneLista = query.getResultList();
-            return låneLista;
-        } finally {
-            entityManager.close();
-        }
-    }
-
-
 }

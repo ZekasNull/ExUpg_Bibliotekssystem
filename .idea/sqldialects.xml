@@ -4,8 +4,24 @@
     <file url="file://$PROJECT_DIR$/db setup scripts/creation_script.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db setup scripts/lookup_table_constants.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db setup scripts/testdata.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Användare.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Bok_Författare.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Bok_Ämnesord.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Exemplar.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Film_Genre.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Film_Regissör.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Lån.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/Upplaga.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_find_overdue_loans.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_get_return_date.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_getcurrentloanscount.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_getloanlimit.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_sök_böcker.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_sök_böcker_avancerad.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/sf_sök_böcker_enkel.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/st_check_loan_limit.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/st_låneexemplar_måste_vara_tillgängligt.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/st_uppdatera_exemplar_tillgänglighet.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/db_ddl/bibliotekssystem/vy_bok_info.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/db/DatabaseService.java" dialect="GenericSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />

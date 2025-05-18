@@ -1,6 +1,7 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
+import d0024e.exupg_bibliotekssystem.ViewLoader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -338,7 +339,7 @@ public class AddBookViewController extends Controller {
         if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
             setWindowToDefaultState();
         } else {
-            getState().vy.loadScene("handle-inventory-view.fxml", "Hantera inventarie");
+            ViewLoader.setView("Hantera inventarie");
         }
     }
 

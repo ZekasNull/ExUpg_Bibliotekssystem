@@ -1,6 +1,7 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
+import d0024e.exupg_bibliotekssystem.ViewLoader;
 import javafx.util.Pair;
 import service.FilmDatabaseService;
 import javafx.beans.property.SimpleStringProperty;
@@ -404,10 +405,7 @@ public class AddFilmViewController extends Controller {
 
     @FXML
     void cancelButtonPressed(ActionEvent event) {
-        if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
-            setWindowToDefaultState();
-        }
-
+        ViewLoader.setView("Hantera inventarie");
     }
 
     @FXML

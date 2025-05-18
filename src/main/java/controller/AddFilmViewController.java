@@ -444,9 +444,9 @@ public class AddFilmViewController extends Controller {
             showInformationPopup("Det finns inga ändringar att skicka.");
         }
 
-        setWindowToDefaultState(); //nollställ fönstret
         filmList.clear(); //tvinga användaren ladda om uppdaterade filmer och exemplar
         exemplarList.clear();
+        setWindowToDefaultState(); //nollställ fönstret
     }
 
     public void initialize() {

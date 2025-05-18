@@ -434,10 +434,6 @@ public class AddBookViewController extends Controller {
         formKeywordList.remove(keywordTable.getSelectionModel().getSelectedItem());
     }
 
-
-
-
-
     /**
      * Lägger till nya böcker eller exemplar i databasen baserat på det som finns i bookList och ExemplarList
      * @param event
@@ -484,8 +480,6 @@ public class AddBookViewController extends Controller {
         //TODO anrop för att stänga fönstret
     }
 
-
-
     /**
      * Lägger till en helt ny bok.
      * @param event
@@ -499,8 +493,6 @@ public class AddBookViewController extends Controller {
     void searchBookButtonPressed(ActionEvent event) throws IOException {
         openSearchWindow();
     }
-
-
 
     //hjälpmetoder
 

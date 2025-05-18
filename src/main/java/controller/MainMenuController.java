@@ -1,6 +1,6 @@
 package controller;
 
-import db.DatabaseService;
+import d0024e.exupg_bibliotekssystem.MainApplication;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +16,7 @@ import net.bytebuddy.implementation.bind.annotation.Super;
 import org.hibernate.dialect.Database;
 import service.BookDatabaseService;
 import service.FilmDatabaseService;
+import state.ApplicationState;
 import state.BorrowItemInterface;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MainMenuController extends Controller {
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
     public Button LogOutButton;
     public Button ShowProfileButton;
     public Button EmployeeViewButton;
@@ -102,7 +104,8 @@ public class MainMenuController extends Controller {
 
                 ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInBookSearchTable.setItems(data);
-                System.out.println("Rows added to table: " + data.size() + " Bok");
+                if (DEBUGPRINTOUTS)
+                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Bok");
 
                 //Sätter in det returnerade värdet från sökningens titel i titelkolumnen osv (Ligger här för att dela upp det mellan bok,film, och tidsskrift)
                 titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
@@ -132,7 +135,8 @@ public class MainMenuController extends Controller {
 
                 ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInFilmSearchTable.setItems(data);
-                System.out.println("Rows added to table: " + data.size() + " Film");
+                if (DEBUGPRINTOUTS)
+                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Film");
 
                 filmTitleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
                 productionCountryColumn.setCellValueFactory(new PropertyValueFactory<>("produktionsland"));
@@ -170,6 +174,7 @@ public class MainMenuController extends Controller {
             e.printStackTrace();
         }
     }
+
     public void onLogOutButtonClick(ActionEvent actionEvent) {
         //FIXME: Logga ut ordentligt :|
     }
@@ -267,11 +272,12 @@ public class MainMenuController extends Controller {
 
     @Override
     public void update(Observable o, Object arg) {
+        if(arg != ApplicationState.UpdateType.USER) return;
         String currentUserType = super.getState().getCurrentUser().getAnvändartyp().getAnvändartyp();
         if (currentUserType == null) {
-            System.out.println("Ingen e inloggad");
-        } else if(currentUserType.equals("bibliotekarie")) {
-            System.out.println("Bibliotekarie inloggad");
+            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Ingen e inloggad");
+        } else if (currentUserType.equals("bibliotekarie")) {
+            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Bibliotekarie inloggad");
             LogOutButton.setVisible(true);
             System.out.println("Bibliotekarie inloggad");
             ShowProfileButton.setVisible(true);
@@ -290,6 +296,7 @@ public class MainMenuController extends Controller {
 
     public void tableViewMouseClick(javafx.scene.input.MouseEvent mouseEvent) {
         //Skriver ut i konsol för testsyfte
-        System.out.println(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
+        if (DEBUGPRINTOUTS)
+            System.out.println("MainMenuController: " + notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
     }
 }

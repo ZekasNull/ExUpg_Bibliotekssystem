@@ -7,7 +7,9 @@ import state.BorrowItemInterface;
 
 import javax.persistence.*;
 import javax.swing.text.html.Option;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +31,9 @@ public class DatabaseService {
     @SuppressWarnings("unchecked") //shush java
     public List<Lån> visaEjÅterlämnadeBöcker () {
         List<Lån> försenade;
-        Timestamp returdatum;
 
         EntityManager em = DBC.getEntityManager();
-        Query returnDateQuery = em.createNativeQuery(
-                "SELECT lånedatum + lånperiod " +
-                        "FROM bibliotekssystem.\"Lån\" l " +
-                        "JOIN bibliotekssystem.\"Exemplar\" e ON l.streckkod = e.streckkod " +
-                        "JOIN bibliotekssystem.\"Låneperiod\" lp ON e.låntyp = lp.låntyp " +
-                        "WHERE l.lån_id = ?");
+
 
         Query loanQuery = em.createNativeQuery("SELECT * FROM bibliotekssystem.sf_find_overdue_loans()", Lån.class);
 
@@ -48,9 +44,7 @@ public class DatabaseService {
             försenade = loanQuery.getResultList();
 
             for (Lån l : försenade) {
-                returnDateQuery.setParameter(1, l.getId());
-                returdatum = (Timestamp) returnDateQuery.getSingleResult();
-                l.setReturDatum(returdatum.toInstant());
+                l.setReturDatum(getReturnDateForLoan(l));
             }
             em.getTransaction().commit();
             return försenade;
@@ -59,6 +53,23 @@ public class DatabaseService {
             em.close();
         }
 
+
+    }
+
+    public Instant getReturnDateForLoan(Lån lån) {
+
+        EntityManager em = DBC.getEntityManager();
+        Query returnDateQuery = em.createNamedQuery("getReturnDate");
+        returnDateQuery.setParameter(1, lån.getId());
+
+        try {
+            em.getTransaction().begin();
+            Timestamp returdatum = (Timestamp) returnDateQuery.getSingleResult();
+            em.getTransaction().commit();
+            return returdatum.toInstant();
+        } finally {
+            em.close();
+        }
 
     }
 

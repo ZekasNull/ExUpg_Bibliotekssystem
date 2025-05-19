@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "Bok"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Bok"
 (
     bok_id  INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -8,9 +8,9 @@ CREATE TABLE IF NOT EXISTS "Bok"
     titel   VARCHAR(50) NOT NULL
 );
 
-COMMENT ON CONSTRAINT bok_isbn_ak ON "Bok" IS 'ISBN är alltid unikt';
+COMMENT ON CONSTRAINT bok_isbn_ak ON bibliotekssystem."Bok" IS 'ISBN är alltid unikt';
 
-CREATE TABLE IF NOT EXISTS "Ämnesord"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Ämnesord"
 (
     ord_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -19,22 +19,22 @@ CREATE TABLE IF NOT EXISTS "Ämnesord"
             UNIQUE
 );
 
-COMMENT ON CONSTRAINT "Ämnesord_pk" ON "Ämnesord" IS 'Ämnesord måste vara unika';
+COMMENT ON CONSTRAINT "Ämnesord_pk" ON bibliotekssystem."Ämnesord" IS 'Ämnesord måste vara unika';
 
-CREATE TABLE IF NOT EXISTS "Bok_Ämnesord"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Bok_Ämnesord"
 (
     ord_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Ämnesord.ord_id"
-            REFERENCES "Ämnesord"
+            REFERENCES bibliotekssystem."Ämnesord"
             ON UPDATE CASCADE ON DELETE CASCADE,
     bok_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Ämnesord.bok_id"
-            REFERENCES "Bok"
+            REFERENCES bibliotekssystem."Bok"
             ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (ord_jc_id, bok_jc_id)
 );
 
-CREATE TABLE IF NOT EXISTS "Författare"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Författare"
 (
     författare_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -42,20 +42,20 @@ CREATE TABLE IF NOT EXISTS "Författare"
     efternamn     VARCHAR(25) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Bok_Författare"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Bok_Författare"
 (
     bok_jc_id        INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Författare.bok_id"
-            REFERENCES "Bok"
+            REFERENCES bibliotekssystem."Bok"
             ON UPDATE CASCADE ON DELETE CASCADE,
     författare_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Bok_Författare.författare_id"
-            REFERENCES "Författare"
+            REFERENCES bibliotekssystem."Författare"
             ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (bok_jc_id, författare_jc_id)
 );
 
-CREATE TABLE IF NOT EXISTS "Skådespelare"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Skådespelare"
 (
     skådespelare_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS "Skådespelare"
     efternamn       VARCHAR(25) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Film"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Film"
 (
     film_id         INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -72,20 +72,20 @@ CREATE TABLE IF NOT EXISTS "Film"
     åldersgräns     INTEGER DEFAULT 0 NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Film_Skådespelare"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Film_Skådespelare"
 (
     skådespelare_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Film_Skådespelare.skådespelare_id"
-            REFERENCES "Skådespelare"
+            REFERENCES bibliotekssystem."Skådespelare"
             ON UPDATE CASCADE ON DELETE CASCADE,
     film_jc_id         INTEGER NOT NULL
         CONSTRAINT "FK_Film_Skådespelare.film_id"
-            REFERENCES "Film"
+            REFERENCES bibliotekssystem."Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (skådespelare_jc_id, film_jc_id)
 );
 
-CREATE TABLE IF NOT EXISTS "Regissör"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Regissör"
 (
     regissör_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -93,20 +93,20 @@ CREATE TABLE IF NOT EXISTS "Regissör"
     efternamn   VARCHAR(25) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Film_Regissör"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Film_Regissör"
 (
     film_jc_id     INTEGER NOT NULL
         CONSTRAINT "FK_Film_Regissör.film_id"
-            REFERENCES "Film"
+            REFERENCES bibliotekssystem."Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
     regissör_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Film_Regissör.regissör_id"
-            REFERENCES "Regissör"
+            REFERENCES bibliotekssystem."Regissör"
             ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (film_jc_id, regissör_jc_id)
 );
 
-CREATE TABLE IF NOT EXISTS "Genre"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Genre"
 (
     genre_id   INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -115,35 +115,35 @@ CREATE TABLE IF NOT EXISTS "Genre"
             UNIQUE
 );
 
-COMMENT ON CONSTRAINT genre_pk ON "Genre" IS 'Genre måste vara unik';
+COMMENT ON CONSTRAINT genre_pk ON bibliotekssystem."Genre" IS 'Genre måste vara unik';
 
-CREATE TABLE IF NOT EXISTS "Film_Genre"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Film_Genre"
 (
     film_jc_id  INTEGER NOT NULL
         CONSTRAINT "FK_Film_Genre.film_id"
-            REFERENCES "Film"
+            REFERENCES bibliotekssystem."Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
     genre_jc_id INTEGER NOT NULL
         CONSTRAINT "FK_Film_Genre.genre_id"
-            REFERENCES "Genre"
+            REFERENCES bibliotekssystem."Genre"
             ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY (film_jc_id, genre_jc_id)
 );
 
-CREATE TABLE IF NOT EXISTS "Användartyp"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Användartyp"
 (
     användartyp_id VARCHAR(20) NOT NULL
         PRIMARY KEY,
     max_lån        SMALLINT    NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Användare"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Användare"
 (
     användare_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
     användartyp  VARCHAR(20) NOT NULL
         CONSTRAINT "FK_Användare.användartyp"
-            REFERENCES "Användartyp"
+            REFERENCES bibliotekssystem."Användartyp"
             ON UPDATE CASCADE ON DELETE RESTRICT,
     användarnamn VARCHAR(10) NOT NULL
         CONSTRAINT användare_pk
@@ -152,52 +152,52 @@ CREATE TABLE IF NOT EXISTS "Användare"
     fullt_namn   VARCHAR(50) NOT NULL
 );
 
-COMMENT ON CONSTRAINT användare_pk ON "Användare" IS 'Användarnamn måste vara unikt';
+COMMENT ON CONSTRAINT användare_pk ON bibliotekssystem."Användare" IS 'Användarnamn måste vara unikt';
 
-CREATE TABLE IF NOT EXISTS "Låneperiod"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Låneperiod"
 (
     låntyp    VARCHAR(20) NOT NULL
         PRIMARY KEY,
     lånperiod INTERVAL    NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Exemplar"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Exemplar"
 (
     streckkod   INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
     film_id     INTEGER
         CONSTRAINT "FK_Exemplar.film_id"
-            REFERENCES "Film"
+            REFERENCES bibliotekssystem."Film"
             ON UPDATE CASCADE ON DELETE CASCADE,
     bok_id      INTEGER
         CONSTRAINT "FK_Exemplar.bok_id"
-            REFERENCES "Bok"
+            REFERENCES bibliotekssystem."Bok"
             ON UPDATE CASCADE ON DELETE CASCADE,
     låntyp      VARCHAR(20)          NOT NULL
         CONSTRAINT "FK_Exemplar.låntyp"
-            REFERENCES "Låneperiod"
+            REFERENCES bibliotekssystem."Låneperiod"
             ON UPDATE CASCADE ON DELETE RESTRICT,
     tillgänglig BOOLEAN DEFAULT TRUE NOT NULL,
     CONSTRAINT must_have_single_id
         CHECK (((film_id IS NULL) AND (bok_id IS NOT NULL)) OR ((bok_id IS NULL) AND (film_id IS NOT NULL)))
 );
 
-CREATE TABLE IF NOT EXISTS "Lån"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Lån"
 (
     lån_id       INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
     streckkod    INTEGER                          NOT NULL
         CONSTRAINT "FK_Lån.streckkod"
-            REFERENCES "Exemplar"
+            REFERENCES bibliotekssystem."Exemplar"
             ON UPDATE RESTRICT ON DELETE CASCADE,
     användare_id INTEGER                          NOT NULL
         CONSTRAINT "FK_Lån.användare_id"
-            REFERENCES "Användare"
+            REFERENCES bibliotekssystem."Användare"
             ON UPDATE CASCADE ON DELETE CASCADE,
     lånedatum    TIMESTAMP DEFAULT LOCALTIMESTAMP NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Tidskrift"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Tidskrift"
 (
     tidskrift_id INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
@@ -206,21 +206,21 @@ CREATE TABLE IF NOT EXISTS "Tidskrift"
             UNIQUE
 );
 
-COMMENT ON CONSTRAINT tidskrift_pk ON "Tidskrift" IS 'Tidskriftens namn måste vara unikt';
+COMMENT ON CONSTRAINT tidskrift_pk ON bibliotekssystem."Tidskrift" IS 'Tidskriftens namn måste vara unikt';
 
-CREATE TABLE IF NOT EXISTS "Upplaga"
+CREATE TABLE IF NOT EXISTS bibliotekssystem."Upplaga"
 (
     upplaga_id   INTEGER GENERATED ALWAYS AS IDENTITY
         PRIMARY KEY,
     tidskrift_id INTEGER NOT NULL
         CONSTRAINT "FK_Upplaga.tidsskrift_id"
-            REFERENCES "Tidskrift"
+            REFERENCES bibliotekssystem."Tidskrift"
             ON UPDATE CASCADE ON DELETE RESTRICT,
     upplaga_nr   INTEGER NOT NULL,
     år           INTEGER NOT NULL
 );
 
-CREATE OR REPLACE VIEW vy_bok_info(bok_id, titel, isbn_13, författare, ämnesord) AS
+CREATE OR REPLACE VIEW bibliotekssystem.vy_bok_info(bok_id, titel, isbn_13, författare, ämnesord) AS
 SELECT b.bok_id,
        b.titel,
        b.isbn_13,
@@ -233,10 +233,11 @@ FROM bibliotekssystem."Bok" b
          LEFT JOIN bibliotekssystem."Ämnesord" a ON ba.ord_jc_id = a.ord_id
 GROUP BY b.bok_id, b.titel, b.isbn_13;
 
-CREATE OR REPLACE PROCEDURE sp_lägg_till_bok(IN p_bok_titel TEXT, IN p_isbn_13 CHARACTER VARYING,
-                                             IN "p_ämnesord_arr" TEXT[], IN "p_förf_förnamn" CHARACTER VARYING,
-                                             IN "p_förf_efternamn" CHARACTER VARYING, OUT status_kod INTEGER,
-                                             OUT status_meddelande TEXT)
+CREATE OR REPLACE PROCEDURE bibliotekssystem.sp_lägg_till_bok(IN p_bok_titel TEXT, IN p_isbn_13 CHARACTER VARYING,
+                                                              IN "p_ämnesord_arr" TEXT[],
+                                                              IN "p_förf_förnamn" CHARACTER VARYING,
+                                                              IN "p_förf_efternamn" CHARACTER VARYING,
+                                                              OUT status_kod INTEGER, OUT status_meddelande TEXT)
     LANGUAGE plpgsql
 AS
 $$
@@ -321,14 +322,16 @@ EXCEPTION
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE sp_lägg_till_film(IN p_titel CHARACTER VARYING, IN p_produktionsland CHARACTER VARYING,
-                                              IN "p_åldersgräns" INTEGER,
-                                              IN "p_regissör_förnamn_arr" CHARACTER VARYING[],
-                                              IN "p_regissör_efternamn_arr" CHARACTER VARYING[],
-                                              IN "p_skådespelare_förnamn_arr" CHARACTER VARYING[],
-                                              IN "p_skådespelare_efternamn_arr" CHARACTER VARYING[],
-                                              IN p_genrenamn_arr CHARACTER VARYING[], OUT debug_status_code INTEGER,
-                                              OUT debug_status_message TEXT)
+CREATE OR REPLACE PROCEDURE bibliotekssystem.sp_lägg_till_film(IN p_titel CHARACTER VARYING,
+                                                               IN p_produktionsland CHARACTER VARYING,
+                                                               IN "p_åldersgräns" INTEGER,
+                                                               IN "p_regissör_förnamn_arr" CHARACTER VARYING[],
+                                                               IN "p_regissör_efternamn_arr" CHARACTER VARYING[],
+                                                               IN "p_skådespelare_förnamn_arr" CHARACTER VARYING[],
+                                                               IN "p_skådespelare_efternamn_arr" CHARACTER VARYING[],
+                                                               IN p_genrenamn_arr CHARACTER VARYING[],
+                                                               OUT debug_status_code INTEGER,
+                                                               OUT debug_status_message TEXT)
     LANGUAGE plpgsql
 AS
 $$
@@ -426,7 +429,7 @@ EXCEPTION
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION st_check_loan_limit() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION bibliotekssystem.st_check_loan_limit() RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
 $$
@@ -445,14 +448,15 @@ $$;
 
 CREATE TRIGGER check_loan_limit_trigger
     BEFORE INSERT
-    ON "Lån"
+    ON bibliotekssystem."Lån"
     FOR EACH ROW
-EXECUTE PROCEDURE st_check_loan_limit();
+EXECUTE PROCEDURE bibliotekssystem.st_check_loan_limit();
 
-CREATE OR REPLACE FUNCTION sf_sök_böcker_avancerad(i_titel TEXT DEFAULT NULL::TEXT, i_isbn TEXT DEFAULT NULL::TEXT,
-                                                   "i_förnamn" TEXT DEFAULT NULL::TEXT,
-                                                   i_efternamn TEXT DEFAULT NULL::TEXT,
-                                                   "i_ämnesord" TEXT[] DEFAULT NULL::TEXT[])
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_sök_böcker_avancerad(i_titel TEXT DEFAULT NULL::TEXT,
+                                                                    i_isbn TEXT DEFAULT NULL::TEXT,
+                                                                    "i_förnamn" TEXT DEFAULT NULL::TEXT,
+                                                                    i_efternamn TEXT DEFAULT NULL::TEXT,
+                                                                    "i_ämnesord" TEXT[] DEFAULT NULL::TEXT[])
     RETURNS TABLE
             (
                 bok_id       INTEGER,
@@ -497,7 +501,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION sf_get_return_date(loan_id INTEGER) RETURNS DATE
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_get_return_date(loan_id INTEGER) RETURNS DATE
     LANGUAGE plpgsql
 AS
 $$
@@ -506,16 +510,16 @@ DECLARE
 BEGIN
     SELECT l.lånedatum + lp.lånperiod
     INTO return_date
-    FROM "Lån" l
-             JOIN "Exemplar" e ON l.streckkod = e.streckkod
-             JOIN "Låneperiod" lp ON e.låntyp = lp.låntyp
+    FROM bibliotekssystem."Lån" l
+             JOIN bibliotekssystem."Exemplar" e ON l.streckkod = e.streckkod
+             JOIN bibliotekssystem."Låneperiod" lp ON e.låntyp = lp.låntyp
     WHERE l.streckkod = loan_id;
 
     RETURN return_date;
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION sf_sök_böcker_enkel("i_sökterm" TEXT)
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_sök_böcker_enkel("i_sökterm" TEXT)
     RETURNS TABLE
             (
                 bok_id       INTEGER,
@@ -550,7 +554,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION st_uppdatera_exemplar_tillgänglighet() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION bibliotekssystem.st_uppdatera_exemplar_tillgänglighet() RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
 $$
@@ -573,11 +577,11 @@ $$;
 
 CREATE TRIGGER trg_uppdatera_exemplar_tillgänglighet
     AFTER INSERT OR DELETE
-    ON "Lån"
+    ON bibliotekssystem."Lån"
     FOR EACH ROW
-EXECUTE PROCEDURE st_uppdatera_exemplar_tillgänglighet();
+EXECUTE PROCEDURE bibliotekssystem.st_uppdatera_exemplar_tillgänglighet();
 
-CREATE OR REPLACE FUNCTION sf_getcurrentloanscount("användarid" INTEGER) RETURNS INTEGER
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_getcurrentloanscount("användarid" INTEGER) RETURNS INTEGER
     STABLE
     LANGUAGE plpgsql
 AS
@@ -594,7 +598,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION sf_getloanlimit("användarid" INTEGER) RETURNS INTEGER
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_getloanlimit("användarid" INTEGER) RETURNS INTEGER
     LANGUAGE plpgsql
 AS
 $$
@@ -611,7 +615,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION sf_find_overdue_loans()
+CREATE OR REPLACE FUNCTION bibliotekssystem.sf_find_overdue_loans()
     RETURNS TABLE
             (
                 "lån_id"       INTEGER,
@@ -632,7 +636,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION st_låneexemplar_måste_vara_tillgängligt() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION bibliotekssystem.st_låneexemplar_måste_vara_tillgängligt() RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
 $$
@@ -651,7 +655,7 @@ $$;
 
 CREATE TRIGGER trigger_check_copy_availability
     BEFORE INSERT
-    ON "Lån"
+    ON bibliotekssystem."Lån"
     FOR EACH ROW
-EXECUTE PROCEDURE st_låneexemplar_måste_vara_tillgängligt();
+EXECUTE PROCEDURE bibliotekssystem.st_låneexemplar_måste_vara_tillgängligt();
 

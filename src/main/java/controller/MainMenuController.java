@@ -208,7 +208,7 @@ public class MainMenuController extends Controller {
         BorrowTable.setItems(state.getBorrowList());
         BorrowListColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
 
-        System.out.println(state.getBorrowList().size() + " rows added to Låna");
+        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: " + state.getBorrowList().size() + " rows added to Låna");
     }
 
     public void onBorrowAllButtonClick(ActionEvent actionEvent) throws Exception{
@@ -234,8 +234,10 @@ public class MainMenuController extends Controller {
         try {
             state.databaseService.läggTillNyaObjekt(nyaLån);
 
-        } catch (Exception e) {
+        } catch (PSQLException e) {
+            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Caught error trying to register loans");
             showErrorPopup("Kunde inte registrera lån: " + e.getMessage());
+            return;
         }
 
 
@@ -250,9 +252,11 @@ public class MainMenuController extends Controller {
             state.notifyObservers();
 
         } catch (PSQLException e) {
+            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Caught error trying to register loans");
             String msg = e.getMessage();
             if (msg != null && msg.contains("redan utlånat")) {
                 showErrorPopup("Du kan ej låna fler objekt");
+                return;
             } else {
                 throw e;
             }
@@ -261,7 +265,7 @@ public class MainMenuController extends Controller {
 
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("Update called");
+        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Update called");
         if(arg != ApplicationState.UpdateType.USER) return;
         if (super.getState().getCurrentUser() == null) {
             if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Ingen e inloggad");
@@ -274,7 +278,6 @@ public class MainMenuController extends Controller {
         } else if (state.getCurrentUser().getAnvändartyp().getAnvändartyp().equals("bibliotekarie")) {
             if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Bibliotekarie inloggad");
             LogOutButton.setVisible(true);
-            System.out.println("Bibliotekarie inloggad");
             ShowProfileButton.setVisible(true);
             EmployeeViewButton.setVisible(true);
             LogInViewButton.setVisible(false);

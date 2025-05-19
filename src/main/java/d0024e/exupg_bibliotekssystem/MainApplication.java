@@ -4,12 +4,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import state.ApplicationState;
 
-import javax.swing.text.View;
-
 public class MainApplication extends Application {
     public static final boolean DEBUGPRINTS = true;
     private ApplicationState APPSTATE;
-    private Stage primaryStage;
 
     public MainApplication() {
     }
@@ -22,8 +19,8 @@ public class MainApplication extends Application {
 
     @Override //Starts the program and sets up the primaryStage
     public void start(Stage var1) throws Exception {
-        ViewLoader.initialize(var1, APPSTATE);
-        ViewLoader.setView("Huvudmeny");
+        APPSTATE.vy.initialize(var1);
+        APPSTATE.vy.setView("Huvudmeny");
     }
     public static void main(String[] args) {
         launch(args);

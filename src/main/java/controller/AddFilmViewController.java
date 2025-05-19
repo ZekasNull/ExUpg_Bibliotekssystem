@@ -405,7 +405,7 @@ public class AddFilmViewController extends Controller {
 
     @FXML
     void cancelButtonPressed(ActionEvent event) {
-        ViewLoader.setView("Hantera inventarie");
+        super.getState().vy.setView("Hantera inventarie");
     }
 
     @FXML

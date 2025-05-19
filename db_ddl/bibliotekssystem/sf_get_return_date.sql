@@ -7,9 +7,9 @@ DECLARE
 BEGIN
     SELECT l.lånedatum + lp.lånperiod
     INTO return_date
-    FROM "Lån" l
-             JOIN "Exemplar" e ON l.streckkod = e.streckkod
-             JOIN "Låneperiod" lp ON e.låntyp = lp.låntyp
+    FROM bibliotekssystem."Lån" l
+             JOIN bibliotekssystem."Exemplar" e ON l.streckkod = e.streckkod
+             JOIN bibliotekssystem."Låneperiod" lp ON e.låntyp = lp.låntyp
     WHERE l.streckkod = loan_id;
 
     RETURN return_date;

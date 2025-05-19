@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class MainMenuController extends Controller {
     private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
+    private ApplicationState state = ApplicationState.getInstance();
     public Button LogOutButton;
     public Button ShowProfileButton;
     public Button EmployeeViewButton;
@@ -54,7 +55,7 @@ public class MainMenuController extends Controller {
     public TableColumn<Film, String> genreColumn;
 
     public void onUserLogInViewButtonClick(ActionEvent actionEvent) throws IOException {
-        super.getState().vy.loadPopup("login-view.fxml", "Log in view");
+        state.vy.loadPopup("login-view.fxml", "Log in view");
         //ger pop-up istället för utbyte av scenen som viewloader skulle
     }
 
@@ -95,7 +96,7 @@ public class MainMenuController extends Controller {
         }
         try{
             if(selectedObjectType.equals("Bok")){
-                List<Bok> searchTerm = super.getState().databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
+                List<Bok> searchTerm = state.databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
 
                 ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInBookSearchTable.setItems(data);
@@ -126,7 +127,7 @@ public class MainMenuController extends Controller {
                 });
             }
             else if (selectedObjectType.equals("Film")){
-                List<Film> searchTerm = super.getState().databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
+                List<Film> searchTerm = state.databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
 
                 ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
                 notLoggedInFilmSearchTable.setItems(data);
@@ -171,20 +172,20 @@ public class MainMenuController extends Controller {
     }
 
     public void onLogOutButtonClick(ActionEvent actionEvent) {
-        //FIXME: Logga ut ordentligt :|
+        super.getState().setCurrentUser(null);
     }
 
     public void onShowProfileButtonClick(ActionEvent actionEvent) {
-        ViewLoader.setView("Profil");
+        state.vy.setView("Profil");
     }
 
     public void onEmployeeViewButton(ActionEvent actionEvent) {
-        ViewLoader.setView("Bibliotikaries första val");
+        state.vy.setView("Bibliotikaries första val");
     }
 
     public void onBorrowObjectButtonClick(ActionEvent actionEvent) {
         //Kolla så användaren är inloggad
-        if (super.getState().getCurrentUser() == null) {
+        if (state.getCurrentUser() == null) {
             showErrorPopup("Du måste logga in för att låna objekt");
             return;
         }
@@ -203,18 +204,18 @@ public class MainMenuController extends Controller {
             return;
         }
 
-        super.getState().getBorrowList().add(selectedItem);
-        BorrowTable.setItems(super.getState().getBorrowList());
+        state.getBorrowList().add(selectedItem);
+        BorrowTable.setItems(state.getBorrowList());
         BorrowListColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
 
-        System.out.println(super.getState().getBorrowList().size() + " rows added to Låna");
+        System.out.println(state.getBorrowList().size() + " rows added to Låna");
     }
 
     public void onBorrowAllButtonClick(ActionEvent actionEvent) throws Exception{
         //Koll görs automatiskt av databasen på om det finns exemplar tillgängliga, samt så uppdaterar den tillgängligheten där
 
         //Hämtar och kollar att själva lånelistan inte är tom
-        List<BorrowItemInterface> borrowList = super.getState().getBorrowList();
+        List<BorrowItemInterface> borrowList = state.getBorrowList();
         if (borrowList.isEmpty()) {
             showErrorPopup("Lånelistan är tom");
             return;
@@ -225,13 +226,13 @@ public class MainMenuController extends Controller {
         for (BorrowItemInterface item : borrowList) {
             for (Exemplar exemplar : item.getExemplars()) {
                 Lån lån = new Lån();
-                lån.setAnvändare(super.getState().getCurrentUser());
+                lån.setAnvändare(state.getCurrentUser());
                 lån.setStreckkod(exemplar);
                 nyaLån.add(lån);
             }
         }
         try {
-            super.getState().databaseService.läggTillNyaObjekt(nyaLån);
+            state.databaseService.läggTillNyaObjekt(nyaLån);
 
         } catch (Exception e) {
             showErrorPopup("Kunde inte registrera lån: " + e.getMessage());
@@ -240,11 +241,13 @@ public class MainMenuController extends Controller {
 
         try {
             //Se till att lånet blir registrerat i datbasen
-            super.getState().databaseService.läggTillNyaObjekt(nyaLån);
+            state.databaseService.läggTillNyaObjekt(nyaLån);
 
-            Användare updatedUser = super.getState().getCurrentUser();
-            super.getState().getCurrentUser().setLåns(updatedUser.getLåns());
-            super.getState().getBorrowList().clear();
+            Användare updatedUser = state.getCurrentUser();
+            state.getCurrentUser().setLåns(updatedUser.getLåns());
+            state.getBorrowList().clear();
+
+            state.notifyObservers();
 
         } catch (PSQLException e) {
             String msg = e.getMessage();
@@ -258,11 +261,17 @@ public class MainMenuController extends Controller {
 
     @Override
     public void update(Observable o, Object arg) {
+        System.out.println("Update called");
         if(arg != ApplicationState.UpdateType.USER) return;
-        String currentUserType = super.getState().getCurrentUser().getAnvändartyp().getAnvändartyp();
-        if (currentUserType == null) {
+        if (super.getState().getCurrentUser() == null) {
             if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Ingen e inloggad");
-        } else if (currentUserType.equals("bibliotekarie")) {
+            LogOutButton.setVisible(false);
+            ShowProfileButton.setVisible(false);
+            EmployeeViewButton.setVisible(false);
+            LogInViewButton.setVisible(true);
+            BorrowObjectButton.setOpacity(0.5);
+            BorrowAllButton.setVisible(false);
+        } else if (state.getCurrentUser().getAnvändartyp().getAnvändartyp().equals("bibliotekarie")) {
             if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Bibliotekarie inloggad");
             LogOutButton.setVisible(true);
             System.out.println("Bibliotekarie inloggad");

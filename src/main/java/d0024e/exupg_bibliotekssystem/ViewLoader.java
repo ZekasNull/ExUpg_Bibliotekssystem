@@ -15,13 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ViewLoader extends Controller {
-    private static ApplicationState APPSTATE;
-    private static BorderPane rootLayout;
+    private BorderPane rootLayout;
+    private ApplicationState APPSTATE;
 
-    private static final Map<String, Node> views = new HashMap<>();
+    private Map<String, Node> views = new HashMap<>();
 
-    public static void initialize(Stage primaryStage, ApplicationState state) throws IOException {
-        APPSTATE = state;
+    public void initialize(Stage primaryStage) throws IOException {
+        APPSTATE = ApplicationState.getInstance();
         rootLayout = new BorderPane();
         Scene scene = new Scene(rootLayout);
         primaryStage.setScene(scene);
@@ -38,30 +38,29 @@ public class ViewLoader extends Controller {
         setView("Huvudmeny");
     }
 
-    private static void loadAndStoreView(String name, String fxmlPath) throws IOException {
+    private void loadAndStoreView(String name, String fxmlPath) throws IOException {
         FXMLLoader loader = new FXMLLoader(ViewLoader.class.getResource(fxmlPath));
         Parent view = loader.load();
 
         Controller controller = loader.getController();
         controller.setState(APPSTATE);
+        APPSTATE.addObserver(controller);
 
-        if (controller instanceof ShowProfileViewController profileController) {
-            profileController.loadData();
+
+        if (controller instanceof ShowProfileViewController) {
+            ((ShowProfileViewController) controller).loadData();
         }
 
         views.put(name, view);
     }
 
-    public static void setView(String name) {
+    public void setView(String name) {
         Node view = views.get(name);
         if (view != null) {
             rootLayout.setCenter(view);
         } else {
             System.err.println("View '" + name + "' not found.");
         }
-    }
-    public static BorderPane getRootLayout() {
-        return rootLayout;
     }
     public void loadPopup(String fxmlFile, String title) throws IOException {
         try{

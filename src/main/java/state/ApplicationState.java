@@ -29,7 +29,6 @@ public class ApplicationState extends Observable {
     public final DatabaseService databaseService;
     private static ApplicationState instance;
     public ViewLoader vy;
-    public BookDatabaseService bdbs;
 
     //data
     private List<Bok> bookSearchResults;
@@ -59,6 +58,7 @@ public class ApplicationState extends Observable {
     }
     private ApplicationState() {
         this.databaseService = new DatabaseService();
+        this.vy = new ViewLoader();
     }
 
     public List<Bok> getBookSearchResults() {

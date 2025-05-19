@@ -29,16 +29,50 @@ public class ShowProfileViewController extends Controller{
     public TableView<Lån> UserShowProfileViewLoanTable;
     public TableColumn<Lån, String> TitleColumn;
     public TableColumn<Lån, String> BarcodeColumn;
-    public TableColumn<Lån, String> BorrowDateColumn;
-    public TableColumn<Lån, Instant > ReturnDateColumn;
+    public TableColumn<Lån, Instant> BorrowDateColumn;
+    public TableColumn<Lån, Instant> ReturnDateColumn;
     public Button ReturnLoanButton;
 
 
     public void initialize() {
     }
-
+//Ger upp, chatgpt i loadData
     public void loadData() {
-        if (super.getState() == null) return; //Just-in-case
+        if (super.getState().getCurrentUser() == null) return;
+
+        Set<Lån> loansSet = super.getState().getCurrentUser().getLåns();
+
+        // ❶ fetch return‑date once per loan and store in the transient field
+        for (Lån l : loansSet) {
+            Instant rd = super.getState().databaseService.getReturnDateForLoan(l);
+            l.setReturDatum(rd);          // fills the transient field
+        }
+
+        // ❷ convert to observable list & bind table
+        ObservableList<Lån> loans = FXCollections.observableArrayList(loansSet);
+        UserShowProfileViewLoanTable.setItems(loans);
+
+        // --- column factories ---
+        TitleColumn.setCellValueFactory(cd -> {
+            var ex = cd.getValue().getStreckkod();
+            String title = ex.getBok() != null
+                    ? ex.getBok().getTitel()
+                    : ex.getFilm_id().getTitel();
+            return new SimpleStringProperty(title);
+        });
+
+        BarcodeColumn.setCellValueFactory(cd ->
+                new SimpleStringProperty(cd.getValue()
+                        .getStreckkod()
+                        .getStreckkod()
+                        .toString()));
+
+        BorrowDateColumn.setCellValueFactory(new PropertyValueFactory<>("lånedatum"));
+
+        ReturnDateColumn.setCellValueFactory(cd ->
+                new SimpleObjectProperty<>(super.getState().databaseService.getReturnDateForLoan(cd.getValue())));
+
+        /*if (super.getState() .getCurrentUser() == null) return; //Just-in-case
         System.out.println("loadData was called");
 
         System.out.println(super.getState().getCurrentUser().getLåns());
@@ -48,21 +82,24 @@ public class ShowProfileViewController extends Controller{
         ObservableList<Lån> loans = FXCollections.observableArrayList(loansSet);
 
         UserShowProfileViewLoanTable.setItems(loans);
-        TitleColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getStreckkod().getTitle()));
+        TitleColumn.setCellValueFactory(cellData -> {
+            var streckkod = cellData.getValue().getStreckkod();
+            if(streckkod.getBok() == null) {
+                return new SimpleStringProperty(streckkod.getFilm_id().getTitel());
+            }
+            else{
+                return new SimpleStringProperty(streckkod.getBok().getTitel());
+            }
+        });
         BarcodeColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getStreckkod().getStreckkod().toString()));
-        BorrowDateColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getLånedatum().toString()));
-        ReturnDateColumn.setCellValueFactory(cellData -> {
-                Lån lån = cellData.getValue();
-                Instant returnDate = super.getState().databaseService.getReturnDateForLoan(lån);
-                return new SimpleObjectProperty<>(returnDate);
-        });
+        BorrowDateColumn.setCellValueFactory(new PropertyValueFactory<>("lånedatum"));
+        ReturnDateColumn.setCellValueFactory(new PropertyValueFactory<>("returDatum"));*/
+
     }
 
     public void onReturnToMainMenuButtonClick(ActionEvent actionEvent) {
-        ViewLoader.setView("Huvudmeny");
+        super.getState().vy.setView("Huvudmeny");
     }
 
     public void onReturnLoanButtonClick(ActionEvent actionEvent) throws PSQLException {

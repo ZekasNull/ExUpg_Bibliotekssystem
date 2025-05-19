@@ -339,7 +339,7 @@ public class AddBookViewController extends Controller {
         if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
             setWindowToDefaultState();
         } else {
-            ViewLoader.setView("Hantera inventarie");
+            super.getState().vy.setView("Hantera inventarie");
         }
     }
 
@@ -676,7 +676,23 @@ public class AddBookViewController extends Controller {
      * TODO ska skötas av ViewLoader
      */
     private void openSearchWindow() throws IOException {
-        super.getState().vy.loadPopup("smallSearchWindow.fxml", "Sök böcker");
+        //super.getState().vy.loadPopup("smallSearchWindow.fxml", "Sök böcker");
+        Stage searchWindow = new Stage();
+        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("smallSearchWindow.fxml"));
+        Scene searchwindow = new Scene(loader.load());
+
+        //hämta referens till controller
+        SmallSearchWindowController controller = loader.getController();
+        controller.setState(getState()); //ge referens till appstate
+        controller.setStage(searchWindow);
+        controller.setMode(SmallSearchWindowController.Mode.BOK);
+
+        searchWindow.setTitle("Search window");
+        searchWindow.setScene(searchwindow);
+        searchWindow.initModality(Modality.APPLICATION_MODAL);
+
+        //ovanstående som metodanrop i konstruktor?
+        searchWindow.show();
     }
 
     /*

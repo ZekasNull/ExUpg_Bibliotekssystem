@@ -11,15 +11,15 @@ public class LibrarianFirstChoiceViewController extends Controller{
     public Button GoBackToMainMenuButton;
 
     public void HandleInventoryClicked(MouseEvent mouseEvent) {
-        ViewLoader.setView("Hantera inventarie");
+        super.getState().vy.setView("Hantera inventarie");
     }
 
     public void HandleNotReturnedClick(MouseEvent mouseEvent) {
-        ViewLoader.setView("Ej återlämnade");
+        super.getState().vy.setView("Ej återlämnade");
     }
 
     public void onGoBackToMainMenuButtonClick(ActionEvent actionEvent) {
-        ViewLoader.setView("Huvudmeny");
+        super.getState().vy.setView("Huvudmeny");
     }
     @Override
     public void update(Observable o, Object arg) {

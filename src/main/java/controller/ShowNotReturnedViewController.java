@@ -93,6 +93,6 @@ public class ShowNotReturnedViewController extends Controller {
     }
 
     public void onGoBackToHandleInventoryClick(ActionEvent actionEvent) {
-        ViewLoader.setView("Hantera inventarie");
+        super.getState().vy.setView("Hantera inventarie");
     }
 }

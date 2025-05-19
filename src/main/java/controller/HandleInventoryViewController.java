@@ -15,15 +15,15 @@ public class HandleInventoryViewController extends Controller{
     public Button GoBackToFirstChoiceButton;
 
     public void onHandleBooksButtonClick(MouseEvent mouseEvent) {
-        ViewLoader.setView("Hantera böcker");
+        super.getState().vy.setView("Hantera böcker");
     }
 
     public void onHandleMoviesButtonClick(MouseEvent mouseEvent) {
-        ViewLoader.setView("Hantera filmer");
+        super.getState().vy.setView("Hantera filmer");
     }
 
     public void onGoBackToFirstChoiceButtonClick(ActionEvent actionEvent) {
-        ViewLoader.setView("Bibliotikaries första val");
+        super.getState().vy.setView("Bibliotikaries första val");
     }
 
     @Override

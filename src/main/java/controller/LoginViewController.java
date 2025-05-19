@@ -34,22 +34,20 @@ public class LoginViewController extends Controller{
         //TODO kontrollern ska ansvara för att analysera informationen i användaren som hämtas (dvs rätt användartyp)
         if (DEBUGPRINTOUTS) System.out.println("LoginViewController: onloginbutton");
         Användare user = state.databaseService.logInUser(idealBoxContents.getText(), pinBoxContents.getText());
+        showLoginConfirmationPopup(user != null);
         if (user != null) state.setCurrentUser(user);
 
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        if(arg != ApplicationState.UpdateType.USER) return;
-        if (DEBUGPRINTOUTS) System.out.println("LoginViewController: State changed");
-        boolean success = state.getCurrentUser() != null;
+    }
+
+    private void showLoginConfirmationPopup(boolean success) {
         Alert alert = new Alert(success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
         alert.setTitle("Information");
         alert.setHeaderText("Login attempt");
         alert.setContentText("The login attempt was" + (success ? "" : "n't") + " successful.");
-
-        if (DEBUGPRINTOUTS) System.out.println("LoginViewController: " + state.getCurrentUser());//Sanitycheck
-
         alert.showAndWait();
     }
 }

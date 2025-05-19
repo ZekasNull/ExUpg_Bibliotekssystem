@@ -1,6 +1,5 @@
 package test;
 
-import db.DatabaseService;
 import model.*;
 
 import javax.persistence.*;
@@ -11,13 +10,16 @@ public class db_test {
     private static EntityManagerFactory emf;
 
     public static void main(String[] args) throws Exception {
-        testBokSearchByTerm("sql");
-
-
+//       DatabaseService dbservice = new DatabaseService();
+//        Användare a = dbservice.logInUser("maxove-1", "0000");
+//        Lån[] låns = a.getLåns().toArray(new Lån[0]);
+//        for (Lån l : låns) {
+//            System.out.println(dbservice.getReturnDateForLoan(l));
+//        }
     }
 
     private static void testSkapaOchRaderaBokOchExemplar() throws Exception {
-        DatabaseService dbservice = new DatabaseService();
+        //DatabaseService dbservice = new DatabaseService();
         ArrayList<Object> testnylista = new ArrayList<>();
 
         //testa skapa ny bok ändra den boken, lägg till exemplar för boken, ta bort boken och exemplaret
@@ -41,7 +43,7 @@ public class db_test {
 
         //lägger till en bok, författare och ämnesord
         testnylista.add(testnybok); //gör till insert-lista för dbservice
-        dbservice.läggTillNyaObjekt(testnylista);
+        //dbservice.läggTillNyaObjekt(testnylista);
 
 
         //skapa exemplar
@@ -50,23 +52,23 @@ public class db_test {
         testex.setNewLåntyp("bok");
 
         testnylista.add(testex);
-        dbservice.läggTillNyaObjekt(testnylista);
+        //dbservice.läggTillNyaObjekt(testnylista);
 
         System.out.println("Nu radering - bör ta bort bok och exemplar");
-        Bok insertedBok = dbservice.searchAndGetBooks("0000000000013").get(0); //hämta id från db
-        ArrayList<Object> deletelist = new ArrayList<>(insertedBok.getExemplars());
-        deletelist.add(insertedBok);
+        //Bok insertedBok = dbservice.searchAndGetBooks("0000000000013").get(0); //hämta id från db
+        //ArrayList<Object> deletelist = new ArrayList<>(insertedBok.getExemplars());
+        //deletelist.add(insertedBok);
 
-        dbservice.raderaObjekt(deletelist);
+        //dbservice.raderaObjekt(deletelist);
         //obs! efteråt kommer testord och testförfattare fortfarande att finnas i db. cascade på sådant skulle riskera att en författare med andra böcker också tas bort, vilket inte tillåts av db's on delete.
     }
 
     private static void låntest() throws Exception {
-        DatabaseService test = new DatabaseService();
+        //DatabaseService test = new DatabaseService();
         Exemplar ex;
 
         //hämta användaren
-        Användare user = test.logInUser("maxove-1", "0000");
+        //Användare user = test.logInUser("maxove-1", "0000");
 
         //hämta testexemplar
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("Bibliotek_PU");
@@ -77,7 +79,7 @@ public class db_test {
 
         //skapa lån
         Lån nyttLån = new Lån();
-        nyttLån.setAnvändare(user);
+        //nyttLån.setAnvändare(user);
         nyttLån.setStreckkod(ex);
 
         ArrayList<Object> addList = new ArrayList<>();
@@ -85,7 +87,7 @@ public class db_test {
 
 
         //för in i db
-        test.läggTillNyaObjekt(addList);
+        //test.läggTillNyaObjekt(addList);
     }
 
     private static void testFilmSearchByTerm(String searchTerm) {

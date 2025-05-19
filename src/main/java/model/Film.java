@@ -1,14 +1,12 @@
 package model;
 
-import state.BorrowItemInterface;
-
 import javax.persistence.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "\"Film\"", schema = "bibliotekssystem")
-public class Film implements BorrowItemInterface {
+public class Film {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "film_id", nullable = false)
@@ -55,7 +53,6 @@ public class Film implements BorrowItemInterface {
         this.id = id;
     }
 
-    @Override
     public String getTitel() {
         return titel;
     }
@@ -80,7 +77,6 @@ public class Film implements BorrowItemInterface {
         this.åldersgräns = åldersgräns;
     }
 
-    @Override
     public Set<Exemplar> getExemplars() {
         return exemplars;
     }

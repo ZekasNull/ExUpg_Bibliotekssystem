@@ -1,6 +1,7 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
+import service.ViewLoader;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -19,13 +20,28 @@ import java.util.Optional;
  * Den har en referens till ett ApplicationState.
  */
 public abstract class Controller implements Observer {
+
+
     private ApplicationState state;
+    protected ViewLoader viewLoader;
+
     public ApplicationState getState() {
         return state;
     }
-
     public void setState(ApplicationState state) {
         this.state = state;
+    }
+
+    /**
+     * Fungerar ungefär som en tredje konstruktor som körs efter vanliga konstruktorn och initialise.
+     * Ser till att kontroller etablerar referenser till state och viewLoader. Bör överskuggas om fler tjänster behöver laddas in från state.
+     * Laddar alltid viewLoader då den är central för navigation i programmet. Andra gemensamma tjänster bör läggas här. Börjar alltid observera state.
+     */
+    public void loadServicesFromState() {
+        if (state == null) throw new IllegalStateException("Controller(super): State must be set before controller services can be initialised");
+        this.viewLoader = state.getViewLoaderService();
+        state.addObserver(this);
+
     }
 
     protected void showInformationPopup(String message) {

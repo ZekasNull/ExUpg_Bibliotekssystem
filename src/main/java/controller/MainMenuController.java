@@ -1,7 +1,7 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
-import d0024e.exupg_bibliotekssystem.ViewLoader;
+import service.ViewLoader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,34 +9,60 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import model.*;
 
 import java.io.IOException;
 
 import org.postgresql.util.PSQLException;
+import service.BookDatabaseService;
+import service.FilmDatabaseService;
+import service.UserDatabaseService;
 import state.ApplicationState;
-import state.BorrowItemInterface;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class MainMenuController extends Controller {
-    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
-    private ApplicationState state = ApplicationState.getInstance();
-    public Button LogOutButton;
+    //debug
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTING;
+    //programreferenser
+    private ApplicationState state;
+    private BookDatabaseService bookDatabaseService;
+    private UserDatabaseService userDatabaseService;
+    private FilmDatabaseService filmDatabaseService;
+
+    //intern data
+    private ObservableList<Exemplar> exemplarTableList = FXCollections.observableArrayList();
+    private ObservableList<Exemplar> exemplarToBorrowList = FXCollections.observableArrayList();
+
+    //fxml
+    @FXML
+    private Button LogOutButton;
     public Button ShowProfileButton;
     public Button EmployeeViewButton;
+
+    @FXML
+    private Label userNameLabel;
+
+    @FXML
+    private Label userRoleLabel;
 
     @FXML
     public Button LogInViewButton; //Knapp för att logga in
     public TextField searchtermBoxContents; //Vad som står i själva sökboxen
     public SplitMenuButton objektTypFlerVal; //Vilket typ av objekt som ska filtreras
     public Button BorrowAllButton;
-    public TableColumn<BorrowItemInterface, String> BorrowListColumn;
-    public TableView<BorrowItemInterface> BorrowTable;
-    private String selectedObjectType;
-    public Button BorrowObjectButton;
 
+    private String selectedObjectType;
+    public Button borrowObjectButton;
+
+    //borrowtable
+    public TableView<Exemplar> BorrowTable;
+    public TableColumn<Exemplar, String> BorrowListColumn;
+
+    //booktable
     public TableColumn<Bok, String> titleColumn;
     public TableColumn<Bok, String> isbnColumn;
     public TableColumn<Bok, String> subjectColumn;
@@ -44,6 +70,9 @@ public class MainMenuController extends Controller {
     public TableView<Bok> notLoggedInBookSearchTable; // tableView för bok, ovan är dess kolumner
 
     public Button SearchButton;
+
+    @FXML
+    private Button removeLoanButton;
 
     //Tableview för film och dess kolumner
     public TableView<Film> notLoggedInFilmSearchTable;
@@ -54,8 +83,103 @@ public class MainMenuController extends Controller {
     public TableColumn<Film, String> actorsColumn;
     public TableColumn<Film, String> genreColumn;
 
+    //exemplar
+    @FXML
+    private TableView<Exemplar> exemplarViewTable;
+
+    @FXML
+    private TableColumn<Exemplar, ?> BarcodeColumn;
+
+    @FXML
+    private TableColumn<Exemplar, String> LåntypColumn;
+
+    @FXML
+    private TableColumn<Exemplar, String> TillgängligColumn;
+
+    public void initialize() {
+        //initialise tables and columns
+        userRoleLabel.setText("");
+        //booksearchtable
+        //Sätter in det returnerade värdet från sökningens titel i titelkolumnen osv (Ligger här för att dela upp det mellan bok,film, och tidsskrift)
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
+        isbnColumn.setCellValueFactory(new PropertyValueFactory<>("isbn13"));
+        //För ämnesord behövde vi ta och skriva ut varje element i listan med ett , mellan
+        subjectColumn.setCellValueFactory(cellData ->
+                        new SimpleStringProperty(
+                                cellData.getValue()
+                                        .getÄmnesord()
+                                        .stream()
+                                        .map(Ämnesord::getOrd)
+                                        .collect(Collectors.joining(", "))
+                        )
+                //cellData = en instans av "CellDataFetures<Bok, String> som ger access till objektet Bok som kommer skrivas ut i vilken rad det gäller i Tableview
+        );
+        //Här är det fråga om sammansätta förnamn och efternamn
+        authorNameColumn.setCellValueFactory(cellData -> {
+            Bok bok = cellData.getValue();
+            String authorName = bok.getFörfattare().stream()
+                    .map(författare -> författare.getFörnamn() + " " + författare.getEfternamn())
+                    .collect(Collectors.joining(","));
+            return new SimpleStringProperty(authorName);
+        });
+
+        //filmsearchtable
+        filmTitleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
+        productionCountryColumn.setCellValueFactory(new PropertyValueFactory<>("produktionsland"));
+        ageLimitColumn.setCellValueFactory(new PropertyValueFactory<>("åldersgräns"));
+        directorsColumn.setCellValueFactory(cellData -> {
+            Film film = cellData.getValue();
+            String directorName = film.getRegissörs().stream()
+                    .map(regissör -> regissör.getFörnamn() + " " + regissör.getEfternamn())
+                    .collect(Collectors.joining(", "));
+            return new SimpleStringProperty(directorName);
+        });
+        actorsColumn.setCellValueFactory(cellData -> {
+            Set<Skådespelare> actors = cellData.getValue().getSkådespelares();
+            String fullNamn = actors.stream()
+                    .map(actor -> actor.getFörnamn() + " " + actor.getEfternamn())
+                    .collect(Collectors.joining(","));
+            return new SimpleStringProperty(fullNamn);
+        });
+        genreColumn.setCellValueFactory(cellData -> {
+            Set<Genre> genres = cellData.getValue().getGenres();
+            String allaGenre = genres.stream()
+                    .map(Genre::getGenreNamn)
+                    .collect(Collectors.joining(", "));
+            return new SimpleStringProperty(allaGenre);
+        });
+
+        //exemplar
+        exemplarViewTable.setItems(exemplarTableList);
+        BarcodeColumn.setCellValueFactory(new PropertyValueFactory<>("streckkod"));
+        LåntypColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getLåntyp().getLåntyp()));
+        TillgängligColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getTillgänglig() ? "Ja" : "Nej"));
+
+        //borrowTable
+        BorrowTable.setItems(exemplarToBorrowList);
+        BorrowListColumn.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getBok() == null) {
+                return new SimpleStringProperty(cellData.getValue().getFilm_id().getTitel());
+            }else{
+                return new SimpleStringProperty(cellData.getValue().getBok().getTitel());
+            }
+        });
+    }
+
+    @Override
+    public void loadServicesFromState() {
+        if (DEBUGPRINTOUTS) System.out.println("Loading MainMenuController services, state MUST EXIST WTF" + getState());
+        super.loadServicesFromState();
+        this.state = getState();
+        this.bookDatabaseService = state.getBookDatabaseService();
+        this.userDatabaseService = state.getUserDatabaseService();
+        this.filmDatabaseService = state.getFilmDatabaseService();
+    }
+
     public void onUserLogInViewButtonClick(ActionEvent actionEvent) throws IOException {
-        state.vy.loadPopup("login-view.fxml", "Log in view");
+        viewLoader.loadPopup(ViewLoader.Views.LOGIN_WINDOW);
         //ger pop-up istället för utbyte av scenen som viewloader skulle
     }
 
@@ -81,106 +205,58 @@ public class MainMenuController extends Controller {
 //TODO: Se till att det inte blir randomized ämnesord
 
     public void onSearchButtonClick(ActionEvent actionEvent) {
-/*Faktiska som körs och inte bara hämtar information
-* Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
-* */
-        if (searchtermBoxContents.getText().trim().isEmpty()&& selectedObjectType == null){
+        /*Faktiska som körs och inte bara hämtar information
+        * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
+        */
+        String trimmedSearchTerm = searchtermBoxContents.getText().trim();
+        if (trimmedSearchTerm.isEmpty()&& selectedObjectType == null){
             showErrorPopup("Du måste välja en objekttyp och minst ett sökord");
             return;
-        } else if (searchtermBoxContents.getText().trim().isEmpty()){
+        } else if (trimmedSearchTerm.isEmpty()){
             showErrorPopup("Du måste ange sökord");
             return;
         }else if (selectedObjectType == null){
             showErrorPopup("Du måste välja en objekttyp");
             return;
         }
-        try{
-            if(selectedObjectType.equals("Bok")){
-                List<Bok> searchTerm = state.databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
 
-                ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
-                notLoggedInBookSearchTable.setItems(data);
-                if (DEBUGPRINTOUTS)
-                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Bok");
+        if(selectedObjectType.equals("Bok")){
+            List<Bok> searchTerm = bookDatabaseService.searchAndGetBooks(trimmedSearchTerm);
+            ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
+            notLoggedInBookSearchTable.setItems(data);
+            if (DEBUGPRINTOUTS)
+                System.out.println("MainMenuController: Rows added to table: " + data.size() + " Bok");
 
-                //Sätter in det returnerade värdet från sökningens titel i titelkolumnen osv (Ligger här för att dela upp det mellan bok,film, och tidsskrift)
-                titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
-                isbnColumn.setCellValueFactory(new PropertyValueFactory<>("isbn13"));
-                //För ämnesord behövde vi ta och skriva ut varje element i listan med ett , mellan
-                subjectColumn.setCellValueFactory(cellData ->
-                                new SimpleStringProperty(
-                                        cellData.getValue()
-                                                .getÄmnesord()
-                                                .stream()
-                                                .map(Ämnesord::getOrd)
-                                                .collect(Collectors.joining(", "))
-                                )
-                        //cellData = en instans av "CellDataFetures<Bok, String> som ger access till objektet Bok som kommer skrivas ut i vilken rad det gäller i Tableview
-                );
-                //Här är det fråga om sammansätta förnamn och efternamn
-                authorNameColumn.setCellValueFactory(cellData -> {
-                    Bok bok = cellData.getValue();
-                    String authorName = bok.getFörfattare().stream()
-                            .map(författare -> författare.getFörnamn() + " " + författare.getEfternamn())
-                            .collect(Collectors.joining(","));
-                    return new SimpleStringProperty(authorName);
-                });
-            }
-            else if (selectedObjectType.equals("Film")){
-                List<Film> searchTerm = state.databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
 
-                ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
-                notLoggedInFilmSearchTable.setItems(data);
-                if (DEBUGPRINTOUTS)
-                    System.out.println("MainMenuController: Rows added to table: " + data.size() + " Film");
-
-                filmTitleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
-                productionCountryColumn.setCellValueFactory(new PropertyValueFactory<>("produktionsland"));
-                ageLimitColumn.setCellValueFactory(new PropertyValueFactory<>("åldersgräns"));
-                directorsColumn.setCellValueFactory(cellData -> {
-                    Film film = cellData.getValue();
-                    String directorName = film.getRegissörs().stream()
-                            .map(regissör -> regissör.getFörnamn() + " " + regissör.getEfternamn())
-                            .collect(Collectors.joining(", "));
-                    return new SimpleStringProperty(directorName);
-                });
-                actorsColumn.setCellValueFactory(cellData -> {
-                    Set<Skådespelare> actors = cellData.getValue().getSkådespelares();
-                    String fullNamn = actors.stream()
-                            .map(actor -> actor.getFörnamn() + " " + actor.getEfternamn())
-                            .collect(Collectors.joining(","));
-                    return new SimpleStringProperty(fullNamn);
-                });
-                genreColumn.setCellValueFactory(cellData -> {
-                    Set<Genre> genres = cellData.getValue().getGenres();
-                    String allaGenre = genres.stream()
-                            .map(Genre::getGenreNamn)
-                            .collect(Collectors.joining(", "));
-                    return new SimpleStringProperty(allaGenre);
-                });
-            }
-            /*else if (selectedObject.equals("Tidskrift")){
-                List<Tidskrift> searchTerm = state.databaseService.searchTidskrift(searchtermBoxContents.getText());
-
-                ObservableList<Tidskrift> data = FXCollections.observableArrayList(searchTerm);
-                notLoggedInSearchTable.setItems(data);
-            }
-            Utkommenterad tills vidare*/
-        }catch (Exception e){
-            e.printStackTrace();
         }
+        else if (selectedObjectType.equals("Film")){
+            List<Film> searchTerm = filmDatabaseService.searchAndGetFilms(trimmedSearchTerm);
+            ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
+            notLoggedInFilmSearchTable.setItems(data);
+            if (DEBUGPRINTOUTS)
+                System.out.println("MainMenuController: Rows added to table: " + data.size() + " Film");
+
+
+        }
+        /*else if (selectedObject.equals("Tidskrift")){
+            List<Tidskrift> searchTerm = state.databaseService.searchTidskrift(searchtermBoxContents.getText());
+
+            ObservableList<Tidskrift> data = FXCollections.observableArrayList(searchTerm);
+            notLoggedInSearchTable.setItems(data);
+        }
+        Utkommenterad tills vidare*/
     }
 
     public void onLogOutButtonClick(ActionEvent actionEvent) {
-        super.getState().setCurrentUser(null);
+        getState().setCurrentUser(null);
     }
 
     public void onShowProfileButtonClick(ActionEvent actionEvent) {
-        state.vy.setView("Profil");
+        viewLoader.setView(ViewLoader.Views.PROFILE);
     }
 
     public void onEmployeeViewButton(ActionEvent actionEvent) {
-        state.vy.setView("Bibliotikaries första val");
+        viewLoader.setView(ViewLoader.Views.LIBRARIAN_FIRST_CHOICE);
     }
 
     public void onBorrowObjectButtonClick(ActionEvent actionEvent) {
@@ -191,110 +267,180 @@ public class MainMenuController extends Controller {
         }
 
         //Sätter selectedItem och kollar vilken objekttyp det gäller
-        BorrowItemInterface selectedItem = null;
-        if (selectedObjectType.equals("Bok")) {
-            selectedItem = notLoggedInBookSearchTable.getSelectionModel().getSelectedItem();
-        } else if (selectedObjectType.equals("Film")) {
-            selectedItem = notLoggedInFilmSearchTable.getSelectionModel().getSelectedItem();
-        }
+        Exemplar selectedItem;
+
+        selectedItem = exemplarViewTable.getSelectionModel().getSelectedItem();
 
         //Kollar om användaren valt en rad
         if(selectedItem == null) {
-            showErrorPopup("Du måste välja ett objekt från en sökning först");
+            showErrorPopup("Du måste välja ett exemplar först");
             return;
         }
 
-        state.getBorrowList().add(selectedItem);
-        BorrowTable.setItems(state.getBorrowList());
-        BorrowListColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
-
-        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: " + state.getBorrowList().size() + " rows added to Låna");
+        exemplarToBorrowList.add(selectedItem);
     }
 
     public void onBorrowAllButtonClick(ActionEvent actionEvent) throws Exception{
-        //Koll görs automatiskt av databasen på om det finns exemplar tillgängliga, samt så uppdaterar den tillgängligheten där
-
-        //Hämtar och kollar att själva lånelistan inte är tom
-        List<BorrowItemInterface> borrowList = state.getBorrowList();
-        if (borrowList.isEmpty()) {
+        Instant timeOfLoan = Instant.now();
+        if (exemplarToBorrowList.isEmpty()) {
             showErrorPopup("Lånelistan är tom");
             return;
         }
 
         List<Lån> nyaLån = new ArrayList<>();
-
-        for (BorrowItemInterface item : borrowList) {
-            for (Exemplar exemplar : item.getExemplars()) {
-                Lån lån = new Lån();
-                lån.setAnvändare(state.getCurrentUser());
-                lån.setStreckkod(exemplar);
-                nyaLån.add(lån);
+        Lån nextLoan;
+        for (Exemplar ex : exemplarToBorrowList) {
+            if(ex.getLåntyp().getLåntyp().equals("referenslitteratur")){
+                showErrorPopup("Du kan inte låna referenslitteratur");
+                return;
             }
-        }
-        try {
-            state.databaseService.läggTillNyaObjekt(nyaLån);
-
-        } catch (PSQLException e) {
-            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Caught error trying to register loans");
-            showErrorPopup("Kunde inte registrera lån: " + e.getMessage());
-            return;
+            nextLoan = new Lån();
+            nextLoan.setAnvändare(state.getCurrentUser());
+            nextLoan.setStreckkod(ex);
+            nyaLån.add(nextLoan);
         }
 
-
         try {
-            //Se till att lånet blir registrerat i datbasen
-            state.databaseService.läggTillNyaObjekt(nyaLån);
-
-            Användare updatedUser = state.getCurrentUser();
-            state.getCurrentUser().setLåns(updatedUser.getLåns());
-            state.getBorrowList().clear();
-
-            state.notifyObservers();
-
+            userDatabaseService.läggTillNyaLån(nyaLån); //skicka lista med inkommande lån
         } catch (PSQLException e) {
             if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Caught error trying to register loans");
             String msg = e.getMessage();
             if (msg != null && msg.contains("redan utlånat")) {
                 showErrorPopup("Du kan ej låna fler objekt");
                 return;
-            } else {
-                throw e;
+            } else if (msg != null && msg.contains("reached the maximum allowed")) {
+                int currentLoans, incomingLoans, maxLoans;
+                currentLoans = state.getCurrentUser().getLåns().size();
+                incomingLoans = exemplarToBorrowList.size();
+                maxLoans = state.getCurrentUser().getAnvändartyp().getMaxLån();
+                showErrorPopup("Du har "+currentLoans+" av "+maxLoans+" maximala lån och försökte låna "+incomingLoans+" till.");
+                return;
             }
         }
+
+        state.updateUserInformation(); //ser till att användarens nya lån laddas
+        printReceipt(timeOfLoan);
+
+        exemplarToBorrowList.clear();
+
+    }
+
+    private void printReceipt(Instant timeOfLoan) {
+        //metodvariabler
+        Set<Lån> låns = state.getCurrentUser().getLåns();
+        
+        låns = låns.stream().filter(lån -> lån.getReturDatum().isAfter(timeOfLoan) ).collect(Collectors.toSet());
+
+        System.out.println("=== LÅNEKVITTO ===");
+        System.out.println("Låntagare: " + state.getCurrentUser().getFulltNamn());
+        System.out.println("Lånedatum: " + timeOfLoan);
+        System.out.println("Lånade objekt:");
+        for (Lån lån : låns) {
+            if (lån.getStreckkod().getBok() != null) {
+                System.out.println(" - " + lån.getStreckkod().getBok().getTitel());
+            } else {
+                System.out.println(" - " + lån.getStreckkod().getFilm_id().getTitel());
+            }
+            System.out.println("   Returneras senast: " + lån.getReturDatum());
+        }
+        System.out.println("================");
+
+
     }
 
     @Override
     public void update(Observable o, Object arg) {
+        //FIXME borde inte vara update som ställer om i fönstret
+
         if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Update called");
-        if(arg != ApplicationState.UpdateType.USER) return;
-        if (super.getState().getCurrentUser() == null) {
-            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Ingen e inloggad");
-            LogOutButton.setVisible(false);
-            ShowProfileButton.setVisible(false);
-            EmployeeViewButton.setVisible(false);
-            LogInViewButton.setVisible(true);
-            BorrowObjectButton.setOpacity(0.5);
-            BorrowAllButton.setVisible(false);
-        } else if (state.getCurrentUser().getAnvändartyp().getAnvändartyp().equals("bibliotekarie")) {
-            if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Bibliotekarie inloggad");
-            LogOutButton.setVisible(true);
-            ShowProfileButton.setVisible(true);
-            EmployeeViewButton.setVisible(true);
-            LogInViewButton.setVisible(false);
-            BorrowObjectButton.setOpacity(1);
-            BorrowAllButton.setVisible(true);
-        }else{
-            LogOutButton.setVisible(true);
-            ShowProfileButton.setVisible(true);
-            LogInViewButton.setVisible(false);
-            BorrowObjectButton.setOpacity(1);
-            BorrowAllButton.setVisible(true);
+        if(arg != ApplicationState.UpdateType.USER) return; //ignore non-user updates
+
+        Användare currentUser = state.getCurrentUser();
+
+        //om det inte längre finns en currentuser
+        if(getState().getCurrentUser() == null) {
+            userNameLabel.setText("Ej inloggad");
+            userRoleLabel.setText("");
+            setWindowStateToNotLoggedIn();
+            return;
+        }
+        userNameLabel.setText(currentUser.getFulltNamn());
+        userRoleLabel.setText(currentUser.getAnvändartyp().getAnvändartyp());
+        if(currentUser.getAnvändartyp().getAnvändartyp().equals("bibliotekarie")) {
+            setWindowStateToAdmin();
+        } else {
+            setWindowStateToUser();
         }
     }
 
-    public void tableViewMouseClick(javafx.scene.input.MouseEvent mouseEvent) {
-        //Skriver ut i konsol för testsyfte
-        if (DEBUGPRINTOUTS)
-            System.out.println("MainMenuController: " + notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().toString());
+    private void setWindowStateToAdmin() {
+        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Bibliotekarie inloggad");
+        setWindowStateToUser();
+        EmployeeViewButton.setVisible(true);
+    }
+
+    private void setWindowStateToUser() {
+        LogOutButton.setVisible(true);
+        ShowProfileButton.setVisible(true);
+        LogInViewButton.setVisible(false);
+        borrowObjectButton.setDisable(false);
+        BorrowAllButton.setDisable(false);
+    }
+
+    private void setWindowStateToNotLoggedIn() {
+        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Ingen e inloggad");
+        LogOutButton.setVisible(false);
+        ShowProfileButton.setVisible(false);
+        EmployeeViewButton.setVisible(false);
+        LogInViewButton.setVisible(true);
+        borrowObjectButton.setDisable(true);
+        BorrowAllButton.setDisable(true);
+    }
+
+    @FXML
+    void removeLoanButtonClicked(ActionEvent event) {
+
+        Exemplar selectedEx = BorrowTable.getSelectionModel().getSelectedItem();
+        exemplarToBorrowList.remove(selectedEx);
+
+        removeLoanButton.setDisable(exemplarToBorrowList.isEmpty());
+    }
+
+    public void filmTableClicked(MouseEvent mouseEvent) {
+        if(notLoggedInFilmSearchTable.getSelectionModel().getSelectedItem() == null) return;
+        exemplarTableList.clear();
+        exemplarTableList.addAll(notLoggedInFilmSearchTable.getSelectionModel().getSelectedItem().getExemplars());
+        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Film table clicked, loaded " + exemplarTableList.size() + " exemplars");
+    }
+
+    public void bookTableClicked(MouseEvent mouseEvent) {
+        if(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem() == null) return;
+        exemplarTableList.clear();
+        exemplarTableList.addAll(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem().getExemplars());
+        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Book table clicked, loaded " + exemplarTableList.size() + " exemplars");
+    }
+
+    public void borrowTableClicked(MouseEvent mouseEvent) {
+        //unnecessary?
+    }
+
+    public void exemplarViewTableClicked(MouseEvent mouseEvent) {
+        if (exemplarViewTable.getSelectionModel().getSelectedItem() == null) {
+            borrowObjectButton.setDisable(true);
+            return;
+        }
+        Exemplar ex = exemplarViewTable.getSelectionModel().getSelectedItem();
+        if (DEBUGPRINTOUTS) System.out.println("MainMenuController: Exemplar view table clicked, selected exemplar has loantype: " + ex.getLåntyp().getLåntyp() +" and the availability is: "+ex.getTillgänglig() );
+
+        if (ex.getLåntyp().getLåntyp().equals("referenslitteratur")) { //får inte lånas
+            borrowObjectButton.setDisable(true);
+            return;
+        }
+        if (!ex.getTillgänglig()) { //redan utlånad
+            borrowObjectButton.setDisable(true);
+            return;
+        }
+        borrowObjectButton.setDisable(false);
+
     }
 }

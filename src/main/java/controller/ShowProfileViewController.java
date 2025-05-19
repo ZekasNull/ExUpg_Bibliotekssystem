@@ -1,6 +1,6 @@
 package controller;
 
-import d0024e.exupg_bibliotekssystem.ViewLoader;
+import service.ViewLoader;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -11,19 +11,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import model.Användare;
 import model.Lån;
-import net.bytebuddy.implementation.bind.annotation.Super;
-import org.postgresql.util.PSQLException;
+import service.UserDatabaseService;
 import state.ApplicationState;
-import state.BorrowItemInterface;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 
 public class ShowProfileViewController extends Controller{
+    //tjänst
+    UserDatabaseService userDatabaseService;
+    //data
+    ObservableList<Lån> loans = FXCollections.observableArrayList();
+
     @FXML
     public Button ReturnToMainMenuButton;
     public TableView<Lån> UserShowProfileViewLoanTable;
@@ -35,21 +37,7 @@ public class ShowProfileViewController extends Controller{
 
 
     public void initialize() {
-    }
-//Ger upp, chatgpt i loadData
-    public void loadData() {
-        if (super.getState().getCurrentUser() == null) return;
 
-        Set<Lån> loansSet = super.getState().getCurrentUser().getLåns();
-
-        // ❶ fetch return‑date once per loan and store in the transient field
-        for (Lån l : loansSet) {
-            Instant rd = super.getState().databaseService.getReturnDateForLoan(l);
-            l.setReturDatum(rd);          // fills the transient field
-        }
-
-        // ❷ convert to observable list & bind table
-        ObservableList<Lån> loans = FXCollections.observableArrayList(loansSet);
         UserShowProfileViewLoanTable.setItems(loans);
 
         // --- column factories ---
@@ -70,7 +58,29 @@ public class ShowProfileViewController extends Controller{
         BorrowDateColumn.setCellValueFactory(new PropertyValueFactory<>("lånedatum"));
 
         ReturnDateColumn.setCellValueFactory(cd ->
-                new SimpleObjectProperty<>(super.getState().databaseService.getReturnDateForLoan(cd.getValue())));
+                new SimpleObjectProperty<>(getState().getUserDatabaseService().getReturnDateForLoan(cd.getValue())));
+    }
+
+    @Override
+    public void loadServicesFromState() {
+        super.loadServicesFromState();
+        userDatabaseService = getState().getUserDatabaseService();
+    }
+//Ger upp, chatgpt i loadData
+    public void loadData() {
+        if (getState().getCurrentUser() == null) return;
+
+        Set<Lån> loansSet = getState().getCurrentUser().getLåns();
+
+        // ❶ fetch return‑date once per loan and store in the transient field
+        for (Lån l : loansSet) {
+            Instant rd = getState().getUserDatabaseService().getReturnDateForLoan(l);
+            l.setReturDatum(rd);          // fills the transient field
+        }
+
+        // ❷ convert to observable list & bind table
+        loans = FXCollections.observableArrayList(loansSet);
+
 
         /*if (super.getState() .getCurrentUser() == null) return; //Just-in-case
         System.out.println("loadData was called");
@@ -99,34 +109,52 @@ public class ShowProfileViewController extends Controller{
     }
 
     public void onReturnToMainMenuButtonClick(ActionEvent actionEvent) {
-        super.getState().vy.setView("Huvudmeny");
+        viewLoader.setView(ViewLoader.Views.MAIN_MENU);
     }
 
-    public void onReturnLoanButtonClick(ActionEvent actionEvent) throws PSQLException {
-        List<Lån> selectedLoans = new ArrayList<>(UserShowProfileViewLoanTable.getSelectionModel().getSelectedItems());
+    public void onReturnLoanButtonClick(ActionEvent actionEvent) {
 
-        if (selectedLoans.isEmpty()) {
-            showErrorPopup("Vänligen välj minst ett lån att returnera.");
-            return;
-        }
+        Lån lån = UserShowProfileViewLoanTable.getSelectionModel().getSelectedItem();
 
-        try {
-            super.getState().databaseService.raderaObjekt(selectedLoans);
-            loadData();
-        } catch (PSQLException e) {
-            String msg = e.getMessage();
-            if (msg != null && msg.contains("some specific database error text")) {
-                showErrorPopup("Kan inte returnera lån: " + msg);
-            } else {
-                throw e;
-            }
-        } catch (Exception e) {
-            showErrorPopup("Kunde inte returnera lån: " + e.getMessage());
-        }
+        userDatabaseService.returnLoan(lån);
+        getState().updateUserInformation();
+
+//        try {
+//            super.getState().getDatabaseService().raderaObjekt(selectedLoans);
+//            loadData();
+//        } catch (PSQLException e) {
+//            String msg = e.getMessage();
+//            if (msg != null && msg.contains("some specific database error text")) {
+//                showErrorPopup("Kan inte returnera lån: " + msg);
+//            } else {
+//                throw e;
+//            }
+//        } catch (Exception e) {
+//            showErrorPopup("Kunde inte returnera lån: " + e.getMessage());
+//        }
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        loadData();
+        if(arg != ApplicationState.UpdateType.USER) return;
+        Användare user = super.getState().getCurrentUser();
+
+        if(user == null){ //hantera om användare är null (loggade ut)
+            loans.clear(); //rensa lista
+            return;
+        }else {
+            loans.clear(); //rensa lista
+            //ladda eller uppdatera användarens lån -
+            Set<Lån> loansSet = user.getLåns();
+
+            // returdatum måste beräknas för varje
+            for (Lån l : loansSet) {
+                l.setReturDatum(userDatabaseService.getReturnDateForLoan(l));
+            }
+
+            // ❷ convert to observable list & bind table
+            loans.addAll(loansSet);
+        }
+
     }
 }

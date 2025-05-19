@@ -16,7 +16,7 @@ INSERT INTO "Exemplar" (bok_id, låntyp)
 VALUES ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000001'), 'kurslitteratur'),
        ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000001'), 'kurslitteratur'),
        ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000001'), 'kurslitteratur'),
-       ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000001'), 'kurslitteratur');
+       ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000001'), 'referenslitteratur');
 
 
 -- Bok 2: delar författare med bok 1, delar ämnesord med bok 1
@@ -31,7 +31,7 @@ CALL sp_lägg_till_bok(
      );
 INSERT INTO "Exemplar" (bok_id, låntyp)
 VALUES ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000002'), 'referenslitteratur'),
-       ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000002'), 'referenslitteratur');
+       ((SELECT bok_id FROM bibliotekssystem."Bok" WHERE isbn_13 = '9780000000002'), 'kurslitteratur');
 
 
 -- Bok 3: ny författare, delar ämnesord med bok 2
@@ -157,6 +157,16 @@ CALL sp_lägg_till_film(
      );
 INSERT INTO "Exemplar" (film_id, låntyp)
 VALUES ((SELECT film_id FROM bibliotekssystem."Film" WHERE titel = 'Ghost in the Shell'), 'film');
+
+INSERT INTO "Tidskrift" (namn)
+VALUES ('Bothniabladet');
+
+INSERT INTO "Upplaga" (tidskrift_id, upplaga_nr, år)
+VALUES (1, 1, 2025),
+       (1, 2, 2025),
+       (1, 3, 2025),
+       (1, 4, 2025),
+       (1, 5, 2025);
 
 
 --Användare - En av varje typ räcker för test. Mest intressant är egentligen bibliotekarie

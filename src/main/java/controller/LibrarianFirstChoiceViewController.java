@@ -1,6 +1,6 @@
 package controller;
 
-import d0024e.exupg_bibliotekssystem.ViewLoader;
+import service.ViewLoader;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
@@ -11,16 +11,20 @@ public class LibrarianFirstChoiceViewController extends Controller{
     public Button GoBackToMainMenuButton;
 
     public void HandleInventoryClicked(MouseEvent mouseEvent) {
-        super.getState().vy.setView("Hantera inventarie");
+        viewLoader.setView(ViewLoader.Views.HANDLE_INVENTORY);
     }
 
     public void HandleNotReturnedClick(MouseEvent mouseEvent) {
-        super.getState().vy.setView("Ej återlämnade");
+        viewLoader.setView(ViewLoader.Views.NOT_RETURNED);
     }
 
     public void onGoBackToMainMenuButtonClick(ActionEvent actionEvent) {
-        super.getState().vy.setView("Huvudmeny");
+        viewLoader.setView(ViewLoader.Views.MAIN_MENU);
     }
+
+    public void initialize() {
+    }
+
     @Override
     public void update(Observable o, Object arg) {
     }

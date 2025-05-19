@@ -5,20 +5,65 @@ import model.*;
 import model.Författare;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import java.util.List;
 
 public class BookDatabaseService {
     private final DBConnector DBC;
     //debug
-    private final boolean debugPrints = true;
+    private final boolean DEBUGPRINTS = true;
 
     public BookDatabaseService() {
         this.DBC = DBConnector.getInstance();
     }
 
+    /**
+     * Söker efter böcker med hjälp av sökterm, matchande något av titel, isbn-13, ämnesord eller författare (för/efternamn)
+     *
+     * @param searchterm en enkel string
+     * @return List<Bok> av alla resultat som kan vara tom om inget hittades
+     */
+    public List<Bok> searchAndGetBooks(String searchterm) {
+        //metodvariabler
+        List<Bok> resultlist;
+        EntityManager em = DBC.getEntityManager();
+
+        //query
+        try {
+            em.getTransaction().begin();
+
+            TypedQuery<Bok> query = em.createQuery(
+                    "SELECT DISTINCT b FROM Bok b " +
+                            "LEFT JOIN FETCH b.Författare a " +
+                            "LEFT JOIN b.Ämnesord k " +
+                            "WHERE LOWER(b.titel) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(b.isbn13) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(a.förnamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(a.efternamn) LIKE LOWER(CONCAT('%', :searchTerm, '%'))" +
+                            "OR LOWER(k.ord) LIKE LOWER(CONCAT('%', :searchTerm, '%'))", Bok.class);
+
+            query.setParameter("searchTerm", searchterm);
+
+            resultlist = query.getResultList();
+
+            for (Bok bok : resultlist) {
+                bok.getÄmnesord().size();
+            } //tvinga em att ladda ämnesord lazily för att undvika en fetch som inte beter sig i query
+
+            em.getTransaction().commit(); //run query
+
+            return resultlist;
+
+        } finally {
+            //runs after return in try block is encountered, but before it is executed
+            em.close();
+        }
+    }
+
     public void addNewBook(Bok book) {
-        if (debugPrints) System.out.println("bookdbservice: incoming book to add: " + book.getTitel());
+        if (DEBUGPRINTS) System.out.println("bookdbservice: incoming book to add: " + book.getTitel());
         EntityManager em = DBC.getEntityManager();
 
         try {
@@ -27,11 +72,15 @@ public class BookDatabaseService {
             for (Författare f : book.getFörfattare()) {
                 if (f.getId() == null) {
                     em.persist(f);
+                }else{
+                    f = em.merge(f);
                 }
             }
             for(Ämnesord a : book.getÄmnesord()){
                 if(a.getId() == null){
                     em.persist(a);
+                }else{
+                    a = em.merge(a);
                 }
             }
 
@@ -68,7 +117,7 @@ public class BookDatabaseService {
     }
 
     public void deleteBook(Bok book) {
-        if (debugPrints) System.out.println("bookdbservice: incoming book to delete: " + book.toString());
+        if (DEBUGPRINTS) System.out.println("bookdbservice: incoming book to delete: " + book.toString());
         EntityManager em = DBC.getEntityManager();
 
         try {
@@ -83,7 +132,7 @@ public class BookDatabaseService {
     }
 
     public void deleteBookCopy(Exemplar ex) {
-        if (debugPrints) System.out.println("bookdbservice: incoming book copy to delete: " + ex.toString());
+        if (DEBUGPRINTS) System.out.println("bookdbservice: incoming book copy to delete: " + ex.toString());
         EntityManager em = DBC.getEntityManager();
         Exemplar managed;
 
@@ -93,6 +142,14 @@ public class BookDatabaseService {
             managed.getBok().getExemplars().remove(managed); //pga fetching måste den raderas från bokens lista också
             em.remove(managed);
             em.getTransaction().commit();
+        } catch (EntityNotFoundException e) {
+            if(e.getMessage().contains( "Unable to find model.Bok")){
+                //kan kasta en exception om ett exemplar skulle raderas men boken blev raderad innan.
+                if (DEBUGPRINTS) System.out.println("BookDatabaseService: Tried to delete a copy whose book does not exist or was already deleted.");
+            }else{
+                throw e;
+            }
+
         } finally {
             em.close();
         }
@@ -108,9 +165,9 @@ public class BookDatabaseService {
         try {
             em.getTransaction().begin();
             result = query.getSingleResult();
-            if (debugPrints) System.out.println("dbservice: Ämnesord found!! in db, returning existing");
+            if (DEBUGPRINTS) System.out.println("dbservice: Ämnesord found!! in db, returning existing");
         }catch (NoResultException e) {
-            if (debugPrints) System.out.println("dbservice: Ämnesord not found in db, creating new");
+            if (DEBUGPRINTS) System.out.println("dbservice: Ämnesord not found in db, creating new");
             result = new Ämnesord();
             result.setOrd(ord);
         }finally {
@@ -129,9 +186,9 @@ public class BookDatabaseService {
         try {
             em.getTransaction().begin();
             result = query.getSingleResult();
-            if (debugPrints) System.out.println("dbservice: författare found!! in db, returning existing");
+            if (DEBUGPRINTS) System.out.println("dbservice: författare found!! in db, returning existing");
         }catch (NoResultException e) {
-            if (debugPrints) System.out.println("dbservice: författare not found in db, creating new");
+            if (DEBUGPRINTS) System.out.println("dbservice: författare not found in db, creating new");
             result = new Författare();
             result.setFörnamn(names[0]);
             result.setEfternamn(names[1]);

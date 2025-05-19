@@ -1,7 +1,7 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
-import d0024e.exupg_bibliotekssystem.ViewLoader;
+import service.ViewLoader;
 import javafx.util.Pair;
 import service.FilmDatabaseService;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,7 +28,10 @@ import java.util.Optional;
 
 public class AddFilmViewController extends Controller {
     //debug
-    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTING;
+
+    //tjänster
+    private FilmDatabaseService filmDatabaseService;
 
     //lists
     private ObservableList<Exemplar> exemplarList = FXCollections.observableArrayList();
@@ -157,12 +160,11 @@ public class AddFilmViewController extends Controller {
      */
     @FXML
     void addActorButtonPressed(ActionEvent event) throws IOException {
-        FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         String[] names = openNameInputDialog();
         if (names == null) return;
         if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for actors");
 
-        skådespelareList.add(dbs.findOrCreateActor(names));
+        skådespelareList.add(filmDatabaseService.findOrCreateActor(names));
     }
 
     @FXML
@@ -173,12 +175,11 @@ public class AddFilmViewController extends Controller {
 
     @FXML
     void addDirectorButtonPressed(ActionEvent event) throws IOException {
-        FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         String[] names = openNameInputDialog();
         if (names == null) return;
         if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ names[0] + " " + names[1] + " in NameInputDialog for directors");
 
-        regissörsList.add(dbs.findOrCreateDirector(names));
+        regissörsList.add(filmDatabaseService.findOrCreateDirector(names));
     }
 
     @FXML
@@ -189,7 +190,6 @@ public class AddFilmViewController extends Controller {
 
     @FXML
     void addGenreButtonPressed(ActionEvent event) {
-        FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         Optional<String> genreNamn;
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Genre");
@@ -203,7 +203,7 @@ public class AddFilmViewController extends Controller {
 
         if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ genreNamn.get() + " in TextInputDialog for genre");
 
-        genresList.add(dbs.findOrCreateGenre(genreNamn.get()));
+        genresList.add(filmDatabaseService.findOrCreateGenre(genreNamn.get()));
     }
 
     @FXML
@@ -262,7 +262,6 @@ public class AddFilmViewController extends Controller {
                 film = filmViewTable.getSelectionModel().getSelectedItem();
                 film.setTitel(titleBoxContents.getText());
                 film.setProduktionsland(produktionslandBoxContents.getText());
-                //FIXME antar snällt att användaren bara skrev siffror
                 film.setÅldersgräns(Integer.parseInt(agelimitBoxContents.getText()));
                 film.setRegissörs(regissörs);
                 film.setSkådespelares(skådespelares);
@@ -334,6 +333,7 @@ public class AddFilmViewController extends Controller {
 
     @FXML
     void addExemplarTableButtonPressed(ActionEvent event) {
+        if(filmViewTable.getSelectionModel().getSelectedItem() == null) return;
         Film film = filmViewTable.getSelectionModel().getSelectedItem(); //för vald film
         //då det bara kan finnas en typ av exemplar för filmer, skapa det direkt
         Exemplar ex = new Exemplar();
@@ -355,6 +355,7 @@ public class AddFilmViewController extends Controller {
             exemplarList.remove(selected);
             selectedFilm.getExemplars().remove(selected);
         } else if (onDeleteUserConfirmation(false)) {
+            selectedFilm.getExemplars().remove(selected);
             exemplarDeletionList.add(selected);
             exemplarList.remove(selected);
         }
@@ -377,7 +378,8 @@ public class AddFilmViewController extends Controller {
 
         //hämta referens till controller
         SmallSearchWindowController controller = loader.getController();
-        controller.setState(getState()); //ge referens till appstate
+        controller.setState(getState());
+        controller.loadServicesFromState(); //ge referens till appstate
         controller.setStage(searchWindow);
         controller.setMode(SmallSearchWindowController.Mode.FILM);
 
@@ -405,34 +407,38 @@ public class AddFilmViewController extends Controller {
 
     @FXML
     void cancelButtonPressed(ActionEvent event) {
-        super.getState().vy.setView("Hantera inventarie");
+        if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
+            setWindowToDefaultState();
+        } else {
+            viewLoader.setView(ViewLoader.Views.HANDLE_INVENTORY);
+            setWindowToResetState();
+        }
     }
 
     @FXML
     void confirmButtonPressed(ActionEvent event) {
-        FilmDatabaseService dbs = new FilmDatabaseService(); //FIXME ENDAST TEST
         ArrayList<Film> processedFilms = new ArrayList<>(); //filmer som har hanterats ska inte gå in i changed
         if (hasNewFilms) {
             for (Film f : filmList) {
                 if(f.getId() == null) //hantera endast nya filmer
-                dbs.addNewFilm(f);
+                filmDatabaseService.addNewFilm(f);
                 processedFilms.add(f);
             }
         }
         filmList.removeAll(processedFilms); //när nya filmer är klara, ta bort från listan
         if (hasChangedFilms) {
             for (Film f : filmList) {
-                dbs.updateFilm(f);
+                filmDatabaseService.updateFilm(f);
             }
         }
         if (!filmDeletionList.isEmpty()) {
             for (Film f : filmDeletionList) {
-                dbs.deleteFilm(f);
+                filmDatabaseService.deleteFilm(f);
             }
         }
         if(!exemplarDeletionList.isEmpty()) {
             for (Exemplar ex : exemplarDeletionList) {
-                dbs.deleteFilmCopy(ex);
+                filmDatabaseService.deleteFilmCopy(ex);
             }
         }
 
@@ -448,7 +454,6 @@ public class AddFilmViewController extends Controller {
     }
 
     public void initialize() {
-
         //director tableview
         directorViewTable.setItems(regissörsList);
         directorFirstName.setCellValueFactory(new PropertyValueFactory<>("förnamn"));
@@ -476,6 +481,13 @@ public class AddFilmViewController extends Controller {
                 new SimpleStringProperty(cellData.getValue().getTillgänglig() ? "Ja" : "Nej"));
 
 
+    }
+
+    @Override
+    public void loadServicesFromState() {
+        super.loadServicesFromState();
+        //tjänster
+        filmDatabaseService = getState().getFilmDatabaseService();
     }
 
     private void updateHasNewFilms() {
@@ -549,6 +561,21 @@ public class AddFilmViewController extends Controller {
         searchFilmButton.setDisable(true);
         addNewFilmButton.setDisable(true);
         editFilmButton.setDisable(true);
+    }
+
+    private void setWindowToResetState() {
+        setWindowToDefaultState();
+
+        //listor
+        filmList.clear();
+        exemplarList.clear();
+        clearForm();
+
+        //status
+        hasNewFilms = false;
+        hasChangedFilms = false;
+
+        formMode = FormMode.NONE;
     }
 
 

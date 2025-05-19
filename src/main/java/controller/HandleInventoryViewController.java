@@ -1,12 +1,11 @@
 package controller;
 
-import d0024e.exupg_bibliotekssystem.ViewLoader;
+import service.ViewLoader;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 
-import javax.swing.text.View;
 import java.util.Observable;
 
 public class HandleInventoryViewController extends Controller{
@@ -14,16 +13,19 @@ public class HandleInventoryViewController extends Controller{
     public Label HandleMoviesButton;
     public Button GoBackToFirstChoiceButton;
 
+    public void initialize() {
+    }
+
     public void onHandleBooksButtonClick(MouseEvent mouseEvent) {
-        super.getState().vy.setView("Hantera böcker");
+        viewLoader.setView(ViewLoader.Views.HANDLE_BOOKS);
     }
 
     public void onHandleMoviesButtonClick(MouseEvent mouseEvent) {
-        super.getState().vy.setView("Hantera filmer");
+        viewLoader.setView(ViewLoader.Views.HANDLE_MOVIES);
     }
 
     public void onGoBackToFirstChoiceButtonClick(ActionEvent actionEvent) {
-        super.getState().vy.setView("Bibliotikaries första val");
+        viewLoader.setView(ViewLoader.Views.LIBRARIAN_FIRST_CHOICE);
     }
 
     @Override

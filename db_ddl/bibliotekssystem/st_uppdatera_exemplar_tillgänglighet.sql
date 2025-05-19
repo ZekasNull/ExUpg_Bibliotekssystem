@@ -4,15 +4,15 @@ AS
 $$
 BEGIN
     --TG_OP (text) is the operation that fired the trigger
-    IF TG_OP = 'INSERT' THEN
+    IF tg_op = 'INSERT' THEN
         UPDATE bibliotekssystem."Exemplar"
         SET tillgänglig = FALSE
-        WHERE streckkod = NEW.streckkod;
+        WHERE streckkod = new.streckkod;
 
-    ELSIF TG_OP = 'DELETE' THEN
+    ELSIF tg_op = 'DELETE' THEN
         UPDATE bibliotekssystem."Exemplar"
         SET tillgänglig = TRUE
-        WHERE streckkod = OLD.streckkod;
+        WHERE streckkod = old.streckkod;
     END IF;
 
     RETURN NULL; -- return null because something has to return

@@ -1,19 +1,15 @@
 package controller;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
-import d0024e.exupg_bibliotekssystem.ViewLoader;
+import service.ViewLoader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 import model.*;
 import java.io.IOException;
@@ -31,7 +27,10 @@ import state.ApplicationState;
 
 public class AddBookViewController extends Controller {
     //debug
-    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTING;
+
+    //tjänstreferenser
+    private BookDatabaseService bookDatabaseService;
 
     //lista över exemplar och böcker som visas i tables
     private ObservableList<Exemplar> exemplarList = FXCollections.observableArrayList();
@@ -241,45 +240,10 @@ public class AddBookViewController extends Controller {
      */
     @FXML
     private Button editBookButton;
+
     @FXML
     void editBookButtonPressed(ActionEvent event) {
         setWindowToEditingExistingBooksState();
-    }
-
-    /**
-     * Förbereder klassens tables genom att ställa in deras cellvaluefactories.
-     */
-    public void initialize() {
-        //author
-        authorTable.setItems(formAuthorList);
-        authorFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("förnamn"));
-        authorLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("efternamn"));
-
-        //keywords
-        keywordTable.setItems(formKeywordList);
-        keywordColumn.setCellValueFactory(new PropertyValueFactory<>("ord"));
-
-
-        //exemplar table
-        ExemplarViewTable.setItems(exemplarList);
-        BarcodeColumn.setCellValueFactory(new PropertyValueFactory<>("streckkod"));
-        LåntypColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getLåntyp().getLåntyp()));
-        TillgängligColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getTillgänglig() ? "Ja" : "Nej"));
-
-        //book table
-        bookViewTable.setItems(bookList);
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
-        //För ämnesord behövde vi ta och skriva ut varje element i listan med ett ',' mellan
-        //Här är det fråga om sammansätta förnamn och efternamn
-        AuthorColumn.setCellValueFactory(cellData -> {
-            Bok bok = cellData.getValue();
-            String authorName = bok.getFörfattare().stream()
-                    .map(författare -> författare.getFörnamn() + " " + författare.getEfternamn())
-                    .collect(Collectors.joining(","));
-            return new SimpleStringProperty(authorName);
-        });
     }
 
     @FXML
@@ -339,7 +303,8 @@ public class AddBookViewController extends Controller {
         if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
             setWindowToDefaultState();
         } else {
-            super.getState().vy.setView("Hantera inventarie");
+            viewLoader.setView(ViewLoader.Views.HANDLE_INVENTORY);
+            setWindowToResetState();
         }
     }
 
@@ -387,7 +352,6 @@ public class AddBookViewController extends Controller {
 
     @FXML
     void addAuthorButtonPressed(ActionEvent event) throws IOException {
-        BookDatabaseService dbs = new BookDatabaseService(); //FIXME ENDAST TEST
 
         //input
         String[] names = openNameInputDialog();
@@ -398,7 +362,7 @@ public class AddBookViewController extends Controller {
 
 
         //add
-        formAuthorList.add(dbs.findOrCreateAuthor(names));
+        formAuthorList.add(bookDatabaseService.findOrCreateAuthor(names));
     }
 
     @FXML
@@ -409,8 +373,7 @@ public class AddBookViewController extends Controller {
 
     @FXML
     void addKeywordButtonPressed(ActionEvent event) {
-        //instansvariabler
-        BookDatabaseService bdbs = new BookDatabaseService(); //FIXME ENDAST TEST - databaskoppling
+        //metodvariabler
         TextInputDialog dialog = new TextInputDialog();
         Optional<String> ämnesord;
 
@@ -426,7 +389,7 @@ public class AddBookViewController extends Controller {
 
         if (DEBUGPRINTOUTS) System.out.println("AddFilmViewController: Found "+ ämnesord.get() + " in TextInputDialog for genre");
 
-        formKeywordList.add(bdbs.findOrCreateÄmnesord(ämnesord.get().trim())); //se om det redan finns i databas och lägg till
+        formKeywordList.add(bookDatabaseService.findOrCreateÄmnesord(ämnesord.get().trim())); //se om det redan finns i databas och lägg till
     }
 
     @FXML
@@ -441,35 +404,34 @@ public class AddBookViewController extends Controller {
      */
     @FXML
     void confirmButtonPressed(ActionEvent event) {
-        BookDatabaseService dbs = new BookDatabaseService(); //FIXME ENDAST TEST - databaskoppling
         ArrayList<Bok> processedBooks = new ArrayList<>();
         //
         if (hasNewBooks) {
             for(Bok b : bookList) {
                 if (b.getId() == null) { //hantera endast nya böcker och skippa uppdaterade
-                    dbs.addNewBook(b);
+                    bookDatabaseService.addNewBook(b);
                     processedBooks.add(b);
                 }
             }
         }
         if (hasChangedBooks) {
             for(Bok b : bookList) {
-                dbs.updateBook(b);
+                bookDatabaseService.updateBook(b);
             }
         }
         bookList.removeAll(processedBooks);
 
         if(!bookDeletionList.isEmpty()) {
             for(Bok b : bookDeletionList) {
-                dbs.deleteBook(b);
+                bookDatabaseService.deleteBook(b);
             }
         }
         if (!exemplarDeletionList.isEmpty()) {
             for(Exemplar e : exemplarDeletionList) {
-                dbs.deleteBookCopy(e);
+                bookDatabaseService.deleteBookCopy(e);
             }
         }
-        if (hasChangedBooks || hasNewBooks) {
+        if (hasChangedBooks || hasNewBooks || !bookDeletionList.isEmpty() || !exemplarDeletionList.isEmpty()) {
             showInformationPopup("Ändringarna skickades till databasen!");
         } else {
             showInformationPopup("Det finns inga ändringar att skicka.");
@@ -492,7 +454,51 @@ public class AddBookViewController extends Controller {
 
     @FXML
     void searchBookButtonPressed(ActionEvent event) throws IOException {
-        openSearchWindow();
+        viewLoader.loadClosingPopup(ViewLoader.Views.SMALL_SEARCH_WINDOW);
+    }
+
+    /**
+     * Förbereder klassens tables genom att ställa in deras cellvaluefactories.
+     */
+    public void initialize() {
+        //tables
+        //author
+        authorTable.setItems(formAuthorList);
+        authorFirstNameColumn.setCellValueFactory(new PropertyValueFactory<>("förnamn"));
+        authorLastNameColumn.setCellValueFactory(new PropertyValueFactory<>("efternamn"));
+
+        //keywords
+        keywordTable.setItems(formKeywordList);
+        keywordColumn.setCellValueFactory(new PropertyValueFactory<>("ord"));
+
+
+        //exemplar table
+        ExemplarViewTable.setItems(exemplarList);
+        BarcodeColumn.setCellValueFactory(new PropertyValueFactory<>("streckkod"));
+        LåntypColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getLåntyp().getLåntyp()));
+        TillgängligColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getTillgänglig() ? "Ja" : "Nej"));
+
+        //book table
+        bookViewTable.setItems(bookList);
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("titel"));
+        //För ämnesord behövde vi ta och skriva ut varje element i listan med ett ',' mellan
+        //Här är det fråga om sammansätta förnamn och efternamn
+        AuthorColumn.setCellValueFactory(cellData -> {
+            Bok bok = cellData.getValue();
+            String authorName = bok.getFörfattare().stream()
+                    .map(författare -> författare.getFörnamn() + " " + författare.getEfternamn())
+                    .collect(Collectors.joining(","));
+            return new SimpleStringProperty(authorName);
+        });
+    }
+
+    @Override
+    public void loadServicesFromState() {
+        super.loadServicesFromState();
+        //tjänster
+        bookDatabaseService = getState().getBookDatabaseService();
     }
 
     //hjälpmetoder
@@ -669,30 +675,6 @@ public class AddBookViewController extends Controller {
         removeKeywordButton.setDisable(state);
         clearFormButton.setDisable(state);
         formOkButton.setDisable(state);
-    }
-
-    /*
-     * POPUPS
-     * TODO ska skötas av ViewLoader
-     */
-    private void openSearchWindow() throws IOException {
-        //super.getState().vy.loadPopup("smallSearchWindow.fxml", "Sök böcker");
-        Stage searchWindow = new Stage();
-        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("smallSearchWindow.fxml"));
-        Scene searchwindow = new Scene(loader.load());
-
-        //hämta referens till controller
-        SmallSearchWindowController controller = loader.getController();
-        controller.setState(getState()); //ge referens till appstate
-        controller.setStage(searchWindow);
-        controller.setMode(SmallSearchWindowController.Mode.BOK);
-
-        searchWindow.setTitle("Search window");
-        searchWindow.setScene(searchwindow);
-        searchWindow.initModality(Modality.APPLICATION_MODAL);
-
-        //ovanstående som metodanrop i konstruktor?
-        searchWindow.show();
     }
 
     /*

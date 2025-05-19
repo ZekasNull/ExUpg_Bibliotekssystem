@@ -1,7 +1,6 @@
 package controller;
 
-import d0024e.exupg_bibliotekssystem.ViewLoader;
-import db.DatabaseService;
+import service.ViewLoader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,8 +16,11 @@ import model.Lån;
 import java.util.Observable;
 
 public class ShowNotReturnedViewController extends Controller {
-    public Button GoBackToHandleInventory;
     private ObservableList<Lån> lånList = FXCollections.observableArrayList();
+
+
+    @FXML
+    private Button GoBackToHandleInventoryButton;
 
     @FXML
     private TableColumn<Lån, String> barcodeColumn;
@@ -56,12 +58,11 @@ public class ShowNotReturnedViewController extends Controller {
     @FXML
     void refreshButtonPressed(ActionEvent event) {
         lånList.clear();
-        lånList.addAll(getState().databaseService.visaEjÅterlämnadeBöcker());
+        lånList.addAll(getState().getUserDatabaseService().visaEjÅterlämnadeBöcker());
     }
 
     public void initialize() {
-        //FIXME proper referens senare
-
+        //table
         overdueLoansTable.setItems(lånList);
         loanIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         usernameColumn.setCellValueFactory(cellData ->
@@ -81,10 +82,6 @@ public class ShowNotReturnedViewController extends Controller {
         });
         loanDateColumn.setCellValueFactory(new PropertyValueFactory<>("lånedatum"));
         returnDateColumn.setCellValueFactory(new PropertyValueFactory<>("returDatum"));
-
-        //get loans
-        DatabaseService db = new DatabaseService();
-        lånList.addAll(db.visaEjÅterlämnadeBöcker());
     }
 
     @Override
@@ -92,7 +89,8 @@ public class ShowNotReturnedViewController extends Controller {
 
     }
 
+    @FXML
     public void onGoBackToHandleInventoryClick(ActionEvent actionEvent) {
-        super.getState().vy.setView("Hantera inventarie");
+        viewLoader.setView(ViewLoader.Views.HANDLE_INVENTORY);
     }
 }

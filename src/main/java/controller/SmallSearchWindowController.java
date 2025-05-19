@@ -1,5 +1,6 @@
 package controller;
 
+import d0024e.exupg_bibliotekssystem.MainApplication;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +12,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.*;
+import service.BookDatabaseService;
+import service.FilmDatabaseService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +26,13 @@ import java.util.stream.Collectors;
  * sökningen är klar.
  */
 public class SmallSearchWindowController extends Controller {
+    //tjänster
+    BookDatabaseService bookDatabaseService;
+    FilmDatabaseService filmDatabaseService;
     //förälderns stage
     private Stage stage;
     //debug
-    private final boolean DEBUGPRINTOUTS = true;
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTING;
 
     //inställning
     public enum Mode {BOK, FILM};
@@ -82,7 +88,12 @@ public class SmallSearchWindowController extends Controller {
         this.stage = stage;
     }
 
-
+    public void loadServicesFromState() {
+        super.loadServicesFromState();
+        //tjänster
+        bookDatabaseService = getState().getBookDatabaseService();
+        filmDatabaseService = getState().getFilmDatabaseService();
+    }
 
     public void initialize() {
         //böcker
@@ -137,9 +148,7 @@ public class SmallSearchWindowController extends Controller {
 
     @FXML
     void okButtonPressed(ActionEvent event) {
-
-
-        switch (this.mode){
+        switch (mode){
             case BOK:
                 if(notLoggedInBookSearchTable.getSelectionModel().getSelectedItem() == null) return; //om inget valts
                 Bok selectedBook = notLoggedInBookSearchTable.getSelectionModel().getSelectedItem();
@@ -160,28 +169,26 @@ public class SmallSearchWindowController extends Controller {
 
     @FXML
     void onSearchButtonClick(ActionEvent event) {
-        List<Bok> bokSearchResults = new ArrayList<>();
-        List<Film> filmSearchResults = new ArrayList<>();
+        List<Bok> bokSearchResults;
+        List<Film> filmSearchResults;
+        String searchterm = searchtermBoxContents.getText().trim();
 
         switch (mode){
             case BOK:
-                bokSearchResults = super.getState().databaseService.searchAndGetBooks(searchtermBoxContents.getText().trim());
+                bokSearchResults = bookDatabaseService.searchAndGetBooks(searchterm);
                 ObservableList<Bok> bookData = FXCollections.observableArrayList(bokSearchResults);
                 notLoggedInBookSearchTable.setItems(bookData);
                 if(DEBUGPRINTOUTS) System.out.println("smallSearchWindowController: Rows added to table: " + bookData.size());
                 break;
             case FILM:
-                List<Film> searchResults = super.getState().databaseService.searchAndGetFilms(searchtermBoxContents.getText().trim());
-                ObservableList<Film> filmData = FXCollections.observableArrayList(searchResults);
+                filmSearchResults = filmDatabaseService.searchAndGetFilms(searchterm);
+                ObservableList<Film> filmData = FXCollections.observableArrayList(filmSearchResults);
                 FilmSearchTable.setItems(filmData);
                 if(DEBUGPRINTOUTS) System.out.println("smallSearchWindowController: Rows added to table: " + filmData.size());
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + mode);
         }
-
-
-
 
     }
 

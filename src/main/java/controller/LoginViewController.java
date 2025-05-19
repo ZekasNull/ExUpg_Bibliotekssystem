@@ -8,17 +8,29 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import model.Användare;
+import service.UserDatabaseService;
 import state.ApplicationState;
 
 import java.util.Observable;
 
 public class LoginViewController extends Controller{
-    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTS;
-    private ApplicationState state = ApplicationState.getInstance();
+    private final boolean DEBUGPRINTOUTS = MainApplication.DEBUGPRINTING;
+    private UserDatabaseService userDatabaseService;
+    private ApplicationState state;
     @FXML
     public Button logInButton;
     public TextField idealBoxContents;
     public PasswordField pinBoxContents;
+
+    public void initialize() {
+    }
+
+    @Override
+    public void loadServicesFromState() {
+        super.loadServicesFromState();
+        this.state = getState();
+        userDatabaseService = state.getUserDatabaseService();
+    }
 
     public void onLogInButtonCLick(ActionEvent actionEvent) {
         if (idealBoxContents.getText().isEmpty() && pinBoxContents.getText().isEmpty()) {
@@ -32,8 +44,7 @@ public class LoginViewController extends Controller{
             return;
         }
         //TODO kontrollern ska ansvara för att analysera informationen i användaren som hämtas (dvs rätt användartyp)
-        if (DEBUGPRINTOUTS) System.out.println("LoginViewController: onloginbutton");
-        Användare user = state.databaseService.logInUser(idealBoxContents.getText(), pinBoxContents.getText());
+        Användare user = userDatabaseService.logInUser(idealBoxContents.getText(), pinBoxContents.getText());
         showLoginConfirmationPopup(user != null);
         if (user != null) state.setCurrentUser(user);
 

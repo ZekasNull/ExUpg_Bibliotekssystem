@@ -1,16 +1,14 @@
 package state;
 
 import d0024e.exupg_bibliotekssystem.MainApplication;
-import d0024e.exupg_bibliotekssystem.ViewLoader;
-import db.DatabaseService;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import service.ViewLoader;
 import model.Användare;
 import model.Bok;
 import model.Film;
 import service.BookDatabaseService;
+import service.FilmDatabaseService;
+import service.UserDatabaseService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -22,44 +20,74 @@ import java.util.Observable;
  */
 public class ApplicationState extends Observable {
     //debug
-    public final boolean DEBUGPRINTS = MainApplication.DEBUGPRINTS;
+    private final boolean DEBUGPRINTS = MainApplication.DEBUGPRINTING;
 
-    //servicereferenser
-    public MainApplication app;
-    public final DatabaseService databaseService;
-    private static ApplicationState instance;
-    public ViewLoader vy;
+    //databastjänster
+    private BookDatabaseService bookDatabaseService;
+    private FilmDatabaseService filmDatabaseService;
+    private UserDatabaseService userDatabaseService;
+
+    //programtjänster
+    private ViewLoader viewLoaderService;
+
 
     //data
     private List<Bok> bookSearchResults;
     private List<Film> filmSearchResults;
     private Användare currentUser;
-    private ObservableList<BorrowItemInterface> borrowList;
-    public ObservableList<BorrowItemInterface> getBorrowList() {
-        if (borrowList == null) {
-            ArrayList<BorrowItemInterface> locallist = new ArrayList<BorrowItemInterface>();
-            borrowList = FXCollections.observableArrayList(locallist);
-        }
-        return borrowList;
-    }
-    //updates
+
+
+
+    //enum för uppdateringstyp
     public enum UpdateType {
         BOOK, FILM, USER
     }
 
-
-
     //singleton-konstruktor
-    public static ApplicationState getInstance() {
-        if (instance == null) {
-            instance = new ApplicationState();
-        }
-        return instance;
+//    public static ApplicationState getInstance() {
+//        if (instance == null) {
+//            instance = new ApplicationState();
+//        }
+//        return instance;
+//    }
+    public ApplicationState() {
+        //skapa databastjänstreferenser
+        bookDatabaseService = new BookDatabaseService();
+        filmDatabaseService = new FilmDatabaseService();
+        userDatabaseService = new UserDatabaseService();
+
+        //skapa programtjänstreferenser
+        viewLoaderService = new ViewLoader(this);
     }
-    private ApplicationState() {
-        this.databaseService = new DatabaseService();
-        this.vy = new ViewLoader();
+
+    //getters och setters för tjänster
+
+    public ViewLoader getViewLoaderService() {
+        return viewLoaderService;
     }
+
+    public UserDatabaseService getUserDatabaseService() {
+        return userDatabaseService;
+    }
+    public void setUserDatabaseService(UserDatabaseService userDatabaseService) {
+        this.userDatabaseService = userDatabaseService;
+    }
+
+    public FilmDatabaseService getFilmDatabaseService() {
+        return filmDatabaseService;
+    }
+    public void setFilmDatabaseService(FilmDatabaseService filmDatabaseService) {
+        this.filmDatabaseService = filmDatabaseService;
+    }
+
+    public BookDatabaseService getBookDatabaseService() {
+        return bookDatabaseService;
+    }
+    public void setBookDatabaseService(BookDatabaseService bookDatabaseService) {
+        this.bookDatabaseService = bookDatabaseService;
+    }
+
+    //getters och setters för data
 
     public List<Bok> getBookSearchResults() {
         return bookSearchResults;
@@ -75,6 +103,7 @@ public class ApplicationState extends Observable {
         return currentUser;
     }
     public void setCurrentUser(Användare currentUser) {
+        if (DEBUGPRINTS) System.out.println("ApplicationState: Setting currentUser and notifying observers.");
         this.currentUser = currentUser;
         setChanged();
         notifyObservers(UpdateType.USER);
@@ -88,4 +117,18 @@ public class ApplicationState extends Observable {
         setChanged();
         notifyObservers(UpdateType.FILM);
     }
+
+    //metoder
+
+    /**
+     * Om användarens information behöver uppdateras. Försöker hitta nuvarande användare i databasen och uppdatera.
+     */
+    public void updateUserInformation() {
+        if (DEBUGPRINTS) System.out.println("ApplicationState: Updating user information.");
+        currentUser = userDatabaseService.getUser(currentUser);
+        setChanged();
+        notifyObservers(UpdateType.USER);
+    }
+
+
 }

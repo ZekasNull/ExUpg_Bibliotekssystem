@@ -4,6 +4,14 @@ import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
+@NamedNativeQuery(
+        name = "getReturnDate",
+        query = "SELECT lånedatum + lånperiod " +
+                "FROM bibliotekssystem.\"Lån\" l " +
+                "JOIN bibliotekssystem.\"Exemplar\" e ON l.streckkod = e.streckkod " +
+                "JOIN bibliotekssystem.\"Låneperiod\" lp ON e.låntyp = lp.låntyp " +
+                "WHERE l.lån_id = ?"
+)
 @Table(name = "\"Lån\"", schema = "bibliotekssystem")
 public class Lån {
     @Id

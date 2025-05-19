@@ -52,23 +52,20 @@ public class DatabaseService {
 
     }
 
-    public Instant getReturnDateForLoan(Lån lån) {
-        System.out.println(lån.getId());
 
+    public Instant getReturnDateForLoan(Lån lån) {
         EntityManager em = DBC.getEntityManager();
-        Query returnDateQuery = em.createNativeQuery("SELECT * FROM bibliotekssystem.sf_get_return_date(?1)");
+        Query returnDateQuery = em.createNamedQuery("getReturnDate");
         returnDateQuery.setParameter(1, lån.getId());
 
         try {
             em.getTransaction().begin();
             Timestamp returdatum = (Timestamp) returnDateQuery.getSingleResult();
-            System.out.println(returdatum);
             em.getTransaction().commit();
             return returdatum.toInstant();
         } finally {
             em.close();
         }
-
     }
 
 

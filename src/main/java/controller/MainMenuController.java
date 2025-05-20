@@ -466,7 +466,7 @@ public class MainMenuController extends Controller {
     }
 
     public void borrowTableClicked(MouseEvent mouseEvent) {
-        //unnecessary?
+        removeLoanButton.setDisable(exemplarToBorrowList.isEmpty());
     }
 
     public void exemplarViewTableClicked(MouseEvent mouseEvent) {
@@ -485,7 +485,12 @@ public class MainMenuController extends Controller {
             borrowObjectButton.setDisable(true);
             return;
         }
-        borrowObjectButton.setDisable(false);
+        if(exemplarToBorrowList.contains(ex)){ //får inte låna samma ex flera gånger
+            borrowObjectButton.setDisable(true);
+        }else{
+            borrowObjectButton.setDisable(false);
+        }
+
 
     }
 

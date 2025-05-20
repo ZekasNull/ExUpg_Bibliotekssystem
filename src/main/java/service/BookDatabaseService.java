@@ -62,6 +62,28 @@ public class BookDatabaseService {
         }
     }
 
+    public List<Tidskrift> searchAndGetTidskrifter(String searchterm) {
+        List<Tidskrift> resultlist;
+        EntityManager em = DBC.getEntityManager();
+
+        TypedQuery<Tidskrift> query = em.createQuery(
+                "SELECT t " +
+                        "FROM Tidskrift t " +
+                        "WHERE LOWER(t.namn) LIKE LOWER(CONCAT('%', :searchterm, '%')) ", Tidskrift.class);
+        query.setParameter("searchterm", searchterm);
+        try {
+            em.getTransaction().begin();
+            resultlist = query.getResultList();
+            em.getTransaction().commit();
+        } catch (NoResultException e) {
+            if (DEBUGPRINTS) System.out.println("BookDatabaseService: No tidskrifter found with searchterm: " + searchterm);
+            resultlist = null;
+        } finally {
+            em.close();
+        }
+        return resultlist;
+    }
+
     public void addNewBook(Bok book) {
         if (DEBUGPRINTS) System.out.println("bookdbservice: incoming book to add: " + book.getTitel());
         EntityManager em = DBC.getEntityManager();

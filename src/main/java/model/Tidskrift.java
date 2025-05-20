@@ -15,7 +15,7 @@ public class Tidskrift {
     @Column(name = "namn", nullable = false, length = 25)
     private String namn;
 
-    @OneToMany(mappedBy = "tidskrift")
+    @OneToMany(mappedBy = "tidskrift", fetch = FetchType.EAGER)
     private Set<Upplaga> upplagas = new LinkedHashSet<>();
 
     public Set<Upplaga> getUpplagas() {

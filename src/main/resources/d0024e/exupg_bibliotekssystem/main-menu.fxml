@@ -71,5 +71,12 @@
       </Label>
       <Button fx:id="removeLoanButton" layoutX="612.0" layoutY="486.0" mnemonicParsing="false" onAction="#removeLoanButtonClicked" text="Ta bort" />
       <Label fx:id="userRoleLabel" layoutX="639.0" layoutY="46.0" text="User role label" />
+      <TableView fx:id="tidskriftTable" layoutX="19.0" layoutY="170.0" prefHeight="200.0" prefWidth="715.0" visible="false">
+        <columns>
+          <TableColumn fx:id="tidskriftNameColumn" prefWidth="230.0" text="Tidskrift" />
+          <TableColumn fx:id="tidskriftYearColumn" prefWidth="221.0" text="År" />
+            <TableColumn fx:id="tidskriftIssueColumn" prefWidth="263.0" text="Nr." />
+        </columns>
+      </TableView>
    </children>
 </AnchorPane>

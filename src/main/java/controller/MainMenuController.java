@@ -83,6 +83,19 @@ public class MainMenuController extends Controller {
     public TableColumn<Film, String> actorsColumn;
     public TableColumn<Film, String> genreColumn;
 
+    //tableview tidskrift
+    @FXML
+    private TableView<Upplaga> tidskriftTable;
+
+    @FXML
+    private TableColumn<Upplaga, String> tidskriftNameColumn;
+
+    @FXML
+    private TableColumn<Upplaga, Integer> tidskriftYearColumn;
+
+    @FXML
+    private TableColumn<Upplaga, Integer> tidskriftIssueColumn;
+
     //exemplar
     @FXML
     private TableView<Exemplar> exemplarViewTable;
@@ -166,6 +179,12 @@ public class MainMenuController extends Controller {
                 return new SimpleStringProperty(cellData.getValue().getBok().getTitel());
             }
         });
+
+        //tidskrifttable
+        tidskriftNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTidskrift().getNamn()));
+        tidskriftYearColumn.setCellValueFactory(new PropertyValueFactory<>("år"));
+        tidskriftIssueColumn.setCellValueFactory(new PropertyValueFactory<>("upplaga_nr"));
+
     }
 
     @Override
@@ -186,18 +205,36 @@ public class MainMenuController extends Controller {
     public void handleBokOption(ActionEvent actionEvent) {
         notLoggedInBookSearchTable.setVisible(true);
         notLoggedInFilmSearchTable.setVisible(false);
+        tidskriftTable.setVisible(false);
+
+        exemplarViewTable.setDisable(false);
+
         selectedObjectType = "Bok";
         objektTypFlerVal.setText(selectedObjectType); //Sätter vilket typ av objekt som ska sökas efter
     }
 
     public void handleFilmOption(ActionEvent actionEvent) {
+        //set tables
         notLoggedInBookSearchTable.setVisible(false);
         notLoggedInFilmSearchTable.setVisible(true);
+
+        exemplarViewTable.setDisable(false);
+        //
+        tidskriftTable.setVisible(false);
         selectedObjectType = "Film";
         objektTypFlerVal.setText(selectedObjectType);
     }
 
     public void handleTidskriftOption(ActionEvent actionEvent) {
+        //set tables
+        notLoggedInBookSearchTable.setVisible(false);
+        notLoggedInFilmSearchTable.setVisible(false);
+
+        exemplarViewTable.setDisable(true);
+        //set option thing
+
+        //class var
+        tidskriftTable.setVisible(true);
         selectedObjectType = "Tidskrift";
         objektTypFlerVal.setText(selectedObjectType);
     }
@@ -209,6 +246,8 @@ public class MainMenuController extends Controller {
         * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
         */
         String trimmedSearchTerm = searchtermBoxContents.getText().trim();
+
+        //check that user selected options and entered text
         if (trimmedSearchTerm.isEmpty()&& selectedObjectType == null){
             showErrorPopup("Du måste välja en objekttyp och minst ett sökord");
             return;
@@ -220,31 +259,37 @@ public class MainMenuController extends Controller {
             return;
         }
 
-        if(selectedObjectType.equals("Bok")){
-            List<Bok> searchTerm = bookDatabaseService.searchAndGetBooks(trimmedSearchTerm);
-            ObservableList<Bok> data = FXCollections.observableArrayList(searchTerm);
-            notLoggedInBookSearchTable.setItems(data);
-            if (DEBUGPRINTOUTS)
-                System.out.println("MainMenuController: Rows added to table: " + data.size() + " Bok");
 
+        switch(selectedObjectType) {
+            case "Bok":
+                List<Bok> bokResults = bookDatabaseService.searchAndGetBooks(trimmedSearchTerm);
+                ObservableList<Bok> bookData = FXCollections.observableArrayList(bokResults);
+                notLoggedInBookSearchTable.setItems(bookData);
+                if (DEBUGPRINTOUTS)
+                    System.out.println("MainMenuController: Rows added to table: " + bookData.size() + " Bok");
 
+                break;
+            case "Film":
+                List<Film> filmResults = filmDatabaseService.searchAndGetFilms(trimmedSearchTerm);
+                ObservableList<Film> filmData = FXCollections.observableArrayList(filmResults);
+                notLoggedInFilmSearchTable.setItems(filmData);
+                if (DEBUGPRINTOUTS)
+                    System.out.println("MainMenuController: Rows added to table: " + filmData.size() + " Film");
+                break;
+            case "Tidskrift":
+                List<Tidskrift> tidskriftsResults = bookDatabaseService.searchAndGetTidskrifter(trimmedSearchTerm);
+                ObservableList<Upplaga> tidskriftData = FXCollections.observableArrayList();
+                for(Tidskrift t : tidskriftsResults) {
+                    tidskriftData.addAll(t.getUpplagas());
+                }
+
+                tidskriftTable.setItems(tidskriftData);
+                break;
+            default:
+                if (DEBUGPRINTOUTS)
+                    System.out.println("MainMenuController: Invalid search state");
+                break;
         }
-        else if (selectedObjectType.equals("Film")){
-            List<Film> searchTerm = filmDatabaseService.searchAndGetFilms(trimmedSearchTerm);
-            ObservableList<Film> data = FXCollections.observableArrayList(searchTerm);
-            notLoggedInFilmSearchTable.setItems(data);
-            if (DEBUGPRINTOUTS)
-                System.out.println("MainMenuController: Rows added to table: " + data.size() + " Film");
-
-
-        }
-        /*else if (selectedObject.equals("Tidskrift")){
-            List<Tidskrift> searchTerm = state.databaseService.searchTidskrift(searchtermBoxContents.getText());
-
-            ObservableList<Tidskrift> data = FXCollections.observableArrayList(searchTerm);
-            notLoggedInSearchTable.setItems(data);
-        }
-        Utkommenterad tills vidare*/
     }
 
     public void onLogOutButtonClick(ActionEvent actionEvent) {
@@ -442,5 +487,9 @@ public class MainMenuController extends Controller {
         }
         borrowObjectButton.setDisable(false);
 
+    }
+
+    private void borrowingAllowed (Boolean state) {
+        borrowObjectButton.setDisable(!state);
     }
 }

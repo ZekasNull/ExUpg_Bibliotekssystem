@@ -36,7 +36,7 @@ public class Upplaga {
         this.id = id;
     }
 
-    public Integer getUpplagaNr() {
+    public Integer getUpplaga_nr() {
         return upplagaNr;
     }
 

@@ -345,6 +345,7 @@ public class AddFilmViewController extends Controller {
 
         film.getExemplars().add(ex); //lägg också till i filmens lista för konsistens
         exemplarList.add(ex);
+        removeExemplarButton.setDisable(false); //läggs ett ex till kan det tas bort
         hasChangedFilms = true; //nytt ex på en film räknas som att filmen ändrades och hanteras när filmer uppdateras
     }
 
@@ -423,6 +424,7 @@ public class AddFilmViewController extends Controller {
     void confirmButtonPressed(ActionEvent event) {
         ArrayList<Film> processedFilms = new ArrayList<>(); //filmer som har hanterats ska inte gå in i changed
         if (hasNewFilms) {
+            if(DEBUGPRINTOUTS) System.out.println("AddFilmViewController: hasNewFilms");
             for (Film f : filmList) {
                 if(f.getId() == null) //hantera endast nya filmer
                 filmDatabaseService.addNewFilm(f);
@@ -431,6 +433,7 @@ public class AddFilmViewController extends Controller {
         }
         filmList.removeAll(processedFilms); //när nya filmer är klara, ta bort från listan
         if (hasChangedFilms) {
+            if(DEBUGPRINTOUTS) System.out.println("AddFilmViewController: hasChangedFilms");
             for (Film f : filmList) {
                 filmDatabaseService.updateFilm(f);
             }
@@ -448,6 +451,8 @@ public class AddFilmViewController extends Controller {
 
         if(hasChangedFilms || hasNewFilms) {
             showInformationPopup("Ändringarna skickades till databasen!");
+            hasChangedFilms = false;
+            hasNewFilms = false;
         }else {
             showInformationPopup("Det finns inga ändringar att skicka.");
         }

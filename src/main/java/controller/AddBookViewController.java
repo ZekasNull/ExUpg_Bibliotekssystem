@@ -436,6 +436,8 @@ public class AddBookViewController extends Controller {
         }
         if (hasChangedBooks || hasNewBooks || !bookDeletionList.isEmpty() || !exemplarDeletionList.isEmpty()) {
             showInformationPopup("Ändringarna skickades till databasen!");
+            hasChangedBooks = false;
+            hasNewBooks = false;
         } else {
             showInformationPopup("Det finns inga ändringar att skicka.");
         }

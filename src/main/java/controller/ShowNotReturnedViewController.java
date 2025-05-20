@@ -91,6 +91,6 @@ public class ShowNotReturnedViewController extends Controller {
 
     @FXML
     public void onGoBackToHandleInventoryClick(ActionEvent actionEvent) {
-        viewLoader.setView(ViewLoader.Views.HANDLE_INVENTORY);
+        viewLoader.setView(ViewLoader.Views.LIBRARIAN_FIRST_CHOICE);
     }
 }

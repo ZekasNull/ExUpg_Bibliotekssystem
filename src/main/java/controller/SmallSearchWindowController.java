@@ -108,7 +108,7 @@ public class SmallSearchWindowController extends Controller {
                                         .map(Ämnesord::getOrd)
                                         .collect(Collectors.joining(", "))
                         )
-                //cellData = en instans av "CellDataFetures<Bok, String> som ger access till objektet Bok som kommer skrivas ut i vilken rad det gäller i Tableview
+                //cellData = en instans av "CellDataFetures<Objekt, String> som ger access till objektet som kommer skrivas ut i vilken rad det gäller i Tableview
         );
         //Här är det fråga om sammansätta förnamn och efternamn
         authorNameColumn.setCellValueFactory(cellData -> {

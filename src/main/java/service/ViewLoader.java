@@ -24,6 +24,7 @@ public class ViewLoader {
     private Map<String, Scene> views = new HashMap<>();
 
     public enum Views {
+        //Lägger in views i lättåtkomliga ord
         MAIN_MENU("Huvudmeny", "/d0024e/exupg_bibliotekssystem/main-menu.fxml"),
         HANDLE_BOOKS("Hantera böcker", "/d0024e/exupg_bibliotekssystem/add-book-view.fxml"),
         HANDLE_MOVIES("Hantera filmer", "/d0024e/exupg_bibliotekssystem/add-movie-view.fxml"),
@@ -94,6 +95,7 @@ public class ViewLoader {
         }
     }
 
+    //Då popup ska komma som ett separat Stage, laddas de in här när de behövs
     public void loadPopup(Views views) throws IOException {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(views.getFxmlPath()));
             Scene scene = new Scene(loader.load());
@@ -130,30 +132,3 @@ public class ViewLoader {
     }
 
 }
-    /*public ViewLoader(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        this.APPSTATE = ApplicationState.getInstance();
-    }
-
-    public void loadScene(String fxmlFile, String title) {
-        try{
-            FXMLLoader loader = new FXMLLoader(this.APPSTATE.app.getClass().getResource(fxmlFile));
-            Scene scene = new Scene(loader.load());
-
-            Controller controller = loader.getController();
-            controller.setState(APPSTATE);
-            if (controller instanceof ShowProfileViewController) {
-                ((ShowProfileViewController) loader.getController()).loadData();
-            }
-
-            APPSTATE.addObserver(controller);
-
-            primaryStage.setScene(scene);
-            primaryStage.setTitle(title);
-            primaryStage.show();
-
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
-

@@ -50,7 +50,7 @@ public class AddBookViewController extends Controller {
         BOK("bok"),
         KURSLITTERATUR("kurslitteratur"),
         REFERENSLITTERATUR("referenslitteratur"),
-        NOT_SELECTED("imgoingtoFUCKINGkillmyself");
+        NOT_SELECTED("ingetvalt");
 
         private final String låntyp;
 

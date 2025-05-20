@@ -199,16 +199,19 @@ public class MainMenuController extends Controller {
 
     public void onUserLogInViewButtonClick(ActionEvent actionEvent) throws IOException {
         viewLoader.loadPopup(ViewLoader.Views.LOGIN_WINDOW);
-        //ger pop-up istället för utbyte av scenen som viewloader skulle
+        //ger pop-up istället för utbyte av hela Stage
     }
 
     public void handleBokOption(ActionEvent actionEvent) {
+        //set tables
         notLoggedInBookSearchTable.setVisible(true);
         notLoggedInFilmSearchTable.setVisible(false);
         tidskriftTable.setVisible(false);
 
         exemplarViewTable.setDisable(false);
+        //aktivera exemplartable
 
+        //class var
         selectedObjectType = "Bok";
         objektTypFlerVal.setText(selectedObjectType); //Sätter vilket typ av objekt som ska sökas efter
     }
@@ -219,7 +222,9 @@ public class MainMenuController extends Controller {
         notLoggedInFilmSearchTable.setVisible(true);
 
         exemplarViewTable.setDisable(false);
-        //
+        //aktivera exemplartable
+
+        //class var
         tidskriftTable.setVisible(false);
         selectedObjectType = "Film";
         objektTypFlerVal.setText(selectedObjectType);
@@ -231,7 +236,7 @@ public class MainMenuController extends Controller {
         notLoggedInFilmSearchTable.setVisible(false);
 
         exemplarViewTable.setDisable(true);
-        //set option thing
+        //aktivera exemplartable
 
         //class var
         tidskriftTable.setVisible(true);
@@ -242,8 +247,8 @@ public class MainMenuController extends Controller {
 //TODO: Se till att det inte blir randomized ämnesord
 
     public void onSearchButtonClick(ActionEvent actionEvent) {
-        /*Faktiska som körs och inte bara hämtar information
-        * Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn) och går till den det gäller
+        /*Den går igenom vilket objekt som för nuvarande finns i splitmenubutton (drop down menyn)
+         och går till den det gäller
         */
         String trimmedSearchTerm = searchtermBoxContents.getText().trim();
 

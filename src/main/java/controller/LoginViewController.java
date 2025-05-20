@@ -43,7 +43,6 @@ public class LoginViewController extends Controller{
             showErrorPopup("Du måste ange ditt pinnummer");
             return;
         }
-        //TODO kontrollern ska ansvara för att analysera informationen i användaren som hämtas (dvs rätt användartyp)
         Användare user = userDatabaseService.logInUser(idealBoxContents.getText(), pinBoxContents.getText());
         showLoginConfirmationPopup(user != null);
         if (user != null) state.setCurrentUser(user);
@@ -60,6 +59,7 @@ public class LoginViewController extends Controller{
         alert.setHeaderText("Login attempt");
         alert.setContentText("The login attempt was" + (success ? "" : "n't") + " successful.");
         alert.showAndWait();
+        //TODO: Stäng fönstret vid lyckad inlogg
     }
 }
 

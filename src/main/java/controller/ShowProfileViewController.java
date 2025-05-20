@@ -66,47 +66,6 @@ public class ShowProfileViewController extends Controller{
         super.loadServicesFromState();
         userDatabaseService = getState().getUserDatabaseService();
     }
-//Ger upp, chatgpt i loadData
-    public void loadData() {
-        if (getState().getCurrentUser() == null) return;
-
-        Set<Lån> loansSet = getState().getCurrentUser().getLåns();
-
-        // ❶ fetch return‑date once per loan and store in the transient field
-        for (Lån l : loansSet) {
-            Instant rd = getState().getUserDatabaseService().getReturnDateForLoan(l);
-            l.setReturDatum(rd);          // fills the transient field
-        }
-
-        // ❷ convert to observable list & bind table
-        loans = FXCollections.observableArrayList(loansSet);
-
-
-        /*if (super.getState() .getCurrentUser() == null) return; //Just-in-case
-        System.out.println("loadData was called");
-
-        System.out.println(super.getState().getCurrentUser().getLåns());
-
-        Set<Lån> loansSet = super.getState().getCurrentUser().getLåns();
-
-        ObservableList<Lån> loans = FXCollections.observableArrayList(loansSet);
-
-        UserShowProfileViewLoanTable.setItems(loans);
-        TitleColumn.setCellValueFactory(cellData -> {
-            var streckkod = cellData.getValue().getStreckkod();
-            if(streckkod.getBok() == null) {
-                return new SimpleStringProperty(streckkod.getFilm_id().getTitel());
-            }
-            else{
-                return new SimpleStringProperty(streckkod.getBok().getTitel());
-            }
-        });
-        BarcodeColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getStreckkod().getStreckkod().toString()));
-        BorrowDateColumn.setCellValueFactory(new PropertyValueFactory<>("lånedatum"));
-        ReturnDateColumn.setCellValueFactory(new PropertyValueFactory<>("returDatum"));*/
-
-    }
 
     public void onReturnToMainMenuButtonClick(ActionEvent actionEvent) {
         viewLoader.setView(ViewLoader.Views.MAIN_MENU);
@@ -119,19 +78,6 @@ public class ShowProfileViewController extends Controller{
         userDatabaseService.returnLoan(lån);
         getState().updateUserInformation();
 
-//        try {
-//            super.getState().getDatabaseService().raderaObjekt(selectedLoans);
-//            loadData();
-//        } catch (PSQLException e) {
-//            String msg = e.getMessage();
-//            if (msg != null && msg.contains("some specific database error text")) {
-//                showErrorPopup("Kan inte returnera lån: " + msg);
-//            } else {
-//                throw e;
-//            }
-//        } catch (Exception e) {
-//            showErrorPopup("Kunde inte returnera lån: " + e.getMessage());
-//        }
     }
 
     @Override

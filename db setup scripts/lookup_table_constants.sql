@@ -1,11 +1,11 @@
-INSERT INTO "Användartyp"
+INSERT INTO bibliotekssystem."Användartyp"
 VALUES ('allmänhet', 1),
        ('student', 2),
        ('forskare', 5),
        ('unianställda', 3),
        ('bibliotekarie', 5);
 
-INSERT INTO "Låneperiod"
+INSERT INTO bibliotekssystem."Låneperiod"
 VALUES ('kurslitteratur', '14 days'),
        ('bok', '1 month'),
        ('film', '7 days'),

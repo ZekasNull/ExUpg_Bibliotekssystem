@@ -63,7 +63,7 @@ public class ViewLoader {
     }
 
     public void prepareViews() throws IOException {
-        loadAndStoreView(Views.MAIN_MENU.getTitle(), Views.MAIN_MENU.getFxmlPath());
+        loadAndStoreView(Views.HANDLE_BOOKS.title, Views.HANDLE_BOOKS.fxmlPath);
         loadAndStoreView(Views.HANDLE_MOVIES.getTitle(), Views.HANDLE_MOVIES.getFxmlPath());
         loadAndStoreView(Views.HANDLE_INVENTORY.getTitle(), Views.HANDLE_INVENTORY.getFxmlPath());
         loadAndStoreView(Views.LIBRARIAN_FIRST_CHOICE.getTitle(), Views.LIBRARIAN_FIRST_CHOICE.getFxmlPath());

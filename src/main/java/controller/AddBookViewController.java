@@ -112,6 +112,9 @@ public class AddBookViewController extends Controller {
 
     //buttons
     @FXML
+    private Button confirmButton;
+
+    @FXML
     private Button addNewBookButton;
 
     @FXML
@@ -542,6 +545,7 @@ public class AddBookViewController extends Controller {
         searchBookButton.setDisable(false);
         addNewBookButton.setDisable(false);
         editBookButton.setDisable(bookList.isEmpty());
+        confirmButton.setDisable(false);
     }
 
     /**
@@ -582,6 +586,7 @@ public class AddBookViewController extends Controller {
         searchBookButton.setDisable(true);
         addNewBookButton.setDisable(true);
         editBookButton.setDisable(true);
+        confirmButton.setDisable(true);
     }
 
     /**
@@ -606,6 +611,7 @@ public class AddBookViewController extends Controller {
         searchBookButton.setDisable(true);
         addNewBookButton.setDisable(true);
         editBookButton.setDisable(true);
+        confirmButton.setDisable(true);
 
     }
 

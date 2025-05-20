@@ -49,7 +49,7 @@
       <Button fx:id="addExemplarButton" disable="true" layoutX="678.0" layoutY="517.0" mnemonicParsing="false" onAction="#addExemplarTableButtonPressed" text="Lägg till" />
       <Button fx:id="removeExemplarButton" disable="true" layoutX="748.0" layoutY="517.0" mnemonicParsing="false" onAction="#removeExemplarButtonPressed" text="Ta bort" />
       <Button fx:id="searchFilmButton" layoutX="401.0" layoutY="37.0" mnemonicParsing="false" onAction="#searchExistingFilmButtonPressed" text="Sök existerande film" />
-      <Button layoutX="691.0" layoutY="683.0" mnemonicParsing="false" onAction="#confirmButtonPressed" text="Bekräfta ändringar" />
+      <Button fx:id="confirmButton" layoutX="691.0" layoutY="683.0" mnemonicParsing="false" onAction="#confirmButtonPressed" text="Bekräfta ändringar" />
       <Button layoutX="622.0" layoutY="683.0" mnemonicParsing="false" onAction="#cancelButtonPressed" text="Avbryt" />
       <Button fx:id="addNewFilmButton" layoutX="414.0" layoutY="66.0" mnemonicParsing="false" onAction="#addNewFilmToListButtonPressed" text="Lägg till ny film" />
       <TextField fx:id="idBoxContents" disable="true" layoutX="218.0" layoutY="78.0" />

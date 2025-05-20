@@ -111,6 +111,9 @@ public class AddFilmViewController extends Controller {
 
     //buttons
     @FXML
+    private Button confirmButton;
+
+    @FXML
     private Button addActorButton;
 
     @FXML
@@ -409,6 +412,7 @@ public class AddFilmViewController extends Controller {
     void cancelButtonPressed(ActionEvent event) {
         if(formMode == FormMode.ADDING || formMode == FormMode.EDITING) {
             setWindowToDefaultState();
+            clearForm();
         } else {
             viewLoader.setView(ViewLoader.Views.HANDLE_INVENTORY);
             setWindowToResetState();
@@ -520,6 +524,9 @@ public class AddFilmViewController extends Controller {
         addExemplarButton.setDisable(filmList.isEmpty());
         removeExemplarButton.setDisable(exemplarList.isEmpty());
 
+        //confirm button
+        confirmButton.setDisable(false);
+
     }
 
     private void setWindowToAddingFilmState() {
@@ -540,7 +547,8 @@ public class AddFilmViewController extends Controller {
         removeExemplarButton.setDisable(true);
         addExemplarButton.setDisable(true);
 
-
+        //confirm
+        confirmButton.setDisable(true);
     }
 
     private void setWindowToEditingFilmState() {
@@ -561,6 +569,9 @@ public class AddFilmViewController extends Controller {
         searchFilmButton.setDisable(true);
         addNewFilmButton.setDisable(true);
         editFilmButton.setDisable(true);
+
+        //confirm
+        confirmButton.setDisable(true);
     }
 
     private void setWindowToResetState() {

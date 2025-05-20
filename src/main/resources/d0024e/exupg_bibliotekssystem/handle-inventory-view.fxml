@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.HandleInventoryViewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.HandleInventoryViewController">
    <children>
       <Label layoutX="193.0" layoutY="41.0" text="Vad vill du göra?">
          <font>
             <Font size="29.0" />
          </font>
       </Label>
-      <Label fx:id="HandleBooksButton" layoutX="219.0" layoutY="165.0" onMouseClicked="#onHandleBooksButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" text="Hantera böcker">
+      <Label fx:id="HandleBooksButton" layoutX="220.0" layoutY="136.0" onMouseClicked="#onHandleBooksButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" text="Hantera böcker">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Label fx:id="HandleMoviesButton" layoutX="225.0" layoutY="277.0" onMouseClicked="#onHandleMoviesButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" text="Hantera filmer">
+      <Label fx:id="HandleMoviesButton" layoutX="226.0" layoutY="208.0" onMouseClicked="#onHandleMoviesButtonClick" style="-fx-text-fill: black; -fx-underline: true; -fx-cursor: hand;" text="Hantera filmer">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Button fx:id="GoBackToFirstChoiceButton" layoutX="20.0" layoutY="16.0" mnemonicParsing="false" text="Gå tillbaka" onAction="#onGoBackToFirstChoiceButtonClick" />
+      <Button fx:id="GoBackToFirstChoiceButton" layoutX="20.0" layoutY="16.0" mnemonicParsing="false" onAction="#onGoBackToFirstChoiceButtonClick" text="Gå tillbaka" />
+      <ToggleButton layoutX="482.0" layoutY="327.0" mnemonicParsing="false" onAction="#doNotPushPushed" text="DO NOT PUSH" textFill="RED" underline="true" />
+      <Button fx:id="detonateProgramButton" layoutX="472.0" layoutY="362.0" mnemonicParsing="false" onAction="#detonateProgramButtonPressed" text="Detonera program" visible="false" />
    </children>
 </AnchorPane>

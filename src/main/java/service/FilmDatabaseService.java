@@ -93,7 +93,7 @@ public class FilmDatabaseService {
     public void updateFilm(Film film) {
         EntityManager em = DBC.getEntityManager();
         if (DEBUGPRINTS) System.out.println("filmdbservice: incoming film to update: " + film.getTitel() +
-                "\n State in database: " + em.find(Film.class, film));
+                "\n State in database: " + em.find(Film.class, film.getId()));
 
 
         try {

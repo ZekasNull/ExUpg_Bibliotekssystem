@@ -37,7 +37,7 @@ public class MainApplication extends Application {
         4. ändra filmen på något sätt
         5. Logga ut
 
-        Söka, låna, återlämna
+        Söka, låna, återlämna, kvittoutskrift:
         6. Logga in som Sven Svensson
         7. Sök efter bok
         8. Köa lån av bok
@@ -48,7 +48,7 @@ public class MainApplication extends Application {
         13. Gå till profil och se lån
         14.  Återlämna lån.
 
-        Ej återlämnade objekt, ta bort objekt, kvittoutskrift:
+        Ej återlämnade objekt, ta bort objekt:
         15. Logga in som Josef
         16. Visa ej återlämnade lån (bör vara ett)
         17. Ta bort testfilm

@@ -92,7 +92,7 @@ public class FilmDatabaseService {
 
     public void updateFilm(Film film) {
         EntityManager em = DBC.getEntityManager();
-        if (DEBUGPRINTS) System.out.println("filmdbservice: incoming film to update: " + film.getTitel() +
+        if (DEBUGPRINTS) System.out.println("FilmDatabaseService: incoming film to update: " + film.toString() +
                 "\n State in database: " + em.find(Film.class, film.getId()));
 
 
@@ -116,15 +116,19 @@ public class FilmDatabaseService {
                 }
             }
 
-            em.merge(film); //detached objekt uppdateras
+            em.merge(film); //detached objekt uppdateras (behöver inte behålla managed object)
             em.getTransaction().commit(); //utför
+
+            if (DEBUGPRINTS) System.out.println("FilmDatabaseService: State after update: "+em.find(Film.class, film.getId()));
         }finally {
             em.close();
         }
+
+
     }
 
     public void deleteFilm(Film film) {
-        if (DEBUGPRINTS) System.out.println("filmdbservice: incoming film to delete: " + film.toString());
+        if (DEBUGPRINTS) System.out.println("FilmDatabaseService: incoming film to delete: " + film.toString());
         EntityManager em = DBC.getEntityManager();
 
         try {
@@ -138,7 +142,7 @@ public class FilmDatabaseService {
     }
     
     public void deleteFilmCopy(Exemplar ex) {
-        if (DEBUGPRINTS) System.out.println("filmdbservice: incoming film copy to delete: " + ex.toString());
+        if (DEBUGPRINTS) System.out.println("FilmDatabaseService: incoming film copy to delete: " + ex.toString());
         EntityManager em = DBC.getEntityManager();
 
         try {
